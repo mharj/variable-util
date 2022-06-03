@@ -2,23 +2,28 @@ import {Config, GetValue} from '../config';
 
 export class FetchJsonEnvConfig extends Config {
 	public type = 'fetch';
-	private req: Request;
+	private requestCallback: () => Promise<Request>;
+	private fetchClient: typeof fetch;
 	private data: Record<string, string> | undefined;
+	private path = 'undefined';
 
-	constructor(input: RequestInfo) {
+	constructor(requestCallback: () => Promise<Request>, fetchClient?: typeof fetch) {
 		super();
-		this.req = new Request(input);
+		this.requestCallback = requestCallback;
+		this.fetchClient = fetchClient || fetch;
 	}
 
 	public async get(key: string): Promise<GetValue> {
 		if (!this.data) {
 			this.data = await this.fetchData();
 		}
-		return Promise.resolve({value: this.data?.[key], path: this.req.url});
+		return Promise.resolve({value: this.data?.[key], path: this.path});
 	}
 
 	private async fetchData() {
-		const res = await fetch(this.req);
+		const req = await this.requestCallback();
+		this.path = req.url;
+		const res = await this.fetchClient(req);
 		if (res.status >= 400) {
 			throw new Error(`http error ${res.status} from FetchEnvConfig`);
 		}
