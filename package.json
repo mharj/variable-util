@@ -1,0 +1,60 @@
+{
+    "name": "variable-util",
+    "version": "0.0.1",
+    "description": "Utility to get variables from multiple resources",
+    "main": "./dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "test": "mocha"
+    },
+    "mocha": {
+        "exit": true,
+        "extension": [
+            "ts",
+            "js"
+        ],
+        "recursive": true,
+        "require": [
+            "ts-node/register",
+            "source-map-support/register"
+        ],
+        "reporters": [
+            "spec",
+            "mocha-junit-reporter"
+        ]
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mharj/variable-util.git"
+    },
+    "keywords": [
+        "env",
+        "variables"
+    ],
+    "author": "mharj",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/mharj/variable-util/issues"
+    },
+    "homepage": "https://github.com/mharj/variable-util#readme",
+    "devDependencies": {
+        "@types/chai": "^4.3.1",
+        "@types/mocha": "^9.1.1",
+        "@types/node": "^16.11.36",
+        "@types/sinon": "^10.0.11",
+        "@typescript-eslint/eslint-plugin": "^5.26.0",
+        "@typescript-eslint/parser": "^5.26.0",
+        "chai": "^4.3.6",
+        "eslint": "^8.16.0",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-config-standard": "^17.0.0",
+        "eslint-plugin-prettier": "^4.0.0",
+        "eslint-plugin-sonarjs": "^0.13.0",
+        "mocha": "^10.0.0",
+        "prettier": "^2.6.2",
+        "sinon": "^14.0.0",
+        "source-map-support": "^0.5.21",
+        "ts-node": "^10.8.0",
+        "typescript": "^4.7.2"
+    }
+}
