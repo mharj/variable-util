@@ -48,6 +48,5 @@ describe('config variable', () => {
 		});
 		expect(await configVar.get('TEST', undefined, {showValue: true})).to.be.eq('asd');
 		expect(infoSpy.getCall(0).args[0]).to.be.eq(`variables: TEST [TEST] from process.env.TEST`);
-		const data = await configVar.get('TEST');
 	});
 });
