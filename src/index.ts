@@ -18,6 +18,7 @@ export class Variables {
 		this.options = options;
 		this.get = this.get.bind(this);
 	}
+
 	// eslint-disable-next-line lines-between-class-members
 	public async get(key: string, defaultValue: string, params?: IParameters): Promise<string>;
 	public async get(key: string, defaultValue?: string | undefined, params?: IParameters): Promise<string | undefined>;
