@@ -1,6 +1,6 @@
-import {Config, GetValue} from '../config';
+import {ConfigLoader, GetValue} from '.';
 
-export class EnvConfig extends Config {
+export class EnvConfigLoader extends ConfigLoader {
 	public type = 'env';
 	public get(key: string): Promise<GetValue> {
 		return Promise.resolve({value: process.env[key], path: `process.env.${key}`});
