@@ -27,6 +27,19 @@ describe('config variable', () => {
 		warnSpy.resetHistory();
 		traceSpy.resetHistory();
 	});
+	it('should return default value', async function () {
+		const configVar = new ConfigVariables([], {
+			logger: {
+				info: infoSpy,
+				debug: debugSpy,
+				error: errorSpy,
+				warn: warnSpy,
+				trace: traceSpy,
+			},
+		});
+		expect(await configVar.get('TEST', 'some_value', {showValue: true})).to.be.eq('some_value');
+		expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [some_value] from default`);
+	});
 	it('should return process react env value', async function () {
 		process.env.REACT_APP_TEST = 'asd';
 		const configVar = new ConfigVariables([new ReactEnvConfigLoader(), new EnvConfigLoader()], {

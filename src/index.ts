@@ -23,13 +23,20 @@ export class ConfigVariables {
 			try {
 				const {value, path} = await config.get(key);
 				if (value) {
-					this.options.logger?.info(`ConfigVariables[${config.type}]: ${key}${printValue(value, params)} from ${path}`);
+					this.printLog(config.type, key, value, path, params);
 					return value;
 				}
 			} catch (err) {
 				this.options.logger?.error(config.type, err);
 			}
 		}
+		if (defaultValue) {
+			this.printLog('default', key, defaultValue, 'default', params);
+		}
 		return defaultValue || undefined;
+	}
+
+	private printLog(type: string, key: string, value: string, path: string, params?: FormatParameters) {
+		this.options.logger?.info(`ConfigVariables[${type}]: ${key}${printValue(value, params)} from ${path}`);
 	}
 }
