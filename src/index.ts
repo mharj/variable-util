@@ -1,42 +1,41 @@
-import {ConfigLoader} from './loaders';
+import {Loader} from './loaders';
 import {FormatParameters, printValue} from './formatUtils';
 import {LoggerLike} from './loggerLike';
 
-interface ConfigVariablesOptions {
-	logger?: LoggerLike;
+let logger: LoggerLike | undefined;
+export function setLogger(newLogger: LoggerLike) {
+	logger = newLogger;
 }
 
-export class ConfigVariables {
-	private configs: ConfigLoader[];
-	private options: ConfigVariablesOptions;
-	constructor(configs: ConfigLoader[], options: ConfigVariablesOptions = {}) {
-		this.configs = configs;
-		this.options = options;
-		this.get = this.get.bind(this);
-	}
-
-	// eslint-disable-next-line lines-between-class-members
-	public async get(key: string, defaultValue: string, params?: FormatParameters): Promise<string>;
-	public async get(key: string, defaultValue?: string | undefined, params?: FormatParameters): Promise<string | undefined>;
-	public async get(key: string, defaultValue?: string | undefined, params?: FormatParameters): Promise<string | undefined> {
-		for (const config of this.configs) {
-			try {
-				const {value, path} = await config.get(key);
-				if (value) {
-					this.printLog(config.type, key, value, path, params);
-					return value;
-				}
-			} catch (err) {
-				this.options.logger?.error(config.type, err);
+/**
+ * @example
+ * const port = await getConfigVariable('PORT', [env()], '8080', {showValue: true});
+ */
+export async function getConfigVariable(rootKey: string, loaders: Loader[], defaultValue: string, params?: FormatParameters): Promise<string>;
+export async function getConfigVariable(
+	rootKey: string,
+	loaders: Loader[],
+	defaultValue?: string | undefined,
+	params?: FormatParameters,
+): Promise<string | undefined>;
+export async function getConfigVariable(rootKey: string, loaders: Loader[], defaultValue?: string | undefined, params?: FormatParameters) {
+	for (const loader of loaders) {
+		try {
+			const {value, path} = await loader.callback(rootKey);
+			if (value) {
+				printLog(loader.type, rootKey, value, path, params);
+				return value;
 			}
+		} catch (err) {
+			logger?.error(err);
 		}
-		if (defaultValue) {
-			this.printLog('default', key, defaultValue, 'default', params);
-		}
-		return defaultValue || undefined;
 	}
+	if (defaultValue) {
+		printLog('default', rootKey, defaultValue, 'default', params);
+	}
+	return defaultValue || undefined;
+}
 
-	private printLog(type: string, key: string, value: string, path: string, params?: FormatParameters) {
-		this.options.logger?.info(`ConfigVariables[${type}]: ${key}${printValue(value, params)} from ${path}`);
-	}
+function printLog(type: string, key: string, value: string, path: string, params?: FormatParameters) {
+	logger?.info(`ConfigVariables[${type}]: ${key}${printValue(value, params)} from ${path}`);
 }

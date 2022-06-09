@@ -1,4 +1,4 @@
-import {ConfigLoader, GetValue} from '.';
+import {ConfigLoader, LoaderValue} from '.';
 import {urlSanitize} from '../formatUtils';
 
 interface FetchConfigLoaderOptions {
@@ -14,7 +14,7 @@ const defaultOptions: FetchConfigLoaderOptions = {
 	payload: 'json',
 };
 
-export class FetchConfigLoader extends ConfigLoader {
+export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	public type = 'fetch';
 	private requestCallback: () => Promise<Request>;
 	private dataPromise: Promise<Record<string, string>> | undefined;
@@ -36,12 +36,13 @@ export class FetchConfigLoader extends ConfigLoader {
 		return this.dataPromise !== undefined;
 	}
 
-	public async get(key: string): Promise<GetValue> {
+	protected async handleLoader(rootKey: string, key: string | undefined): Promise<LoaderValue> {
 		if (!this.dataPromise) {
 			this.dataPromise = this.fetchData();
 		}
 		const data = await this.dataPromise;
-		return Promise.resolve({value: data?.[key], path: this.path});
+		const targetKey = key || rootKey;
+		return {value: data?.[targetKey], path: this.path};
 	}
 
 	private async fetchData() {

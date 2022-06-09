@@ -1,8 +1,11 @@
-import {ConfigLoader, GetValue} from '.';
+import {Loader} from '.';
 
-export class EnvConfigLoader extends ConfigLoader {
-	public type = 'env';
-	public get(key: string): Promise<GetValue> {
-		return Promise.resolve({value: process.env[key], path: `process.env.${key}`});
-	}
-}
+export const env = (key?: string | undefined): Loader => {
+	return {
+		type: 'env',
+		callback: (rootKey) => {
+			const targetKey = key || rootKey;
+			return Promise.resolve({key: rootKey, value: process.env[targetKey], path: `process.env.${targetKey}`});
+		},
+	};
+};

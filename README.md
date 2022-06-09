@@ -5,26 +5,22 @@ Utility to get variables from multiple resources
 ### UI example with react env and fetch API call
 
 ```typescript
-const fetchConfig = new FetchConfigLoader(() => Promise.resolve(new Request('settings.json')));
+// build class based loader
+const fetchEnv = new FetchConfigLoader(() => Promise.resolve(new Request('settings.json'))).getLoader;
 
-// using method call
-const configVariable = new ConfigVariables([new ReactEnvConfigLoader(), fetchConfig], {
-	logger: console,
-});
-const backendApi = await configVariable.get('BACKEND_API', undefined, {sanitizeUrl: true});
+// example: UI variables
+const backendApi = await getConfigVariable('API_SERVER', [reactEnv(), fetchEnv()], undefined, {sanitizeUrl: true});
 
-// using direct function (binded)
-export const getConfigVariable = new ConfigVariables([new ReactEnvConfigLoader(), fetchConfig], {
-	logger: console,
-}).get;
+// example:  without default value
+const backendApi = await getConfigVariable('BACKEND_API', [env(), someOtherEnv()], undefined, {sanitizeUrl: true}); // Promise <string | undefined>
 
-// without default value
-const backendApi = await getConfigVariable('BACKEND_API', undefined, {sanitizeUrl: true}); // Promise <string | undefined>
+// example:  with default value
+const backendApi = await getConfigVariable('BACKEND_API', [env(), someOtherEnv()], 'http://localhost:1234/api', {sanitizeUrl: true}); // Promise <string>
 
-// with default value
-const backendApi = await getConfigVariable('BACKEND_API', 'http://localhost:1234/api', {sanitizeUrl: true}); // Promise <string>
+// example: using root key overrides
+const backendApi = await getConfigVariable('BACKEND_API', [env(), env('ANOTHER_BACKEND_API')], undefined, {sanitizeUrl: true}); // Promise <string | undefined>
 ```
 
-More config loaders can be create with extending [ConfigLoader](./src/loaders/index.ts) abstract class.
+More config loaders can be create with extending [ConfigLoader](./src/loaders/index.ts) abstract class or loader function
 
-See [FetchConfigLoader](./src/loaders/FetchConfigLoader.ts) as example
+See [FetchConfigLoader](./src/loaders/FetchConfigLoader.ts) as example class
