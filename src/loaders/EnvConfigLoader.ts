@@ -1,11 +1,11 @@
-import {Loader} from '.';
+import {IConfigLoader} from '../interfaces/IConfigLoader';
 
-export const env = (key?: string | undefined): Loader => {
+export function env(overrideKey?: string | undefined): IConfigLoader {
 	return {
 		type: 'env',
-		callback: (rootKey) => {
-			const targetKey = key || rootKey;
-			return Promise.resolve({key: rootKey, value: process.env[targetKey], path: `process.env.${targetKey}`});
+		callback: (lookupKey) => {
+			const targetKey = overrideKey || lookupKey;
+			return Promise.resolve({key: lookupKey, value: process.env[targetKey], path: `process.env.${targetKey}`});
 		},
 	};
-};
+}

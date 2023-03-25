@@ -1,17 +1,35 @@
-import {ConfigLoader, LoaderValue} from '.';
-import {urlSanitize} from '../formatUtils';
+import {LoaderValue} from '../interfaces/IConfigLoader';
+import {ConfigLoader} from './ConfigLoader';
+import {urlSanitize} from '../lib/formatUtils';
+import {ValidateCallback} from '../interfaces/IValidate';
 
 interface FetchConfigLoaderOptions {
 	fetchClient: typeof fetch;
 	/** this prevents Error to be thrown if have http error */
 	isSilent: boolean;
 	payload: 'json';
+	/**
+	 * optional validator for JSON response
+	 *
+	 * @example
+	 * // using zod
+	 * const stringRecordSchema = z.record(z.string().min(1), z.string());
+	 * const validate: ValidateCallback<Record<string, string>> = async (data) => {
+	 *   const result = await stringRecordSchema.safeParseAsync(data);
+	 *   if (!result.success) {
+	 *     return {success: false, message: result.error.message};
+	 *   }
+	 *   return {success: true};
+	 * };
+	 */
+	validate?: ValidateCallback<Record<string, string>>;
 }
 
 const defaultOptions: FetchConfigLoaderOptions = {
 	fetchClient: fetch,
 	isSilent: false,
 	payload: 'json',
+	validate: undefined,
 };
 
 export class FetchConfigLoader extends ConfigLoader<string | undefined> {
@@ -20,6 +38,7 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	private dataPromise: Promise<Record<string, string>> | undefined;
 	private path = 'undefined';
 	private options: FetchConfigLoaderOptions;
+	private _isLoaded = false;
 
 	constructor(requestCallback: () => Promise<Request>, _options: Partial<FetchConfigLoaderOptions> = {}) {
 		super();
@@ -27,25 +46,33 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 		this.requestCallback = requestCallback;
 	}
 
+	/**
+	 * reloads the data from the fetch request
+	 */
 	public async reload(): Promise<void> {
 		this.dataPromise = this.fetchData();
 		await this.dataPromise;
 	}
 
+	/**
+	 * is the data loaded
+	 */
 	public isLoaded(): boolean {
-		return this.dataPromise !== undefined;
+		return this._isLoaded;
 	}
 
-	protected async handleLoader(rootKey: string, key: string | undefined): Promise<LoaderValue> {
+	protected async handleLoader(lookupKey: string, overriderKey: string | undefined): Promise<LoaderValue> {
+		// check if we have JSON data loaded, if not load it
 		if (!this.dataPromise) {
 			this.dataPromise = this.fetchData();
 		}
 		const data = await this.dataPromise;
-		const targetKey = key || rootKey;
+		const targetKey = overriderKey || lookupKey; // optional override key, else use actual lookupKey
 		return {value: data?.[targetKey], path: this.path};
 	}
 
-	private async fetchData() {
+	private async fetchData(): Promise<any> {
+		this._isLoaded = false;
 		const req = await this.requestCallback();
 		this.path = urlSanitize(req.url); // hide username/passwords from URL in logs
 		const res = await this.options.fetchClient(req);
@@ -57,12 +84,21 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 		}
 		const contentType = res.headers.get('content-type');
 		if (contentType?.startsWith('application/json') && this.options.payload === 'json') {
-			return this.handleJson(res);
+			const data = await this.handleJson(res);
+			this._isLoaded = true;
+			return data;
 		}
 		throw new Error(`unsupported content-type ${contentType} from FetchEnvConfig`);
 	}
 
-	private handleJson(res: Response) {
-		return res.json();
+	private async handleJson(res: Response): Promise<Record<string, string>> {
+		const data = await res.json();
+		if (this.options.validate) {
+			const res = await this.options.validate(data);
+			if (!res.success) {
+				throw new Error(`invalid json response from FetchEnvConfig: ${res.message}`);
+			}
+		}
+		return data;
 	}
 }

@@ -1,11 +1,12 @@
 {
     "compilerOptions": {
         "lib": [
-            "es2018",
-            "dom"
+            "es2021",
+            "dom",
+            "dom.iterable"
         ],
         "module": "commonjs",
-        "target": "es5",
+        "target": "es2021",
         "rootDir": "./src",
         "outDir": "./dist",
         "moduleResolution": "node",
@@ -23,7 +24,6 @@
         "noImplicitAny": true,
         "importHelpers": false,
         "strictNullChecks": true,
-        "suppressImplicitAnyIndexErrors": true,
         "noUnusedLocals": true,
         "strict": true,
     },

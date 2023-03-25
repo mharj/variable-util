@@ -1,11 +1,10 @@
-import {LoggerLike} from './loggerLike';
+import {ILoggerLike} from '../interfaces/';
 
 export interface FormatParameters {
 	showValue?: boolean;
-	sanitizeUrl?: boolean;
 }
 
-export function urlSanitize(value: string, logger?: LoggerLike): string {
+export function urlSanitize(value: string, logger?: ILoggerLike): string {
 	try {
 		const url = new URL(value);
 		url.password = '*'.repeat(url.password.length);
@@ -19,11 +18,8 @@ export function urlSanitize(value: string, logger?: LoggerLike): string {
 }
 
 export function printValue(value: string | undefined, config: FormatParameters | undefined) {
-	if (!config || (!config.showValue && !config.sanitizeUrl)) {
+	if (!config || !config.showValue) {
 		return '';
-	}
-	if (value && config.sanitizeUrl) {
-		return ` [${urlSanitize(value)}]`;
 	}
 	return ` [${value}]`;
 }

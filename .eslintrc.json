@@ -15,6 +15,22 @@
     ],
     "rules": {
         "camelcase": 1,
-        "@typescript-eslint/no-this-alias": ["error",{"allowedNames": ["self"]}]
+        "@typescript-eslint/no-this-alias": [
+            "error",
+            {
+                "allowedNames": [
+                    "self"
+                ]
+            }
+        ],
+        "sort-keys": [
+            "error",
+            "asc",
+            {
+                "caseSensitive": false,
+                "natural": true,
+                "minKeys": 4
+            }
+        ]
     }
 }
