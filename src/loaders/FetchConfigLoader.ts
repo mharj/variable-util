@@ -25,13 +25,6 @@ interface FetchConfigLoaderOptions {
 	validate?: ValidateCallback<Record<string, string>>;
 }
 
-const defaultOptions: FetchConfigLoaderOptions = {
-	fetchClient: fetch,
-	isSilent: false,
-	payload: 'json',
-	validate: undefined,
-};
-
 export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	public type = 'fetch';
 	private requestCallback: () => Promise<Request>;
@@ -39,10 +32,16 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	private path = 'undefined';
 	private options: FetchConfigLoaderOptions;
 	private _isLoaded = false;
+	private defaultOptions: FetchConfigLoaderOptions = {
+		fetchClient: fetch,
+		isSilent: false,
+		payload: 'json',
+		validate: undefined,
+	};
 
 	constructor(requestCallback: () => Promise<Request>, _options: Partial<FetchConfigLoaderOptions> = {}) {
 		super();
-		this.options = {...defaultOptions, ..._options};
+		this.options = {...this.defaultOptions, ..._options};
 		this.requestCallback = requestCallback;
 	}
 
