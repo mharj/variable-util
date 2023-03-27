@@ -30,13 +30,15 @@ const errorSpy = sinon.spy();
 const warnSpy = sinon.spy();
 const traceSpy = sinon.spy();
 
-setLogger({
+const spyLogger = {
 	debug: debugSpy,
 	error: errorSpy,
 	info: infoSpy,
 	trace: traceSpy,
 	warn: warnSpy,
-});
+};
+
+setLogger(spyLogger);
 
 const objectSchema = z.object({
 	foo: z.string(),
@@ -92,11 +94,17 @@ describe('config variable', () => {
 		expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [asd] from process.env.TEST`);
 	});
 	itFetch('should return fetch value', async function () {
-		const fetchEnv = new FetchConfigLoader(() => Promise.resolve(new Request('' + process.env.FETCH_URI)), {validate: fetchValidate}).getLoader;
+		const fetchEnv = new FetchConfigLoader(() => Promise.resolve(new Request('' + process.env.FETCH_URI)), {validate: fetchValidate, logger: spyLogger})
+			.getLoader;
 		expect(await getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), undefined, {showValue: true})).to.be.eql(
 			new URL(process.env.FETCH_API_SERVER || ''),
 		);
+		expect(infoSpy.callCount).to.be.eq(1);
 		expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[fetch]: API_SERVER [${process.env.FETCH_API_SERVER}/] from ${process.env.FETCH_URI}`);
+		expect(debugSpy.callCount).to.be.eq(1);
+		expect(debugSpy.getCall(0).args[0])
+			.to.be.an('string')
+			.and.satisfy((msg: string) => msg.startsWith('fetching config from'));
 	});
 	it('should return process env config', async function () {
 		process.env.TEST = 'foo=bar;baz=qux';

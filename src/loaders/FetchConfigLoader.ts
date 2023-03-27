@@ -2,6 +2,8 @@ import {LoaderValue} from '../interfaces/IConfigLoader';
 import {ConfigLoader} from './ConfigLoader';
 import {urlSanitize} from '../lib/formatUtils';
 import {ValidateCallback} from '../interfaces/IValidate';
+import {VariableError} from '../VariableError';
+import {ILoggerLike} from '../interfaces/ILoggerLike';
 
 interface FetchConfigLoaderOptions {
 	fetchClient: typeof fetch;
@@ -23,6 +25,7 @@ interface FetchConfigLoaderOptions {
 	 * };
 	 */
 	validate?: ValidateCallback<Record<string, string>>;
+	logger?: ILoggerLike;
 }
 
 export class FetchConfigLoader extends ConfigLoader<string | undefined> {
@@ -70,16 +73,18 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 		return {value: data?.[targetKey], path: this.path};
 	}
 
-	private async fetchData(): Promise<any> {
+	private async fetchData(): Promise<Record<string, string>> {
 		this._isLoaded = false;
 		const req = await this.requestCallback();
 		this.path = urlSanitize(req.url); // hide username/passwords from URL in logs
+		this.options.logger?.debug(`fetching config from ${this.path}`);
 		const res = await this.options.fetchClient(req);
 		if (res.status >= 400) {
 			if (this.options.isSilent) {
+				this.options.logger?.info(`http error ${res.status} from FetchEnvConfig`);
 				return Promise.resolve({}); // set as empty so we prevent fetch spamming
 			}
-			throw new Error(`http error ${res.status} from FetchEnvConfig`);
+			throw new VariableError(`http error ${res.status} from FetchEnvConfig`);
 		}
 		const contentType = res.headers.get('content-type');
 		if (contentType?.startsWith('application/json') && this.options.payload === 'json') {
@@ -87,7 +92,11 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 			this._isLoaded = true;
 			return data;
 		}
-		throw new Error(`unsupported content-type ${contentType} from FetchEnvConfig`);
+		if (this.options.isSilent) {
+			this.options.logger?.info(`unsupported content-type ${contentType} from FetchEnvConfig`);
+			return Promise.resolve({}); // set as empty so we prevent fetch spamming
+		}
+		throw new VariableError(`unsupported content-type ${contentType} from FetchEnvConfig`);
 	}
 
 	private async handleJson(res: Response): Promise<Record<string, string>> {
@@ -95,7 +104,11 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 		if (this.options.validate) {
 			const res = await this.options.validate(data);
 			if (!res.success) {
-				throw new Error(`invalid json response from FetchEnvConfig: ${res.message}`);
+				if (this.options.isSilent) {
+					this.options.logger?.info(`invalid json response from FetchEnvConfig: ${res.message}`);
+					return Promise.resolve({}); // set as empty so we prevent fetch spamming
+				}
+				throw new VariableError(`invalid json response from FetchEnvConfig: ${res.message}`);
 			}
 		}
 		return data;
