@@ -14,7 +14,7 @@ export async function getConfigVariable<Out>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Out>,
-	defaultValue: string,
+	defaultValue: Out,
 	params?: FormatParameters,
 ): Promise<Out>;
 export async function getConfigVariable<Out>(
