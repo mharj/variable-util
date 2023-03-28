@@ -7,6 +7,7 @@ import * as z from 'zod';
 import {URL} from 'url';
 import 'cross-fetch/polyfill';
 import {
+	booleanParser,
 	env,
 	FetchConfigLoader,
 	getConfigVariable,
@@ -92,6 +93,18 @@ describe('config variable', () => {
 		const call: Promise<string | undefined> = getConfigVariable('TEST', [env(), reactEnv()], stringParser, undefined, {showValue: true});
 		await expect(call).to.be.eventually.eq('asd');
 		expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [asd] from process.env.TEST`);
+	});
+	it('should return process env boolean true value', async function () {
+		process.env.TEST = 'YES';
+		const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env(), reactEnv()], booleanParser, undefined, {showValue: true});
+		await expect(call).to.be.eventually.eq(true);
+		expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [true] from process.env.TEST`);
+	});
+	it('should return process env boolean false value', async function () {
+		process.env.TEST = 'N';
+		const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env(), reactEnv()], booleanParser, undefined, {showValue: true});
+		await expect(call).to.be.eventually.eq(false);
+		expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [false] from process.env.TEST`);
 	});
 	itFetch('should return fetch value', async function () {
 		const fetchEnv = new FetchConfigLoader(() => Promise.resolve(new Request('' + process.env.FETCH_URI)), {validate: fetchValidate, logger: spyLogger})

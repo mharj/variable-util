@@ -121,6 +121,11 @@ see [IConfigLoader](./src/interfaces/IConfigLoader.ts) or extend abstract class 
 
 A function that simply returns the given string value and validates this value to be a string.
 
+### `booleanParser(value: string): IConfigParser<boolean>`
+
+A function that parses the given string value to a boolean and validates this value to be a boolean.
+Allowed true values: `['true', '1', 'yes', 'y', 'on']`. Allowed false values: `['false', '0', 'no', 'n', 'off']`.
+
 ### `new UrlParser(options?: {urlSanitize?: boolean}): IConfigParser<URL>`
 
 A ConfigParser instance that parses the loaded value to a URL object.
