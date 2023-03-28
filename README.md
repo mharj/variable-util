@@ -44,7 +44,7 @@ const validate: ValidateCallback<ObjectSchema> = async (data: ObjectSchema) => {
 
 // Define the parser instances for the config values
 const semicolonConfigParser = new SemicolonConfigParser<ObjectSchema>({validate}); // optional validate callback
-const jsonConfigParser = new JsonConfigParser<ObjectSchema>({validate});  // optional validate callback
+const jsonConfigParser = new JsonConfigParser<ObjectSchema>({validate}); // optional validate callback
 const urlParser = new UrlParser({urlSanitize: true}); // urlSanitize hides credentials from logs
 
 // optional logger function
@@ -97,22 +97,21 @@ A IConfigLoader instance that loads configuration values from the process.env.
 
 ### `reactEnv(): IConfigLoader`
 
-A IConfigLoader instance that loads configuration values from the process.env. with REACT_APP_ prefix.
+A IConfigLoader instance that loads configuration values from the process.env. with REACT*APP* prefix.
 
 ### `new FetchConfigLoader(() => Promise<Response>, options?: FetchConfigLoaderOptions).getLoader: IConfigLoader`
 
 A IConfigLoader instance that loads configuration values from a remote source.
 
-Note: ___getLoader___ is function generator which can override key we are looking for example, fetchEnv() with default key or fetchEnv('OVERRIDE_KEY')
+Note: **_getLoader_** is function generator which can override key we are looking for example, fetchEnv() with default key or fetchEnv('OVERRIDE_KEY')
 
 - options.fetchClient (optional): A fetch client that can be used to fetch the remote configuration value.
 - options.isSilent (optional): No throw error if fetch fails. Returns empty object instead.
 - options.payload (optional): Only 'json' is supported. And default is 'json'.
 - options.validate (optional): An optional async function that can validate the fetched object to be valid `Record<string, string>`
 
-
-
 ### How to build a custom loader:
+
 see [IConfigLoader](./src/interfaces/IConfigLoader.ts) or extend abstract class [ConfigLoader](./src/loaders/ConfigLoader.ts)
 
 ## Current parsers:
@@ -120,6 +119,14 @@ see [IConfigLoader](./src/interfaces/IConfigLoader.ts) or extend abstract class 
 ### `stringParser(value: string): IConfigParser<string>`
 
 A function that simply returns the given string value and validates this value to be a string.
+
+### `integerParser(value: string): IConfigParser<number>`
+
+A function that simply returns the given string value as integer number and validates this value.
+
+### `floatParser(value: string): IConfigParser<number>`
+
+A function that simply returns the given string value as float number and validates this value.
 
 ### `booleanParser(value: string): IConfigParser<boolean>`
 

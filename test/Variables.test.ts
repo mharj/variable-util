@@ -10,7 +10,9 @@ import {
 	booleanParser,
 	env,
 	FetchConfigLoader,
+	floatParser,
 	getConfigVariable,
+	integerParser,
 	JsonConfigParser,
 	reactEnv,
 	SemicolonConfigParser,
@@ -100,11 +102,24 @@ describe('config variable', () => {
 		await expect(call).to.be.eventually.eq(true);
 		expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [true] from process.env.TEST`);
 	});
+
 	it('should return process env boolean false value', async function () {
 		process.env.TEST = 'N';
 		const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env(), reactEnv()], booleanParser, undefined, {showValue: true});
 		await expect(call).to.be.eventually.eq(false);
 		expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [false] from process.env.TEST`);
+	});
+	it('should return process env integer value', async function () {
+		process.env.TEST = '02';
+		const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], integerParser, undefined, {showValue: true});
+		await expect(call).to.be.eventually.eq(2);
+		expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [2] from process.env.TEST`);
+	});
+	it('should return process env float value', async function () {
+		process.env.TEST = '2.5';
+		const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], floatParser, undefined, {showValue: true});
+		await expect(call).to.be.eventually.eq(2.5);
+		expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [2.5] from process.env.TEST`);
 	});
 	itFetch('should return fetch value', async function () {
 		const fetchEnv = new FetchConfigLoader(() => Promise.resolve(new Request('' + process.env.FETCH_URI)), {validate: fetchValidate, logger: spyLogger})
