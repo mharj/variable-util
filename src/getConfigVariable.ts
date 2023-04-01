@@ -1,54 +1,150 @@
 import {FormatParameters, printValue} from './lib/formatUtils';
 import {ILoggerLike, IConfigParser, IConfigLoader} from './interfaces/';
+import {VariableError} from './VariableError';
 
 let logger: ILoggerLike | undefined;
 export function setLogger(newLogger: ILoggerLike) {
 	logger = newLogger;
 }
 
+export function rebuildAsVariableError<Output, RawOutput = unknown>(
+	value: string,
+	error: Error,
+	parser: IConfigParser<Output, RawOutput>,
+	params?: FormatParameters,
+): VariableError {
+	if (error instanceof VariableError) {
+		return error;
+	} else {
+		const varError = new VariableError(`variables[${parser.name}]:${printValue(value, params)} ${error.message}`);
+		varError.stack = error.stack;
+		return varError;
+	}
+}
+
+function buildPreValidateErrorMessage<Output, RawOutput = unknown>(
+	value: string,
+	err: unknown,
+	parser: IConfigParser<Output, RawOutput>,
+	params?: FormatParameters,
+): VariableError {
+	if (err instanceof Error) {
+		return rebuildAsVariableError(value, err, parser, params);
+	} else {
+		return new VariableError(`variables[${parser.name}]:${printValue(value, params)} unknown preValidate error`);
+	}
+}
+
+function buildParserErrorMessage<Output, RawOutput = unknown>(
+	value: string,
+	err: unknown,
+	parser: IConfigParser<Output, RawOutput>,
+	params?: FormatParameters,
+): VariableError {
+	if (err instanceof Error) {
+		return rebuildAsVariableError(value, err, parser, params);
+	} else {
+		return new VariableError(`variables[${parser.name}]:${printValue(value, params)} unknown parse error`);
+	}
+}
+
+function buildPostValidateErrorMessage<Output, RawOutput = unknown>(
+	value: string,
+	err: unknown,
+	parser: IConfigParser<Output, RawOutput>,
+	params?: FormatParameters,
+): VariableError {
+	if (err instanceof Error) {
+		return rebuildAsVariableError(value, err, parser, params);
+	} else {
+		return new VariableError(`variables[${parser.name}]:${printValue(value, params)} unknown postValidate error`);
+	}
+}
+
+async function handleLoader<Output, RawOutput = unknown>(
+	rootKey: string,
+	loader: IConfigLoader,
+	parser: IConfigParser<Output, RawOutput>,
+	params?: FormatParameters,
+): Promise<Output | undefined> {
+	try {
+		const {value, path} = await loader.callback(rootKey);
+		if (value) {
+			/**
+			 * pre-validate
+			 */
+			try {
+				await parser.preValidate?.(rootKey, value);
+			} catch (err) {
+				throw buildPreValidateErrorMessage(value, err, parser, params);
+			}
+			/**
+			 * parse
+			 */
+			let rawOutput: RawOutput;
+			try {
+				rawOutput = await parser.parse(rootKey, value);
+			} catch (err) {
+				throw buildParserErrorMessage(value, err, parser, params);
+			}
+			/**
+			 * post-validate
+			 */
+			let output: Output = rawOutput as unknown as Output; // TODO: if validator on parser is not defined we should return RawOutput type
+			try {
+				const validateData = await parser.postValidate?.(rootKey, rawOutput);
+				if (validateData) {
+					output = validateData;
+				}
+			} catch (err) {
+				throw buildPostValidateErrorMessage(value, err, parser, params);
+			}
+			/**
+			 * print log
+			 */
+			printLog(loader.type, rootKey, parser.toString(output), path, params);
+			return output;
+		}
+	} catch (err) {
+		logger?.error(err);
+	}
+	return undefined;
+}
+
 /**
  * @example
- * const port = await getConfigVariable('PORT', [env()], '8080', {showValue: true});
+ * // from "@avanio/variable-util-node"
+ * const fileEnv = new FileConfigLoader({fileName: './settings.json', type: 'json'}).getLoader;
+ *
+ * const port: Promise<string> = await getConfigVariable('PORT', [env(), fileEnv()], stringParser, '8080', {showValue: true});
+ * // with override key
+ * const port: Promise<string> = await getConfigVariable('PORT', [env('HTTP_PORT', fileEnv())], stringParser, '8080', {showValue: true});
  */
-export async function getConfigVariable<Out>(
+export async function getConfigVariable<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
-	parser: IConfigParser<Out>,
-	defaultValue: Out,
+	parser: IConfigParser<Output, unknown>,
+	defaultValue: Output,
 	params?: FormatParameters,
-): Promise<Out>;
-export async function getConfigVariable<Out>(
+): Promise<Output>;
+export async function getConfigVariable<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
-	parser: IConfigParser<Out>,
-	defaultValue?: Out | undefined,
+	parser: IConfigParser<Output, unknown>,
+	defaultValue?: Output | undefined,
 	params?: FormatParameters,
-): Promise<Out | undefined>;
-export async function getConfigVariable<Out>(
+): Promise<Output | undefined>;
+export async function getConfigVariable<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
-	parser: IConfigParser<Out>,
-	defaultValue?: Out | undefined,
+	parser: IConfigParser<Output, unknown>,
+	defaultValue?: Output | undefined,
 	params?: FormatParameters,
-): Promise<Out | undefined> {
+): Promise<Output | undefined> {
 	for (const loader of loaders) {
-		try {
-			const {value, path} = await loader.callback(rootKey);
-			if (value) {
-				const preValid = await parser.preValidate?.(rootKey, value);
-				if (preValid && !preValid.success) {
-					throw new Error(`variables: ${preValid.message}`);
-				}
-				const output = await parser.parse(rootKey, value);
-				const postValid = await parser.postValidate?.(rootKey, output);
-				if (postValid && !postValid.success) {
-					throw new Error(`variables: ${postValid.message}`);
-				}
-				printLog(loader.type, rootKey, parser.toString(output), path, params);
-				return output;
-			}
-		} catch (err) {
-			logger?.error(err);
+		const output = await handleLoader(rootKey, loader, parser, params);
+		if (output !== undefined) {
+			return output;
 		}
 	}
 	if (defaultValue) {

@@ -1,20 +1,24 @@
-import {ValidateCallback, IValidateResponse} from '../interfaces/IValidate';
+import {ValidateCallback} from '../interfaces/IValidate';
 import {IConfigParser} from '../interfaces/IConfigParser';
 import {parseSemicolonConfig, stringifySemicolonConfig} from '../lib/semicolonUtils';
 
-interface SemicolonConfigParserOptions<Out extends Record<string, string | undefined>> {
+type ConfigParseType = Record<string, string>;
+
+interface SemicolonConfigParserOptions<Out extends ConfigParseType = ConfigParseType, RawType extends ConfigParseType = ConfigParseType> {
 	keysToHide?: string[];
-	validate?: ValidateCallback<Out>;
+	validate?: ValidateCallback<Out, RawType>;
 	/**
 	 * keep case of keys, if set as false then will convert keys first letters to lower case (Js Style)
 	 */
 	keepCase?: boolean;
 }
 
-export class SemicolonConfigParser<Out extends Record<string, string | undefined>> implements IConfigParser<Out> {
+export class SemicolonConfigParser<Out extends ConfigParseType = ConfigParseType, RawType extends ConfigParseType = ConfigParseType>
+	implements IConfigParser<Out, RawType>
+{
 	public name = 'semicolonConfigParser';
 	private keysToHide: string[] | undefined;
-	private validate: ValidateCallback<Out> | undefined;
+	private validate: ValidateCallback<Out, RawType> | undefined;
 	private keepCase: boolean;
 
 	constructor({keepCase, keysToHide, validate}: SemicolonConfigParserOptions<Out> = {}) {
@@ -23,12 +27,12 @@ export class SemicolonConfigParser<Out extends Record<string, string | undefined
 		this.keepCase = keepCase ?? true;
 	}
 
-	public parse(key: string, value: string): Promise<Out> {
-		return Promise.resolve(parseSemicolonConfig(value, this.keepCase) as Out);
+	public parse(key: string, value: string): Promise<RawType> {
+		return Promise.resolve(parseSemicolonConfig(value, this.keepCase) as RawType);
 	}
 
-	public async postValidate(key: string, value: Out): Promise<IValidateResponse> {
-		return (await this.validate?.(value)) || {success: true};
+	public async postValidate(key: string, value: RawType): Promise<Out | undefined> {
+		return await this.validate?.(value);
 	}
 
 	public toString(value: Out): string {

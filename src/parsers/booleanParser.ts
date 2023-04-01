@@ -1,5 +1,4 @@
 import {IConfigParser} from '../interfaces/IConfigParser';
-import {IValidateResponse} from '../interfaces/IValidate';
 
 const booleanTrueStringValues = ['true', '1', 'yes', 'y', 'on'];
 const booleanFalseStringValues = ['false', '0', 'no', 'n', 'off'];
@@ -23,19 +22,17 @@ const allBooleanStringValues = [...booleanFalseStringValues, ...booleanTrueStrin
  * - n
  * - off
  */
-export const booleanParser: IConfigParser<boolean> = {
+export const booleanParser: IConfigParser<boolean, boolean> = {
 	name: 'booleanParser',
 	parse: async (key: string, value: string): Promise<boolean> => {
-		return booleanTrueStringValues.includes(value.toLowerCase());
-	},
-	preValidate: async (key: string, value: string): Promise<IValidateResponse> => {
 		if (typeof value !== 'string') {
-			return {success: false, message: `variables: value for key ${key} is not a string`};
+			throw new TypeError(`value for key ${key} is not a string`);
 		}
-		if (!allBooleanStringValues.includes(value.toLowerCase())) {
-			return {success: false, message: `variables: value for key ${key} valid boolean string`};
+		const output = value.toLowerCase();
+		if (!allBooleanStringValues.includes(output)) {
+			throw new TypeError(`value for key ${key} is not valid boolean string`);
 		}
-		return {success: true};
+		return booleanTrueStringValues.includes(output);
 	},
 	toString: (value: boolean): string => {
 		return value ? 'true' : 'false';

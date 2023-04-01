@@ -1,7 +1,7 @@
 import 'url-polyfill';
 import {IConfigParser} from '../interfaces/IConfigParser';
 
-export class UrlParser implements IConfigParser<URL> {
+export class UrlParser implements IConfigParser<URL, URL> {
 	public name = 'urlParser';
 	private urlSanitize: boolean;
 
@@ -13,8 +13,7 @@ export class UrlParser implements IConfigParser<URL> {
 		try {
 			return Promise.resolve(new URL(value));
 		} catch (err) {
-			const message = err instanceof Error ? err.message : 'unknown error';
-			throw new Error(`variables: value for key ${key} is not a URL, ${message}`);
+			throw err instanceof Error ? err : new Error('unknown error');
 		}
 	}
 

@@ -99,11 +99,13 @@ A IConfigLoader instance that loads configuration values from the process.env.
 
 A IConfigLoader instance that loads configuration values from the process.env. with REACT*APP* prefix.
 
-### `new FetchConfigLoader(() => Promise<Response>, options?: FetchConfigLoaderOptions).getLoader: IConfigLoader`
+### `new FetchConfigLoader(() => Promise<Response | RequestNotReadyMessage>, options?: FetchConfigLoaderOptions).getLoader: IConfigLoader`
 
 A IConfigLoader instance that loads configuration values from a remote source.
 
 Note: **_getLoader_** is function generator which can override key we are looking for example, fetchEnv() with default key or fetchEnv('OVERRIDE_KEY')
+
+- requestCallback: A function that returns a Promise that resolves to a Response or RequestNotReadyMessage object if the request is not ready yet.(i.e. auth is needed and user is not logged in)
 
 - options.fetchClient (optional): A fetch client that can be used to fetch the remote configuration value.
 - options.isSilent (optional): No throw error if fetch fails. Returns empty object instead.

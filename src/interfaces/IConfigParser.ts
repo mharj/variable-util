@@ -1,6 +1,4 @@
-import {IValidateResponse} from './IValidate';
-
-export interface IConfigParser<T> {
+export interface IConfigParser<Output, RawOutput> {
 	/**
 	 * name of the parser (not used yet)
 	 */
@@ -8,21 +6,24 @@ export interface IConfigParser<T> {
 
 	/**
 	 * main parsing function
+	 * @throws Error if parsing fails
 	 */
-	parse(key: string, value: string): Promise<T>;
+	parse(key: string, value: string): Promise<RawOutput>;
 
 	/**
-	 * optional raw value validation before parsing
+	 * optional raw string value validation before parsing.
+	 * @throws Error if validation fails
 	 */
-	preValidate?(key: string, value: string): Promise<IValidateResponse>;
+	preValidate?(key: string, value: string): Promise<void>;
 
 	/**
-	 * optional value validation after parsing, expect to throw an error if the value is not valid
+	 * optional value validation after parsing
+	 * @throws Error if validation fails
 	 */
-	postValidate?(key: string, value: T): Promise<IValidateResponse>;
+	postValidate?(key: string, value: RawOutput): Promise<Output | undefined>;
 
 	/**
 	 * build readable string from value
 	 */
-	toString(value: T): string;
+	toString(value: Output): string;
 }

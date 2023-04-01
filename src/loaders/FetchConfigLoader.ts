@@ -24,25 +24,38 @@ interface FetchConfigLoaderOptions {
 	 *   return {success: true};
 	 * };
 	 */
-	validate?: ValidateCallback<Record<string, string>>;
+	validate?: ValidateCallback<Record<string, string>, Record<string, string>>;
 	logger?: ILoggerLike;
+}
+
+export interface RequestNotReadyMessage {
+	message: string;
+}
+
+function isRequestNotReadMessage(obj: unknown): obj is RequestNotReadyMessage {
+	return typeof obj === 'object' && obj !== null && 'message' in obj && typeof (obj as RequestNotReadyMessage).message === 'string';
 }
 
 export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	public type = 'fetch';
-	private requestCallback: () => Promise<Request>;
+	private requestCallback: () => Promise<Request | RequestNotReadyMessage>;
 	private dataPromise: Promise<Record<string, string>> | undefined;
 	private path = 'undefined';
 	private options: FetchConfigLoaderOptions;
 	private _isLoaded = false;
 	private defaultOptions: FetchConfigLoaderOptions = {
-		fetchClient: fetch,
+		fetchClient: typeof window === 'object' ? fetch.bind(window) : fetch,
 		isSilent: false,
 		payload: 'json',
 		validate: undefined,
 	};
 
-	constructor(requestCallback: () => Promise<Request>, _options: Partial<FetchConfigLoaderOptions> = {}) {
+	/**
+	 *
+	 * @param requestCallback - callback that returns a fetch request or a message object that the request is not ready
+	 * @param _options
+	 */
+	constructor(requestCallback: () => Promise<Request | RequestNotReadyMessage>, _options: Partial<FetchConfigLoaderOptions> = {}) {
 		super();
 		this.options = {...this.defaultOptions, ..._options};
 		this.requestCallback = requestCallback;
@@ -65,7 +78,7 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 
 	protected async handleLoader(lookupKey: string, overriderKey: string | undefined): Promise<LoaderValue> {
 		// check if we have JSON data loaded, if not load it
-		if (!this.dataPromise) {
+		if (!this.dataPromise || this._isLoaded === false) {
 			this.dataPromise = this.fetchData();
 		}
 		const data = await this.dataPromise;
@@ -76,6 +89,10 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	private async fetchData(): Promise<Record<string, string>> {
 		this._isLoaded = false;
 		const req = await this.requestCallback();
+		if (isRequestNotReadMessage(req)) {
+			this.options.logger?.debug(`FetchEnvConfig: ${req.message}`);
+			return Promise.resolve({});
+		}
 		this.path = urlSanitize(req.url); // hide username/passwords from URL in logs
 		this.options.logger?.debug(`fetching config from ${this.path}`);
 		const res = await this.options.fetchClient(req);
@@ -102,13 +119,15 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	private async handleJson(res: Response): Promise<Record<string, string>> {
 		const data = await res.json();
 		if (this.options.validate) {
-			const res = await this.options.validate(data);
-			if (!res.success) {
+			try {
+				return await this.options.validate(data);
+			} catch (error) {
+				const err = error instanceof Error ? error : new Error('unknown error');
 				if (this.options.isSilent) {
-					this.options.logger?.info(`invalid json response from FetchEnvConfig: ${res.message}`);
+					this.options.logger?.info(`invalid json response from FetchEnvConfig: ${err.message}`);
 					return Promise.resolve({}); // set as empty so we prevent fetch spamming
 				}
-				throw new VariableError(`invalid json response from FetchEnvConfig: ${res.message}`);
+				throw new VariableError(`invalid json response from FetchEnvConfig: ${err.message}`);
 			}
 		}
 		return data;
