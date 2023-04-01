@@ -3,7 +3,7 @@ import {readFile} from 'fs/promises';
 import {ConfigLoader, LoaderValue, VariableError, ILoggerLike} from '@avanio/variable-util/';
 
 export interface FileConfigLoaderOptions {
-	fileName: string;
+	fileName: string | (() => Promise<string>);
 	type: 'json';
 	/** set to false if need errors */
 	isSilent?: boolean;
@@ -34,27 +34,29 @@ export class FileConfigLoader extends ConfigLoader<string | undefined> {
 		if (!this.filePromise) {
 			this.filePromise = this.loadFile();
 		}
+		const fileName = typeof this.options.fileName === 'string' ? this.options.fileName : await this.options.fileName();
 		const data = await this.filePromise;
 		const targetKey = key || rootKey;
-		return {value: data[targetKey], path: this.options.fileName};
+		return {value: data[targetKey], path: fileName};
 	}
 
 	private async loadFile(): Promise<Record<string, string | undefined>> {
-		if (!existsSync(this.options.fileName)) {
+		const fileName = typeof this.options.fileName === 'string' ? this.options.fileName : await this.options.fileName();
+		if (!existsSync(fileName)) {
 			if (this.options.isSilent) {
-				this.options.logger?.debug(`ConfigVariables[file]: file ${this.options.fileName} not found`);
+				this.options.logger?.debug(`ConfigVariables[file]: file ${fileName} not found`);
 				return {};
 			}
-			throw new VariableError(`ConfigVariables[file]: file ${this.options.fileName} not found`);
+			throw new VariableError(`ConfigVariables[file]: file ${fileName} not found`);
 		}
 		try {
-			return JSON.parse(await readFile(this.options.fileName, 'utf8'));
+			return JSON.parse(await readFile(fileName, 'utf8'));
 		} catch (err) {
 			if (this.options.isSilent) {
-				this.options.logger?.info(`ConfigVariables[file]: file ${this.options.fileName} is not a valid JSON`);
+				this.options.logger?.info(`ConfigVariables[file]: file ${fileName} is not a valid JSON`);
 				return {};
 			}
-			throw new VariableError(`ConfigVariables[file]: file ${this.options.fileName} is not a valid JSON`);
+			throw new VariableError(`ConfigVariables[file]: file ${fileName} is not a valid JSON`);
 		}
 	}
 }

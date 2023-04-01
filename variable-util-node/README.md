@@ -16,6 +16,7 @@ setLogger(console); // or log4js or winston
 const dockerEnv = new DockerSecretsConfigLoader({fileLowerCase: true}).getLoader;
 // settings json file (i.e. modified on pipeline or agent)
 const fileEnv = new FileConfigLoader({fileName: './settings.json', type: 'json'}).getLoader;
+const fileEnv = new FileConfigLoader({fileName: async () => './settings.json', type: 'json'}).getLoader;
 
 const urlParser = new UrlParser({urlSanitize: true}); // urlSanitize hides credentials from logs
 

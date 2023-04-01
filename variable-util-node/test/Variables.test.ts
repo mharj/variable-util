@@ -27,9 +27,9 @@ describe('config variable', () => {
 		warnSpy.resetHistory();
 		traceSpy.resetHistory();
 	});
-	describe('docker secrets', () => {
+	describe('File loader', () => {
 		it('should return file variable value', async function () {
-			const fileEnv = new FileConfigLoader({fileName: './test/testSettings.json', type: 'json'}).getLoader;
+			const fileEnv = new FileConfigLoader({fileName: async () => './test/testSettings.json', type: 'json'}).getLoader;
 			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser, undefined, {showValue: true})).to.be.eq('settings_file');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);
 		});
@@ -39,7 +39,7 @@ describe('config variable', () => {
 			expect(errorSpy.calledOnce).to.be.true;
 		});
 	});
-	describe('docker secrets', () => {
+	describe('Docker Secrets loader', () => {
 		it('should return docker secret value force lowercase key', async function () {
 			const dockerEnv = new DockerSecretsConfigLoader({path: './test', fileLowerCase: true}).getLoader;
 			expect(await getConfigVariable('DOCKERSECRET1', [dockerEnv()], stringParser, undefined, {showValue: true})).to.be.eq('docker_value');
