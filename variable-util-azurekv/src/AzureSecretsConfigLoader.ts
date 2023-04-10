@@ -1,14 +1,10 @@
-import {ConfigLoader, LoaderValue} from '@avanio/variable-util/';
+import {ConfigLoader, Loadable, LoaderValue} from '@avanio/variable-util/';
 import {SecretClient} from '@azure/keyvault-secrets';
 import {TokenCredential} from '@azure/identity';
 
 export interface AzureSecretsConfigLoaderOptions {
-	credentials: TokenCredential | (() => Promise<TokenCredential>);
-	url: string | (() => Promise<string>);
-}
-
-function isTokenCredential(credentials: unknown): credentials is TokenCredential {
-	return typeof credentials === 'object' && credentials !== null && 'getToken' in credentials;
+	credentials: Loadable<TokenCredential>;
+	url: Loadable<string>;
 }
 
 export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined> {
@@ -32,8 +28,8 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined> {
 
 	private async getClient(): Promise<SecretClient> {
 		if (!this.client) {
-			const url = typeof this.options.url === 'string' ? this.options.url : await this.options.url();
-			const credentials = isTokenCredential(this.options.credentials) ? this.options.credentials : await this.options.credentials();
+			const url = await (typeof this.options.url === 'function' ? this.options.url() : this.options.url);
+			const credentials = await (typeof this.options.credentials === 'function' ? this.options.credentials() : this.options.credentials);
 			this.client = new SecretClient(url, credentials);
 		}
 		return this.client;

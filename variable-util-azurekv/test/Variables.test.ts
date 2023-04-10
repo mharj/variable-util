@@ -26,7 +26,7 @@ setLogger({
 let mongoUrl: URL;
 let mongoString: string;
 
-describe('config variable', () => {
+describe('key vault config variable', () => {
 	before(function () {
 		if (!process.env.KV_URI || !process.env.KV_MONGO_KEY || !process.env.MONGO_URL) {
 			this.skip();
@@ -45,9 +45,12 @@ describe('config variable', () => {
 		this.timeout(600000);
 		const urlParser = new UrlParser({urlSanitize: true});
 		const fetchKv = new AzureSecretsConfigLoader({credentials: async () => new DefaultAzureCredential(), url: async () => `${process.env.KV_URI}`}).getLoader;
-		expect(await getConfigVariable('MONGO_URL', [fetchKv(process.env.KV_MONGO_KEY)], urlParser, undefined, {showValue: true})).to.be.eql(mongoUrl);
+		const callback = getConfigVariable('MONGO_URL', [fetchKv(process.env.KV_MONGO_KEY)], urlParser, undefined, {showValue: true});
+		await callback;
+		expect(errorSpy.callCount, errorSpy.getCall(0)?.args[0]).to.be.eq(0);
 		expect(infoSpy.getCall(0).args[0]).to.be.eq(
 			`ConfigVariables[azure-secrets]: MONGO_URL [${mongoString}] from ${process.env.KV_URI}${process.env.KV_MONGO_KEY}`,
 		);
+		expect(await callback).to.be.eql(mongoUrl);
 	});
 });
