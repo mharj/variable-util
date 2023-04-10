@@ -1,5 +1,6 @@
 import {FormatParameters, printValue} from './lib/formatUtils';
-import {ILoggerLike, IConfigParser, IConfigLoader} from './interfaces/';
+import {IConfigLoader, IConfigParser, ILoggerLike} from './interfaces/';
+import {Loadable} from './types/Loadable';
 import {VariableError} from './VariableError';
 
 let logger: ILoggerLike | undefined;
@@ -124,23 +125,39 @@ export async function getConfigVariable<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
-	defaultValue: Output,
+	defaultValueLoadable: Loadable<Output>,
 	params?: FormatParameters,
 ): Promise<Output>;
 export async function getConfigVariable<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
-	defaultValue?: Output | undefined,
+	defaultValueLoadable?: Loadable<Output> | undefined,
 	params?: FormatParameters,
 ): Promise<Output | undefined>;
 export async function getConfigVariable<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
-	defaultValue?: Output | undefined,
+	defaultValueLoadable?: Loadable<Output> | undefined,
 	params?: FormatParameters,
 ): Promise<Output | undefined> {
+	let defaultValue: Output | undefined;
+	/**
+	 * get default value before loaders (to throw error before loaders)
+	 */
+	if (defaultValueLoadable) {
+		try {
+			const value = await (typeof defaultValueLoadable === 'function' ? defaultValueLoadable() : defaultValueLoadable);
+			if (!value) {
+				throw new VariableError('default value is empty');
+			}
+			defaultValue = value;
+		} catch (err) {
+			logger?.error(err);
+			throw err;
+		}
+	}
 	for (const loader of loaders) {
 		const output = await handleLoader(rootKey, loader, parser, params);
 		if (output !== undefined) {
@@ -150,7 +167,7 @@ export async function getConfigVariable<Output>(
 	if (defaultValue) {
 		printLog('default', rootKey, parser.toString(defaultValue), 'default', params);
 	}
-	return defaultValue || undefined;
+	return defaultValue;
 }
 
 function printLog(type: string, key: string, value: string, path: string, params?: FormatParameters) {

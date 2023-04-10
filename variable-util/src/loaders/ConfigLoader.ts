@@ -8,7 +8,7 @@ export abstract class ConfigLoader<HandlerParams> {
 
 	/**
 	 * builds config loader object and passes extra params to implementation
-	 * @param params - optional passing params for handleLoader (i.e. lookup key overriders, settings etc.)
+	 * @param params - optional passing params for handleLoader (i.e. lookup key override, settings etc.)
 	 * @returns {IConfigLoader} - IConfigLoader object
 	 */
 	public getLoader(params?: HandlerParams): IConfigLoader {

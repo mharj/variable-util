@@ -1,14 +1,14 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as chai from 'chai';
-import 'mocha';
-import * as chaiAsPromised from 'chai-as-promised';
-import * as sinon from 'sinon';
-import * as dotenv from 'dotenv';
-import * as z from 'zod';
-import {URL} from 'url';
 import 'cross-fetch/polyfill';
+import 'mocha';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as dotenv from 'dotenv';
+import * as sinon from 'sinon';
+import * as z from 'zod';
 import {
 	booleanParser,
+	createRequestNotReady,
 	env,
 	FetchConfigLoader,
 	floatParser,
@@ -23,6 +23,7 @@ import {
 	UrlParser,
 	ValidateCallback,
 } from '../src/';
+import {URL} from 'url';
 
 chai.use(chaiAsPromised);
 
@@ -64,11 +65,11 @@ const fetchValidate: ValidateCallback<Record<string, string>, Record<string, unk
 let fetchEnv: (params?: string | undefined) => IConfigLoader;
 const urlDefault = new URL('http://localhost/api');
 let fetchRequestData: Request | undefined;
-function handleFetchRequest(): Promise<Request | {message: string}> {
+function handleFetchRequest() {
 	if (fetchRequestData) {
-		return Promise.resolve(fetchRequestData);
+		return fetchRequestData;
 	}
-	return Promise.resolve({message: 'fetch request not ready'});
+	return createRequestNotReady('fetch request not ready');
 }
 
 describe('config variable', () => {
@@ -85,6 +86,28 @@ describe('config variable', () => {
 		const call: Promise<string> = getConfigVariable('TEST', [], stringParser, 'some_value', {showValue: true});
 		await expect(call).to.be.eventually.eq('some_value');
 		expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [some_value] from default`);
+	});
+	describe('default values', () => {
+		it('should return default value', async function () {
+			const call: Promise<string> = getConfigVariable('TEST', [], stringParser, 'some_value', {showValue: true});
+			await expect(call).to.be.eventually.eq('some_value');
+			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [some_value] from default`);
+		});
+		it('should return default promise value', async function () {
+			const call: Promise<string> = getConfigVariable('TEST', [], stringParser, Promise.resolve('some_value'), {showValue: true});
+			await expect(call).to.be.eventually.eq('some_value');
+			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [some_value] from default`);
+		});
+		it('should return default callback value', async function () {
+			const call: Promise<string> = getConfigVariable('TEST', [], stringParser, () => 'some_value', {showValue: true});
+			await expect(call).to.be.eventually.eq('some_value');
+			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [some_value] from default`);
+		});
+		it('should return default callback promise value', async function () {
+			const call: Promise<string> = getConfigVariable('TEST', [], stringParser, () => Promise.resolve('some_value'), {showValue: true});
+			await expect(call).to.be.eventually.eq('some_value');
+			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [some_value] from default`);
+		});
 	});
 	describe('loaders', () => {
 		it('should return process env value', async function () {

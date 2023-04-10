@@ -1,9 +1,10 @@
-import {LoaderValue} from '../interfaces/IConfigLoader';
 import {ConfigLoader} from './ConfigLoader';
+import type {ILoggerLike} from '../interfaces/ILoggerLike';
+import type {LoaderValue} from '../interfaces/IConfigLoader';
+import type {RequestNotReady} from '../types/RequestNotReady';
 import {urlSanitize} from '../lib/formatUtils';
-import {ValidateCallback} from '../interfaces/IValidate';
+import type {ValidateCallback} from '../interfaces/IValidate';
 import {VariableError} from '../VariableError';
-import {ILoggerLike} from '../interfaces/ILoggerLike';
 
 interface FetchConfigLoaderOptions {
 	fetchClient: typeof fetch;
@@ -28,17 +29,17 @@ interface FetchConfigLoaderOptions {
 	logger?: ILoggerLike;
 }
 
-export interface RequestNotReadyMessage {
-	message: string;
-}
+type ConfigRequest = Request | RequestNotReady;
 
-function isRequestNotReadMessage(obj: unknown): obj is RequestNotReadyMessage {
-	return typeof obj === 'object' && obj !== null && 'message' in obj && typeof (obj as RequestNotReadyMessage).message === 'string';
+type FetchConfigRequest = ConfigRequest | Promise<ConfigRequest> | (() => ConfigRequest | Promise<ConfigRequest>);
+
+function isRequestNotReadMessage(obj: unknown): obj is RequestNotReady {
+	return typeof obj === 'object' && obj !== null && 'message' in obj && typeof (obj as RequestNotReady).message === 'string';
 }
 
 export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	public type = 'fetch';
-	private requestCallback: () => Promise<Request | RequestNotReadyMessage>;
+	private request: FetchConfigRequest;
 	private dataPromise: Promise<Record<string, string>> | undefined;
 	private path = 'undefined';
 	private options: FetchConfigLoaderOptions;
@@ -55,10 +56,10 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	 * @param requestCallback - callback that returns a fetch request or a message object that the request is not ready
 	 * @param _options
 	 */
-	constructor(requestCallback: () => Promise<Request | RequestNotReadyMessage>, _options: Partial<FetchConfigLoaderOptions> = {}) {
+	constructor(request: FetchConfigRequest, _options: Partial<FetchConfigLoaderOptions> = {}) {
 		super();
 		this.options = {...this.defaultOptions, ..._options};
-		this.requestCallback = requestCallback;
+		this.request = request;
 	}
 
 	/**
@@ -76,19 +77,19 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 		return this._isLoaded;
 	}
 
-	protected async handleLoader(lookupKey: string, overriderKey: string | undefined): Promise<LoaderValue> {
+	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
 		// check if we have JSON data loaded, if not load it
 		if (!this.dataPromise || this._isLoaded === false) {
 			this.dataPromise = this.fetchData();
 		}
 		const data = await this.dataPromise;
-		const targetKey = overriderKey || lookupKey; // optional override key, else use actual lookupKey
+		const targetKey = overrideKey || lookupKey; // optional override key, else use actual lookupKey
 		return {value: data?.[targetKey], path: this.path};
 	}
 
 	private async fetchData(): Promise<Record<string, string>> {
 		this._isLoaded = false;
-		const req = await this.requestCallback();
+		const req = await this.getRequest();
 		if (isRequestNotReadMessage(req)) {
 			this.options.logger?.debug(`FetchEnvConfig: ${req.message}`);
 			return Promise.resolve({});
@@ -131,5 +132,9 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 			}
 		}
 		return data;
+	}
+
+	private async getRequest(): Promise<ConfigRequest> {
+		return typeof this.request === 'function' ? this.request() : this.request;
 	}
 }
