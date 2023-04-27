@@ -1,10 +1,10 @@
-import {expect} from 'chai';
 import 'mocha';
+import * as dotenv from 'dotenv';
 import * as sinon from 'sinon';
 import {getConfigVariable, setLogger, UrlParser} from '@avanio/variable-util';
 import {AzureSecretsConfigLoader} from '../src/';
 import {DefaultAzureCredential} from '@azure/identity';
-import * as dotenv from 'dotenv';
+import {expect} from 'chai';
 import {urlSanitize} from '@avanio/variable-util/dist/lib/formatUtils';
 
 dotenv.config();
@@ -16,11 +16,11 @@ const warnSpy = sinon.spy();
 const traceSpy = sinon.spy();
 
 setLogger({
-	info: infoSpy,
 	debug: debugSpy,
 	error: errorSpy,
-	warn: warnSpy,
+	info: infoSpy,
 	trace: traceSpy,
+	warn: warnSpy,
 });
 
 let mongoUrl: URL;
