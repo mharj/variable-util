@@ -1,5 +1,5 @@
-import {ValidateCallback} from '../interfaces/IValidate';
 import {IConfigParser} from '../interfaces/IConfigParser';
+import {ValidateCallback} from '../interfaces/IValidate';
 
 type JsonParseType = Record<string, unknown>;
 

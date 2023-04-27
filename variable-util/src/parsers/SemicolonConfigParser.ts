@@ -1,6 +1,6 @@
-import {ValidateCallback} from '../interfaces/IValidate';
-import {IConfigParser} from '../interfaces/IConfigParser';
 import {parseSemicolonConfig, stringifySemicolonConfig} from '../lib/semicolonUtils';
+import {IConfigParser} from '../interfaces/IConfigParser';
+import {ValidateCallback} from '../interfaces/IValidate';
 
 type ConfigParseType = Record<string, string>;
 
