@@ -15,6 +15,7 @@ import {
 	getConfigVariable,
 	IConfigLoader,
 	integerParser,
+	IRequestCache,
 	JsonConfigParser,
 	reactEnv,
 	SemicolonConfigParser,
@@ -36,6 +37,22 @@ const errorSpy = sinon.spy();
 const warnSpy = sinon.spy();
 const traceSpy = sinon.spy();
 
+let isOnline = true;
+const resCache = new Map<string, Response>();
+
+const reqCacheSetup: IRequestCache = {
+	isOnline() {
+		return isOnline;
+	},
+	storeRequest(req, res) {
+		resCache.set(req.url, res.clone());
+		return Promise.resolve();
+	},
+	fetchRequest(req) {
+		return Promise.resolve(resCache.get(req.url));
+	},
+};
+
 const spyLogger = {
 	debug: debugSpy,
 	error: errorSpy,
@@ -56,9 +73,9 @@ const validate: ValidateCallback<ObjectSchema, Record<string, unknown>> = async 
 	return objectSchema.parseAsync(data);
 };
 
-const stringRecordSchema = z.record(z.string().min(1), z.string());
+const stringRecordSchema = z.record(z.string().min(1), z.string().nullable());
 
-const fetchValidate: ValidateCallback<Record<string, string>, Record<string, unknown>> = async (data: Record<string, unknown>) => {
+const fetchValidate: ValidateCallback<Record<string, string | null>, Record<string, unknown>> = async (data: Record<string, unknown>) => {
 	return stringRecordSchema.parseAsync(data);
 };
 
@@ -127,7 +144,7 @@ describe('config variable', () => {
 				if (!process.env.FETCH_URI || !process.env.FETCH_API_SERVER) {
 					this.skip();
 				}
-				fetchEnv = new FetchConfigLoader(handleFetchRequest, {validate: fetchValidate, logger: spyLogger}).getLoader;
+				fetchEnv = new FetchConfigLoader(handleFetchRequest, {validate: fetchValidate, logger: spyLogger, cache: reqCacheSetup}).getLoader;
 			});
 			it('should return default if fetch request not ready yet', async function () {
 				expect(await getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true})).to.be.eql(urlDefault);
@@ -143,6 +160,22 @@ describe('config variable', () => {
 				fetchRequestData = req;
 				const call = getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
 				const output = await call;
+				expect(infoSpy.callCount).to.be.eq(1);
+				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[fetch]: API_SERVER [${value}] from ${src}`);
+				expect(debugSpy.callCount).to.be.eq(1);
+				expect(debugSpy.getCall(0).args[0]).to.be.an('string').and.eq(`fetching config from ${src}`);
+				expect(output).to.be.eql(value);
+			});
+			it('should return cached fetch value when offline', async function () {
+				isOnline = false;
+				fetchEnv = new FetchConfigLoader(handleFetchRequest, {validate: fetchValidate, logger: spyLogger, cache: reqCacheSetup}).getLoader;
+				const src = new URL('' + process.env.FETCH_URI);
+				const value = new URL('' + process.env.FETCH_API_SERVER);
+				const req = new Request(src);
+				fetchRequestData = req;
+				const call = getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
+				const output = await call;
+				expect(errorSpy.callCount, errorSpy.getCall(0)?.args.join(' ')).to.be.eq(0);
 				expect(infoSpy.callCount).to.be.eq(1);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[fetch]: API_SERVER [${value}] from ${src}`);
 				expect(debugSpy.callCount).to.be.eq(1);
