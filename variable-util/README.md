@@ -75,6 +75,25 @@ const valueFromJsonConfig = getConfigVariable('TEST', [env()], jsonConfigParser,
 // valueFromJsonConfig: Promise<ObjectSchema | undefined>
 ```
 
+## usage example with ConfigMap
+
+```typescript
+type TestEnv = {
+	PORT: number;
+	HOST: string;
+	DEBUG: boolean;
+	URL: URL;
+};
+const config = new ConfigMap<TestEnv>({
+	DEBUG: {loaders: [env()], parser: booleanParser, defaultValue: false},
+	HOST: {loaders: [env()], parser: stringParser, defaultValue: 'localhost'},
+	PORT: {loaders: [env()], parser: integerParser, defaultValue: 3000},
+	URL: {loaders: [env()], parser: new UrlParser({urlSanitize: true}), defaultValue: new URL('http://localhost:3000')},
+});
+
+console.log('port', await config.get('PORT'));
+```
+
 ## getConfigVariable arguments:
 
 `getConfigVariable<Output>(key: string, loaders: ConfigLoader[], parser: ConfigParser, defaultValue?: Output, options?: {showValue?: boolean}): Promise<Output | undefined>`
