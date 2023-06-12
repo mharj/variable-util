@@ -70,6 +70,7 @@
         "zod": "^3.21.4"
     },
     "dependencies": {
+        "@avanio/logger-like": "^0.1.1",
         "url-polyfill": "^1.1.12"
     }
 }

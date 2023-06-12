@@ -1,5 +1,5 @@
 import {ConfigLoader} from './ConfigLoader';
-import type {ILoggerLike} from '../interfaces/ILoggerLike';
+import type {ILoggerLike} from '@avanio/logger-like';
 import type {IRequestCache} from '../interfaces/IRequestCache';
 import type {LoaderValue} from '../interfaces/IConfigLoader';
 import type {RequestNotReady} from '../types/RequestNotReady';
@@ -89,7 +89,7 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 		const data = await this.dataPromise;
 		const targetKey = overrideKey || lookupKey; // optional override key, else use actual lookupKey
 		const value = data?.[targetKey] || undefined;
-		return {value, path: this.path};
+		return {type: this.type, value, path: this.path};
 	}
 
 	private async fetchData(): Promise<Record<string, string | null>> {

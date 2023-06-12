@@ -6,3 +6,4 @@ export * from './parsers';
 export * from './VariableError';
 export * from './VariableLookupError';
 export * from './ConfigMap';
+export * from './logger';

@@ -55,6 +55,17 @@ describe('ConfigMap', () => {
 			await expect(call).to.be.eventually.eql(new URL('https://www.google.com'));
 		});
 	});
+	describe('getAll', () => {
+		it('should get all values', async function () {
+			const call = config.getAll();
+			await expect(call).to.be.eventually.eql({
+				DEBUG: {type: 'env', value: true},
+				HOST: {type: 'env', value: 'minecraft'},
+				PORT: {type: 'env', value: 6000},
+				URL: {type: 'env', value: new URL('https://www.google.com/')},
+			});
+		});
+	});
 	describe('validateAll', () => {
 		it('should validate all with zod', async function () {
 			await config.validateAll((data) => testEnvSchema.parse(data));

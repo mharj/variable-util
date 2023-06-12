@@ -5,7 +5,7 @@ export function env(overrideKey?: string | undefined): IConfigLoader {
 		type: 'env',
 		callback: async (lookupKey): Promise<LoaderValue> => {
 			const targetKey = overrideKey || lookupKey;
-			return {value: process.env[targetKey], path: `process.env.${targetKey}`};
+			return {type: 'env', value: process.env[targetKey], path: `process.env.${targetKey}`};
 		},
 	};
 }

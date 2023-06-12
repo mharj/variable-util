@@ -5,6 +5,8 @@ export interface LoaderValue {
 	value: string | undefined;
 	/** this is shown on logs "ConfigVariables[type]: KEY [VALUE] from {___path___}" */
 	path: string;
+	/** this is shown on logs "ConfigVariables[___type___]: ___KEY___ [VALUE] from {path}" */
+	type: string;
 }
 
 /**

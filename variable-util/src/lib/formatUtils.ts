@@ -1,4 +1,4 @@
-import {ILoggerLike} from '../interfaces/';
+import {ILoggerLike} from '@avanio/logger-like';
 
 export interface FormatParameters {
 	showValue?: boolean;

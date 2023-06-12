@@ -1,12 +1,9 @@
 import {FormatParameters, printValue} from './lib/formatUtils';
-import {IConfigLoader, IConfigParser, ILoggerLike} from './interfaces/';
+import {IConfigLoader, IConfigParser} from './interfaces/';
+import {getLogger} from './logger';
+import {ILoggerLike} from '@avanio/logger-like';
 import {Loadable} from './types/Loadable';
 import {VariableError} from './VariableError';
-
-let logger: ILoggerLike | undefined;
-export function setLogger(newLogger: ILoggerLike) {
-	logger = newLogger;
-}
 
 export function rebuildAsVariableError<Output, RawOutput = unknown>(
 	value: string,
@@ -62,14 +59,15 @@ function buildPostValidateErrorMessage<Output, RawOutput = unknown>(
 	}
 }
 
-async function handleLoader<Output, RawOutput = unknown>(
+export async function handleLoader<Output, RawOutput = unknown>(
 	rootKey: string,
 	loader: IConfigLoader,
 	parser: IConfigParser<Output, RawOutput>,
 	params?: FormatParameters,
-): Promise<Output | undefined> {
+): Promise<{type: string; value: Output | undefined} | undefined> {
+	const logger = getLogger();
 	try {
-		const {value, path} = await loader.callback(rootKey);
+		const {type, value, path} = await loader.callback(rootKey);
 		if (value) {
 			/**
 			 * pre-validate
@@ -103,8 +101,8 @@ async function handleLoader<Output, RawOutput = unknown>(
 			/**
 			 * print log
 			 */
-			printLog(loader.type, rootKey, parser.toString(output), path, params);
-			return output;
+			printLog(logger, loader.type, rootKey, parser.toString(output), path, params);
+			return {type, value: output};
 		}
 	} catch (err) {
 		logger?.error(err);
@@ -143,6 +141,7 @@ export async function getConfigVariable<Output>(
 	params?: FormatParameters,
 ): Promise<Output | undefined> {
 	let defaultValue: Output | undefined;
+	const logger = getLogger();
 	/**
 	 * get default value before loaders (to throw error before loaders)
 	 */
@@ -161,15 +160,15 @@ export async function getConfigVariable<Output>(
 	for (const loader of loaders) {
 		const output = await handleLoader(rootKey, loader, parser, params);
 		if (output !== undefined) {
-			return output;
+			return output.value;
 		}
 	}
 	if (defaultValue) {
-		printLog('default', rootKey, parser.toString(defaultValue), 'default', params);
+		printLog(logger, 'default', rootKey, parser.toString(defaultValue), 'default', params);
 	}
 	return defaultValue;
 }
 
-function printLog(type: string, key: string, value: string, path: string, params?: FormatParameters) {
+export function printLog(logger: ILoggerLike | undefined, type: string, key: string, value: string, path: string, params?: FormatParameters) {
 	logger?.info(`ConfigVariables[${type}]: ${key}${printValue(value, params)} from ${path}`);
 }
