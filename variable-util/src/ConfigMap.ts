@@ -1,3 +1,4 @@
+import {Err, IResult, Ok} from 'mharj-result';
 import {EnvMapSchema} from './types/EnvMapSchema';
 import {getConfigObject} from './getConfigObject';
 import {TypeValue} from './types/TypeValue';
@@ -10,6 +11,9 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 		this.schema = schema;
 	}
 
+	/**
+	 * get env object from config map
+	 */
 	public getObject<Key extends keyof Data = keyof Data>(key: Key): Promise<TypeValue<Data[Key]>> {
 		const entry = this.schema[key];
 		if (!entry) {
@@ -22,8 +26,33 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 		return getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params) as Promise<TypeValue<Data[Key]>>;
 	}
 
+	/**
+	 * get env object from config map as Result
+	 */
+	public async getObjectResult<Key extends keyof Data = keyof Data>(key: Key): Promise<IResult<TypeValue<Data[Key]>>> {
+		try {
+			return new Ok(await this.getObject(key));
+		} catch (err) {
+			return new Err(err);
+		}
+	}
+
+	/**
+	 * get env value from config map
+	 */
 	public async get<Key extends keyof Data = keyof Data>(key: Key): Promise<Data[Key]> {
 		return (await this.getObject(key)).value;
+	}
+
+	/**
+	 * get env value from config map as Result
+	 */
+	public async getResult<Key extends keyof Data = keyof Data>(key: Key): Promise<IResult<Data[Key]>> {
+		try {
+			return new Ok(await this.get(key));
+		} catch (err) {
+			return new Err(err);
+		}
 	}
 
 	public async getAll(): Promise<TypeValueRecords<Data>> {

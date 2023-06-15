@@ -47,10 +47,10 @@
         "@types/chai": "^4.3.5",
         "@types/chai-as-promised": "^7.1.5",
         "@types/mocha": "^10.0.1",
-        "@types/node": "^16.18.35",
+        "@types/node": "^16.18.36",
         "@types/sinon": "^10.0.15",
-        "@typescript-eslint/eslint-plugin": "^5.59.9",
-        "@typescript-eslint/parser": "^5.59.9",
+        "@typescript-eslint/eslint-plugin": "^5.59.11",
+        "@typescript-eslint/parser": "^5.59.11",
         "chai": "^4.3.7",
         "chai-as-promised": "^7.1.1",
         "cross-fetch": "^3.1.6",
@@ -71,6 +71,7 @@
     },
     "dependencies": {
         "@avanio/logger-like": "^0.1.1",
+        "mharj-result": "^0.2.1",
         "url-polyfill": "^1.1.12"
     }
 }

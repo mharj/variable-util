@@ -1,4 +1,4 @@
-import {handleLoader, printLog} from './getConfigVariable';
+import {handleLoader, printLog} from './loaderUtils';
 import {IConfigLoader, IConfigParser} from './interfaces/';
 import {FormatParameters} from './lib/formatUtils';
 import {getLogger} from './logger';
@@ -46,7 +46,12 @@ export async function getConfigObject<Output>(
 		}
 	}
 	for (const loader of loaders) {
-		const output = await handleLoader(rootKey, loader, parser, params);
+		let output: {type: string; value: Output | undefined} | undefined;
+		try {
+			output = await handleLoader(rootKey, loader, parser, params);
+		} catch (err) {
+			logger?.error(err);
+		}
 		if (output !== undefined) {
 			return output;
 		}
