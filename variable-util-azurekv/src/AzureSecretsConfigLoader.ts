@@ -1,4 +1,4 @@
-import {ConfigLoader, Loadable, LoaderValue} from '@avanio/variable-util/';
+import {ConfigLoader, Loadable, LoaderValue} from '@avanio/variable-util';
 import {SecretClient} from '@azure/keyvault-secrets';
 import {TokenCredential} from '@azure/identity';
 
