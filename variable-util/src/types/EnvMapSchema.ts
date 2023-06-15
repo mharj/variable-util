@@ -19,6 +19,14 @@ export type RequiredEnvEntry<Value> = {
 	undefinedThrowsError?: boolean;
 };
 
+export type RequiredUndefinedThrowEntry<Value> = {
+	loaders: IConfigLoader[];
+	parser: IConfigParser<Value, unknown>;
+	defaultValue?: Loadable<Value>;
+	params?: FormatParameters;
+	undefinedThrowsError: true;
+};
+
 export type EnvMapSchema<Output extends Record<string, unknown>> = {
-	[K in keyof Output]: undefined extends Output[K] ? OptionalEnvEntry<Output[K]> : RequiredEnvEntry<Output[K]>;
+	[K in keyof Output]: undefined extends Output[K] ? OptionalEnvEntry<Output[K]> : RequiredEnvEntry<Output[K]> | RequiredUndefinedThrowEntry<Output[K]>;
 };
