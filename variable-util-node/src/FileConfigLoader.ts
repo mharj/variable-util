@@ -1,5 +1,6 @@
-import {ConfigLoader, ILoggerLike, Loadable, LoaderValue, VariableError} from '@avanio/variable-util/';
+import {ConfigLoader, Loadable, LoaderValue, VariableError} from '@avanio/variable-util';
 import {existsSync} from 'fs';
+import {ILoggerLike} from '@avanio/logger-like';
 import {readFile} from 'fs/promises';
 
 export interface FileConfigLoaderOptions {

@@ -1,6 +1,7 @@
 import * as path from 'path';
-import {ConfigLoader, ILoggerLike, LoaderValue, VariableLookupError} from '@avanio/variable-util/';
+import {ConfigLoader, LoaderValue, VariableLookupError} from '@avanio/variable-util';
 import {existsSync} from 'fs';
+import {ILoggerLike} from '@avanio/logger-like';
 import {readFile} from 'fs/promises';
 
 export interface DockerSecretsConfigLoaderOptions {

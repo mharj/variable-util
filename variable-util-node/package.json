@@ -54,6 +54,9 @@
     "typescript": "^5.0.3"
   },
   "peerDependencies": {
-    "@avanio/variable-util": "^0.2.6"
+    "@avanio/variable-util": "^0.2.10"
+  },
+  "dependencies": {
+    "@avanio/logger-like": "^0.1.1"
   }
 }
