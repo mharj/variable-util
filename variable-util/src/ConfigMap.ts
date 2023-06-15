@@ -2,6 +2,7 @@ import {Err, IResult, Ok} from 'mharj-result';
 import {EnvMapSchema} from './types/EnvMapSchema';
 import {getConfigObject} from './getConfigObject';
 import {TypeValue} from './types/TypeValue';
+import {VariableError} from './VariableError';
 
 type TypeValueRecords<T> = Record<keyof T, TypeValue<T[keyof T]>>;
 
@@ -14,16 +15,20 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 	/**
 	 * get env object from config map
 	 */
-	public getObject<Key extends keyof Data = keyof Data>(key: Key): Promise<TypeValue<Data[Key]>> {
+	public async getObject<Key extends keyof Data = keyof Data>(key: Key): Promise<TypeValue<Data[Key]>> {
 		const entry = this.schema[key];
 		if (!entry) {
-			throw new Error(`Key ${String(key)} not found in config map`);
+			throw new VariableError(`Key ${String(key)} not found in config map`);
 		}
 		if (typeof key !== 'string') {
-			throw new Error(`Key ${String(key)} is not a string`);
+			throw new VariableError(`Key ${String(key)} is not a string`);
 		}
-		const {loaders, parser, defaultValue, params} = entry;
-		return getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params) as Promise<TypeValue<Data[Key]>>;
+		const {loaders, parser, defaultValue, params, undefinedThrowsError} = entry;
+		const value = (await getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params)) as TypeValue<Data[Key]>;
+		if (undefinedThrowsError && value === undefined) {
+			throw new VariableError(`Key ${String(key)} is undefined`);
+		}
+		return value;
 	}
 
 	/**

@@ -8,6 +8,7 @@ export type OptionalEnvEntry<Value> = {
 	parser: IConfigParser<Value, unknown>;
 	defaultValue?: Loadable<Value> | undefined;
 	params?: FormatParameters;
+	undefinedThrowsError?: boolean;
 };
 
 export type RequiredEnvEntry<Value> = {
@@ -15,6 +16,7 @@ export type RequiredEnvEntry<Value> = {
 	parser: IConfigParser<Value, unknown>;
 	defaultValue: Loadable<Value>;
 	params?: FormatParameters;
+	undefinedThrowsError?: boolean;
 };
 
 export type EnvMapSchema<Output extends Record<string, unknown>> = {
