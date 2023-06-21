@@ -28,5 +28,7 @@ export type RequiredUndefinedThrowEntry<Value> = {
 };
 
 export type EnvMapSchema<Output extends Record<string, unknown>> = {
-	[K in keyof Required<Output>]: undefined extends Output[K] ? OptionalEnvEntry<Output[K]> : RequiredEnvEntry<Output[K]> | RequiredUndefinedThrowEntry<Output[K]>;
+	[K in keyof Required<Output>]: undefined extends Output[K]
+		? OptionalEnvEntry<Output[K]>
+		: RequiredEnvEntry<Output[K]> | RequiredUndefinedThrowEntry<Output[K]>;
 };
