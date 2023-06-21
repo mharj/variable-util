@@ -15,6 +15,7 @@ const expect = chai.expect;
 
 type TestEnv = {
 	PORT: number;
+	DEMO?: string;
 	HOST: string;
 	DEBUG: boolean;
 	URL: URL;
@@ -22,6 +23,7 @@ type TestEnv = {
 
 const testEnvSchema = z.object({
 	DEBUG: z.boolean(),
+	DEMO: z.string().optional(),
 	HOST: z.string(),
 	PORT: z.number(),
 	URL: z.instanceof(URL),
@@ -29,6 +31,7 @@ const testEnvSchema = z.object({
 
 const config = new ConfigMap<TestEnv>({
 	DEBUG: {loaders: [env()], parser: booleanParser, defaultValue: false},
+	DEMO: {loaders: [env()], parser: stringParser},
 	HOST: {loaders: [env()], parser: stringParser, defaultValue: 'localhost'},
 	PORT: {loaders: [env()], parser: integerParser, defaultValue: 3000},
 	URL: {loaders: [env()], parser: new UrlParser({urlSanitize: true}), defaultValue: new URL('http://localhost:3000')},
@@ -84,6 +87,7 @@ describe('ConfigMap', () => {
 			const call = config.getAll();
 			await expect(call).to.be.eventually.eql({
 				DEBUG: {type: 'env', value: true},
+				DEMO: {type: undefined, value: undefined},
 				HOST: {type: 'env', value: 'minecraft'},
 				PORT: {type: 'env', value: 6000},
 				URL: {type: 'env', value: new URL('https://www.google.com/')},
