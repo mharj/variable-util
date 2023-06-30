@@ -2,13 +2,21 @@ name: Validate and publish package to npmjs
 on:
   push:
     branches: [main]
+    paths: 
+      - "variable-util/**"
   pull_request:
     branches: [main]
+    paths: 
+      - "variable-util/**"
 
 env:
   # Setting an environment variable with the value of a configuration variable
   CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+defaults:
+  run:
+    working-directory: variable-util
 
 jobs:
   build:
