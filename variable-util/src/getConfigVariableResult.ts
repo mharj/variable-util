@@ -1,4 +1,4 @@
-import {Err, IResult, Ok} from 'mharj-result';
+import {Err, Ok, Result} from 'mharj-result';
 import {IConfigLoader, IConfigParser} from './interfaces';
 import {FormatParameters} from './lib/formatUtils';
 import {getConfigVariable} from './getConfigVariable';
@@ -18,24 +18,24 @@ export async function getConfigVariableResult<Output>(
 	parser: IConfigParser<Output, unknown>,
 	defaultValueLoadable: Loadable<Output>,
 	params?: FormatParameters,
-): Promise<IResult<Output>>;
+): Promise<Result<Output>>;
 export async function getConfigVariableResult<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
 	defaultValueLoadable?: Loadable<Output> | undefined,
 	params?: FormatParameters,
-): Promise<IResult<Output | undefined>>;
+): Promise<Result<Output | undefined>>;
 export async function getConfigVariableResult<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
 	defaultValueLoadable?: Loadable<Output> | undefined,
 	params?: FormatParameters,
-): Promise<IResult<Output | undefined>> {
+): Promise<Result<Output | undefined>> {
 	try {
-		return new Ok(await getConfigVariable(rootKey, loaders, parser, defaultValueLoadable, params));
+		return Ok(await getConfigVariable(rootKey, loaders, parser, defaultValueLoadable, params));
 	} catch (err) {
-		return new Err(err);
+		return Err(err);
 	}
 }

@@ -1,4 +1,4 @@
-import {Err, IResult, Ok} from 'mharj-result';
+import {Err, Ok, Result} from 'mharj-result';
 import {EnvMapSchema} from './types/EnvMapSchema';
 import {getConfigObject} from './getConfigObject';
 import {getLogger} from './logger';
@@ -37,11 +37,11 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 	/**
 	 * get env object from config map as Result
 	 */
-	public async getObjectResult<Key extends keyof Data = keyof Data>(key: Key): Promise<IResult<TypeValue<Data[Key]>>> {
+	public async getObjectResult<Key extends keyof Data = keyof Data>(key: Key): Promise<Result<TypeValue<Data[Key]>>> {
 		try {
-			return new Ok(await this.getObject(key));
+			return Ok(await this.getObject(key));
 		} catch (err) {
-			return new Err(err);
+			return Err(err);
 		}
 	}
 
@@ -55,11 +55,11 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 	/**
 	 * get env value from config map as Result
 	 */
-	public async getResult<Key extends keyof Data = keyof Data>(key: Key): Promise<IResult<Data[Key]>> {
+	public async getResult<Key extends keyof Data = keyof Data>(key: Key): Promise<Result<Data[Key]>> {
 		try {
-			return new Ok(await this.get(key));
+			return Ok(await this.get(key));
 		} catch (err) {
-			return new Err(err);
+			return Err(err);
 		}
 	}
 

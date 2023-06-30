@@ -6,7 +6,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 import * as z from 'zod';
 import {booleanParser, ConfigMap, env, integerParser, stringParser, UrlParser} from '../src/';
-import {IResult} from 'mharj-result';
+import {Result} from 'mharj-result';
 import {URL} from 'url';
 
 dotenv.config();
@@ -63,22 +63,22 @@ describe('ConfigMap', () => {
 	describe('getResult', () => {
 		it('should return PORT env value', async function () {
 			process.env.PORT = '6000';
-			const call: IResult<number> = await config.getResult('PORT');
+			const call: Result<number> = await config.getResult('PORT');
 			expect(call.ok()).to.be.eq(6000);
 		});
 		it('should return HOST env value', async function () {
 			process.env.HOST = 'minecraft';
-			const call: IResult<string> = await config.getResult('HOST');
+			const call: Result<string> = await config.getResult('HOST');
 			expect(call.ok()).to.be.eq('minecraft');
 		});
 		it('should return DEBUG env value', async function () {
 			process.env.DEBUG = 'true';
-			const call: IResult<boolean> = await config.getResult('DEBUG');
+			const call: Result<boolean> = await config.getResult('DEBUG');
 			expect(call.ok()).to.be.eq(true);
 		});
 		it('should return URL env value', async function () {
 			process.env.URL = 'https://www.google.com';
-			const call: IResult<URL> = await config.getResult('URL');
+			const call: Result<URL> = await config.getResult('URL');
 			expect(call.ok()).to.be.eql(new URL('https://www.google.com'));
 		});
 	});
