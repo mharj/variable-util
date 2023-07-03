@@ -48,15 +48,15 @@
         "@types/chai": "^4.3.5",
         "@types/chai-as-promised": "^7.1.5",
         "@types/mocha": "^10.0.1",
-        "@types/node": "^16.18.37",
+        "@types/node": "^16.18.38",
         "@types/sinon": "^10.0.15",
         "@typescript-eslint/eslint-plugin": "^5.60.1",
         "@typescript-eslint/parser": "^5.60.1",
         "chai": "^4.3.7",
         "chai-as-promised": "^7.1.1",
-        "cross-fetch": "^3.1.6",
+        "cross-fetch": "^3.1.8",
         "dotenv": "^16.3.1",
-        "eslint": "^8.43.0",
+        "eslint": "^8.44.0",
         "eslint-config-prettier": "^8.8.0",
         "eslint-config-standard": "^17.1.0",
         "eslint-plugin-deprecation": "^1.4.1",
@@ -72,7 +72,7 @@
     },
     "dependencies": {
         "@avanio/logger-like": "^0.1.1",
-        "mharj-result": "^0.3.0",
+        "mharj-result": "^0.3.1",
         "url-polyfill": "^1.1.12"
     }
 }
