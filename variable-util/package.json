@@ -1,6 +1,6 @@
 {
     "name": "@avanio/variable-util",
-    "version": "0.2.16",
+    "version": "0.2.17",
     "description": "Utility to get variables from multiple resources",
     "main": "./dist/index.js",
     "private": false,
