@@ -10,6 +10,23 @@ import {VariableError} from './VariableError';
  */
 export type TypeValueRecords<T> = Record<keyof T, LoaderTypeValue<T[keyof T]>>;
 
+/**
+ * ConfigMap
+ * @example
+ * type ConfigEnv = {
+ * 	 PORT: number;
+ * 	 HOST: string;
+ * 	 DEBUG: boolean;
+ * 	 URL: URL;
+ * };
+ * const config = new ConfigMap<ConfigEnv>({
+ * 	 DEBUG: {loaders: [env()], parser: booleanParser, defaultValue: false},
+ * 	 HOST: {loaders: [env()], parser: stringParser, defaultValue: 'localhost'},
+ * 	 PORT: {loaders: [env()], parser: integerParser, defaultValue: 3000},
+ * 	 URL: {loaders: [env()], parser: new UrlParser({urlSanitize: true}), defaultValue: new URL('http://localhost:3000')},
+ * });
+ * console.log('port', await config.get('PORT'));
+ */
 export class ConfigMap<Data extends Record<string, unknown>> {
 	private schema: EnvMapSchema<Data>;
 	constructor(schema: EnvMapSchema<Data>) {

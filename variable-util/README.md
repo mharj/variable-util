@@ -11,9 +11,10 @@ Also have ability to parse (and verify) string, URL and JSON stringified or semi
 npm i @avanio/variable-util
 ```
 
-## [Documentation](https://avanio.github.io/variable-util/)
+## [Documentation](https://mharj.github.io/variable-util/)
 
-
+- [ConfigMap](https://mharj.github.io/variable-util/classes/ConfigMap.html)
+- [getConfigVariable](https://mharj.github.io/variable-util/functions/getConfigVariable.html)
 
 ## Usage examples
 
