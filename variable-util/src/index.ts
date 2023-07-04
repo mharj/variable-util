@@ -10,3 +10,4 @@ export * from './VariableError';
 export * from './VariableLookupError';
 export * from './ConfigMap';
 export * from './logger';
+export * from './lib';

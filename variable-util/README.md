@@ -11,6 +11,10 @@ Also have ability to parse (and verify) string, URL and JSON stringified or semi
 npm i @avanio/variable-util
 ```
 
+## [Documentation](https://avanio.github.io/variable-util/)
+
+
+
 ## Usage examples
 
 ```typescript

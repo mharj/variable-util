@@ -5,6 +5,7 @@
     "main": "./dist/index.js",
     "private": false,
     "scripts": {
+        "doc": "typedoc",
         "build": "tsc",
         "watch": "tsc -w",
         "prepublishOnly": "npm run build",
@@ -67,6 +68,7 @@
         "sinon": "^15.2.0",
         "source-map-support": "^0.5.21",
         "ts-node": "^10.9.1",
+        "typedoc": "^0.24.8",
         "typescript": "^5.1.6",
         "zod": "^3.21.4"
     },

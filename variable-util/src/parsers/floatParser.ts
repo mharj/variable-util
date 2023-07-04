@@ -1,5 +1,10 @@
 import {IConfigParser} from '../interfaces/IConfigParser';
 
+/**
+ * Float parser function is used to parse and validate env variables of type float.
+ * @implements {IConfigParser<number, number>}
+ * @category Parsers
+ */
 export const floatParser: IConfigParser<number, number> = {
 	name: 'floatParser',
 	parse: async (key: string, value: string): Promise<number> => {

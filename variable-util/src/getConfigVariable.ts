@@ -4,6 +4,7 @@ import {getConfigObject} from './getConfigObject';
 import {Loadable} from './types/Loadable';
 
 /**
+ * get config variable from loaders
  * @example
  * // from "@avanio/variable-util-node"
  * const fileEnv = new FileConfigLoader({fileName: './settings.json', type: 'json'}).getLoader;

@@ -2,9 +2,12 @@ import {parseSemicolonConfig, stringifySemicolonConfig} from '../lib/semicolonUt
 import {IConfigParser} from '../interfaces/IConfigParser';
 import {ValidateCallback} from '../interfaces/IValidate';
 
-type ConfigParseType = Record<string, string>;
+/**
+ * The base type of the parsed JSON object
+ */
+export type ConfigParseType = Record<string, string>;
 
-interface SemicolonConfigParserOptions<Out extends ConfigParseType = ConfigParseType, RawType extends ConfigParseType = ConfigParseType> {
+export interface SemicolonConfigParserOptions<Out extends ConfigParseType = ConfigParseType, RawType extends ConfigParseType = ConfigParseType> {
 	keysToHide?: string[];
 	validate?: ValidateCallback<Out, RawType>;
 	/**
@@ -13,6 +16,11 @@ interface SemicolonConfigParserOptions<Out extends ConfigParseType = ConfigParse
 	keepCase?: boolean;
 }
 
+/**
+ * A parser for semicolon separated string as config
+ * @implements {IConfigParser<Out, RawType>}
+ * @category Parsers
+ */
 export class SemicolonConfigParser<Out extends ConfigParseType = ConfigParseType, RawType extends ConfigParseType = ConfigParseType>
 	implements IConfigParser<Out, RawType>
 {

@@ -1,13 +1,16 @@
+import {isRequestNotReadMessage, type RequestNotReady} from '../types/RequestNotReady';
 import {ConfigLoader} from './ConfigLoader';
 import type {ILoggerLike} from '@avanio/logger-like';
 import type {IRequestCache} from '../interfaces/IRequestCache';
 import type {LoaderValue} from '../interfaces/IConfigLoader';
-import type {RequestNotReady} from '../types/RequestNotReady';
 import {urlSanitize} from '../lib/formatUtils';
 import type {ValidateCallback} from '../interfaces/IValidate';
 import {VariableError} from '../VariableError';
 
-interface FetchConfigLoaderOptions {
+/**
+ * Options for the FetchConfigLoader
+ */
+export interface FetchConfigLoaderOptions {
 	fetchClient: typeof fetch;
 	/** this prevents Error to be thrown if have http error */
 	isSilent: boolean;
@@ -31,14 +34,18 @@ interface FetchConfigLoaderOptions {
 	cache?: IRequestCache;
 }
 
-type ConfigRequest = Request | RequestNotReady;
+export type ConfigRequest = Request | RequestNotReady;
 
-type FetchConfigRequest = ConfigRequest | Promise<ConfigRequest> | (() => ConfigRequest | Promise<ConfigRequest>);
+/**
+ * FetchConfigRequest is used to load config from a fetch request
+ */
+export type FetchConfigRequest = ConfigRequest | Promise<ConfigRequest> | (() => ConfigRequest | Promise<ConfigRequest>);
 
-function isRequestNotReadMessage(obj: unknown): obj is RequestNotReady {
-	return typeof obj === 'object' && obj !== null && 'message' in obj && typeof (obj as RequestNotReady).message === 'string';
-}
-
+/**
+ * FetchConfigLoader is used to load config from a fetch request
+ * @category Loaders
+ * @implements {IConfigLoader}
+ */
 export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	public type = 'fetch';
 	private request: FetchConfigRequest;
@@ -56,7 +63,7 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	};
 
 	/**
-	 *
+	 * Constructor for FetchConfigLoader
 	 * @param requestCallback - callback that returns a fetch request or a message object that the request is not ready
 	 * @param _options
 	 */

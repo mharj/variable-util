@@ -1,5 +1,11 @@
 import {IConfigLoader, LoaderValue} from '../interfaces/IConfigLoader';
 
+/**
+ * env loader function is used to load env variables from process.env
+ * @param {string} [overrideKey] - optional override key for lookup
+ * @returns {IConfigLoader} - IConfigLoader object
+ * @category Loaders
+ */
 export function env(overrideKey?: string | undefined): IConfigLoader {
 	return {
 		type: 'env',

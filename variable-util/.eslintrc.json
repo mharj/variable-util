@@ -57,6 +57,7 @@
                 "exceptAfterOverload": true,
                 "exceptAfterSingleLine": true
             }
-        ]
+        ],
+        "@typescript-eslint/explicit-function-return-type": "error"
     }
 }

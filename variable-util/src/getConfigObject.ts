@@ -5,6 +5,20 @@ import {getLogger} from './logger';
 import {Loadable} from './types/Loadable';
 import {VariableError} from './VariableError';
 
+/**
+ * get config object which contains value and type of loader
+ * @param rootKey root key of config object
+ * @param loaders array of loaders
+ * @param parser parser for value
+ * @param defaultValueLoadable optional default value
+ * @param params optional format parameters
+ * @example
+ * // from "@avanio/variable-util-node"
+ * const fileEnv = new FileConfigLoader({fileName: './settings.json', type: 'json'}).getLoader;
+ * const portConfig: {type: string | undefined; value: string} = await getConfigObject('PORT', [env(), fileEnv()], stringParser, '8080', {showValue: true});
+ * const value: string = portConfig.value;
+ * const type: string | undefined = portConfig.type; // loader type name
+ */
 export async function getConfigObject<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],

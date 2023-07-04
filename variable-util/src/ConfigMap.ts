@@ -2,10 +2,13 @@ import {Err, Ok, Result} from 'mharj-result';
 import {EnvMapSchema} from './types/EnvMapSchema';
 import {getConfigObject} from './getConfigObject';
 import {getLogger} from './logger';
-import {TypeValue} from './types/TypeValue';
+import {LoaderTypeValue} from './types/TypeValue';
 import {VariableError} from './VariableError';
 
-type TypeValueRecords<T> = Record<keyof T, TypeValue<T[keyof T]>>;
+/**
+ * TypeValueRecords
+ */
+export type TypeValueRecords<T> = Record<keyof T, LoaderTypeValue<T[keyof T]>>;
 
 export class ConfigMap<Data extends Record<string, unknown>> {
 	private schema: EnvMapSchema<Data>;
@@ -16,7 +19,7 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 	/**
 	 * get env object from config map
 	 */
-	public async getObject<Key extends keyof Data = keyof Data>(key: Key): Promise<TypeValue<Data[Key]>> {
+	public async getObject<Key extends keyof Data = keyof Data>(key: Key): Promise<LoaderTypeValue<Data[Key]>> {
 		const logger = getLogger();
 		const entry = this.schema[key];
 		if (!entry) {
@@ -26,7 +29,7 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 			throw new VariableError(`ConfigMap key ${String(key)} is not a string`);
 		}
 		const {loaders, parser, defaultValue, params, undefinedThrowsError} = entry;
-		const configObject = (await getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params)) as TypeValue<Data[Key]>;
+		const configObject = (await getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params)) as LoaderTypeValue<Data[Key]>;
 		if (undefinedThrowsError && configObject.value === undefined) {
 			logger?.info(`ConfigMap key ${String(key)} is undefined (expect to throw error)`);
 			throw new VariableError(`ConfigMap key ${String(key)} is undefined`);
@@ -37,7 +40,7 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 	/**
 	 * get env object from config map as Result
 	 */
-	public async getObjectResult<Key extends keyof Data = keyof Data>(key: Key): Promise<Result<TypeValue<Data[Key]>>> {
+	public async getObjectResult<Key extends keyof Data = keyof Data>(key: Key): Promise<Result<LoaderTypeValue<Data[Key]>>> {
 		try {
 			return Ok(await this.getObject(key));
 		} catch (err) {
@@ -65,7 +68,7 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 
 	public async getAll(): Promise<TypeValueRecords<Data>> {
 		const values = await Promise.all(
-			(Object.keys(this.schema) as (keyof Data)[]).map<Promise<[keyof Data, TypeValue<Data[keyof Data]>]>>(async (key) => {
+			(Object.keys(this.schema) as (keyof Data)[]).map<Promise<[keyof Data, LoaderTypeValue<Data[keyof Data]>]>>(async (key) => {
 				return [key, await this.getObject(key as keyof Data)];
 			}),
 		);
@@ -76,7 +79,7 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 	}
 
 	public async validateAll(callback: (data: Data) => void): Promise<void> {
-		const data = (Object.entries(await this.getAll()) as [[keyof Data, TypeValue<Data[keyof Data]>]]).reduce((result, [key, {value}]) => {
+		const data = (Object.entries(await this.getAll()) as [[keyof Data, LoaderTypeValue<Data[keyof Data]>]]).reduce((result, [key, {value}]) => {
 			result[key] = value;
 			return result;
 		}, {} as Data);

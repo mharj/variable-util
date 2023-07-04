@@ -1,5 +1,11 @@
 import {IConfigLoader, LoaderValue} from '../interfaces/IConfigLoader';
 
+/**
+ * React env loader function is used to load env variables from process.env.REACT_APP_*
+ * @param {string} [overrideKey] - optional override key for lookup
+ * @returns {IConfigLoader} - IConfigLoader object
+ * @category Loaders
+ */
 export function reactEnv(overrideKey?: string | undefined): IConfigLoader {
 	return {
 		type: 'react-env',

@@ -1,9 +1,19 @@
 import {ILoggerLike} from '@avanio/logger-like';
 
+/**
+ * Format parameters for the variables
+ */
 export interface FormatParameters {
 	showValue?: boolean;
 }
 
+/**
+ * Sanitizes a URL by replacing the username and password with asterisks.
+ * @param {string} value - The URL to sanitize.
+ * @param {ILoggerLike} [logger] - An optional logger to use for logging warnings.
+ * @returns {string} The sanitized URL.
+ * @category Utils
+ */
 export function urlSanitize(value: string, logger?: ILoggerLike): string {
 	try {
 		const url = new URL(value);
@@ -12,12 +22,20 @@ export function urlSanitize(value: string, logger?: ILoggerLike): string {
 		return url.href;
 	} catch (err) {
 		// warn to log if can't parse url
-		logger && logger.warn('variables:', err);
+		logger?.warn('variables:', err);
 		return value;
 	}
 }
 
-export function printValue(value: string | undefined, config: FormatParameters | undefined) {
+/**
+ * Returns a formatted string representation of a value, enclosed in square brackets.
+ * @param {string | undefined} value - The value to format.
+ * @param {FormatParameters | undefined} config - An optional configuration object.
+ * @param {boolean} config.showValue - Whether to include the value in the output.
+ * @returns {string} The formatted string representation of the value.
+ * @category Utils
+ */
+export function printValue(value: string | undefined, config: FormatParameters | undefined): string {
 	if (!config || !config.showValue) {
 		return '';
 	}

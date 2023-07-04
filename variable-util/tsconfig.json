@@ -27,6 +27,11 @@
         "noUnusedLocals": true,
         "strict": true,
     },
+    "typedocOptions": {
+		"entryPoints": ["src/index.ts"],
+		"out": "docs",
+        "defaultCategory": "General",
+	},
     "include": [
         "src"
     ],

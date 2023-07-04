@@ -6,7 +6,7 @@ const booleanFalseStringValues = ['false', '0', 'no', 'n', 'off'];
 const allBooleanStringValues = [...booleanFalseStringValues, ...booleanTrueStringValues];
 
 /**
- * parses a string to a boolean
+ * Boolean parser function is used to parse and validate env variables of type boolean.
  *
  * supports the following string ___true___ values:
  * - true
@@ -21,6 +21,8 @@ const allBooleanStringValues = [...booleanFalseStringValues, ...booleanTrueStrin
  * - no
  * - n
  * - off
+ * @implements {IConfigParser<boolean, boolean>}
+ * @category Parsers
  */
 export const booleanParser: IConfigParser<boolean, boolean> = {
 	name: 'booleanParser',

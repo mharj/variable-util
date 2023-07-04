@@ -1,3 +1,6 @@
+/**
+ * Interface for the LoaderValue output payload
+ */
 export interface LoaderValue {
 	/**
 	 * this is shown on logs "ConfigVariables[type]: KEY [___VALUE___] from {path}" if showValue is true
@@ -10,9 +13,7 @@ export interface LoaderValue {
 }
 
 /**
- * @typedef {Object} IConfigLoader
- * @property {type} type - this is shown on logs "ConfigVariables[___type___]: KEY [VALUE] from {path}"
- * @property {function(lookupKey: string): Promise<LoaderValue>} callback - The Y Coordinate
+ * Interface for config loaders
  */
 export interface IConfigLoader {
 	/**

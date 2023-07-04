@@ -7,10 +7,10 @@ import {Loadable} from './types/Loadable';
 /**
  * @example
  * // from "@avanio/variable-util-node"
- * const port: Promise<IResult<string>> = await getConfigVariableResult('PORT', [env(), fileEnv()], stringParser, '8080', {showValue: true});
+ * const portResult: Result<string> = await getConfigVariableResult('PORT', [env(), fileEnv()], stringParser, '8080', {showValue: true});
  *
- * const value: string = port.unwrap(); //  get value or throw error
- * const value: string | undefined = port.ok(); //  get value or undefined
+ * const value: string = portResult.unwrap(); //  get value or throw error
+ * const value: string | undefined = portResult.ok(); //  get value or undefined
  */
 export async function getConfigVariableResult<Output>(
 	rootKey: string,

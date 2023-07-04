@@ -1,5 +1,10 @@
 import {IConfigLoader, LoaderValue} from '../interfaces/';
 
+/**
+ * Abstract base class for config loaders
+ * @category Loaders
+ * @abstract
+ */
 export abstract class ConfigLoader<HandlerParams> {
 	public abstract type: string;
 	constructor() {

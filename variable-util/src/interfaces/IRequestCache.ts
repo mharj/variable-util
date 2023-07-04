@@ -1,5 +1,6 @@
 /**
  * interface for a request cache
+ * @category Utils
  * @example
  * const exampleCache: IRequestCache = {
  *   isOnline() {

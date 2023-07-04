@@ -1,8 +1,16 @@
 import {IConfigParser} from '../interfaces/IConfigParser';
 import {ValidateCallback} from '../interfaces/IValidate';
 
-type JsonParseType = Record<string, unknown>;
+/**
+ * The base type of the parsed JSON object
+ */
+export type JsonParseType = Record<string, unknown>;
 
+/**
+ * A parser for JSON sting as config
+ * @implements {IConfigParser<Out, JsonParseType>}
+ * @category Parsers
+ */
 export class JsonConfigParser<Out extends JsonParseType> implements IConfigParser<Out, JsonParseType> {
 	public name = 'jsonConfigParser';
 	private keysToHide: string[] | undefined;
