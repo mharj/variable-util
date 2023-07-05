@@ -15,6 +15,9 @@ npm i @avanio/variable-util
 
 - [ConfigMap](https://mharj.github.io/variable-util/classes/ConfigMap.html)
 - [getConfigVariable](https://mharj.github.io/variable-util/functions/getConfigVariable.html)
+- [getConfigVariableResult](https://mharj.github.io/variable-util/functions/getConfigVariableResult.html)
+- [getConfigObject](https://mharj.github.io/variable-util/functions/getConfigObject.html)
+- [getConfigObjectResult](https://mharj.github.io/variable-util/functions/getConfigObjectResult.html)
 
 ## Usage examples
 
@@ -121,7 +124,7 @@ A IConfigLoader instance that loads configuration values from the process.env.
 
 ### `reactEnv(): IConfigLoader`
 
-A IConfigLoader instance that loads configuration values from the process.env. with REACT*APP* prefix.
+A IConfigLoader instance that loads configuration values from the process.env. with ```REACT_APP_*``` prefix.
 
 ### `new FetchConfigLoader(() => Promise<Response | RequestNotReadyMessage>, options?: FetchConfigLoaderOptions).getLoader: IConfigLoader`
 

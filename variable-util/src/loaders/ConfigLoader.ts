@@ -23,5 +23,10 @@ export abstract class ConfigLoader<HandlerParams> {
 		};
 	}
 
+	/**
+	 * implementation of config loader function
+	 * @param lookupKey - key to lookup in config
+	 * @param params - optional passing params for handleLoader (i.e. lookup key override, settings etc.)
+	 */
 	protected abstract handleLoader(lookupKey: string, params?: HandlerParams): Promise<LoaderValue>;
 }
