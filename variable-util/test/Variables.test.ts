@@ -18,6 +18,7 @@ import {
 	IRequestCache,
 	JsonConfigParser,
 	reactEnv,
+	RequestNotReady,
 	SemicolonConfigParser,
 	setLogger,
 	stringParser,
@@ -61,8 +62,6 @@ const spyLogger = {
 	warn: warnSpy,
 };
 
-setLogger(spyLogger);
-
 const objectSchema = z.object({
 	foo: z.string(),
 	baz: z.string(),
@@ -82,7 +81,8 @@ const fetchValidate: ValidateCallback<Record<string, string | null>, Record<stri
 let fetchEnv: (params?: string | undefined) => IConfigLoader;
 const urlDefault = new URL('http://localhost/api');
 let fetchRequestData: Request | undefined;
-function handleFetchRequest() {
+
+function handleFetchRequest(): Request | RequestNotReady {
 	if (fetchRequestData) {
 		return fetchRequestData;
 	}
@@ -90,6 +90,9 @@ function handleFetchRequest() {
 }
 
 describe('config variable', () => {
+	before(() => {
+		setLogger(spyLogger);
+	});
 	beforeEach(() => {
 		delete process.env.REACT_APP_TEST;
 		delete process.env.TEST;

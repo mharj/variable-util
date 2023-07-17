@@ -29,6 +29,7 @@ export type TypeValueRecords<T> = Record<keyof T, LoaderTypeValue<T[keyof T]>>;
  */
 export class ConfigMap<Data extends Record<string, unknown>> {
 	private schema: EnvMapSchema<Data>;
+	private cache = new Map<string, LoaderTypeValue<Data[keyof Data]>>();
 	constructor(schema: EnvMapSchema<Data>) {
 		this.schema = schema;
 	}
@@ -46,10 +47,20 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 			throw new VariableError(`ConfigMap key ${String(key)} is not a string`);
 		}
 		const {loaders, parser, defaultValue, params, undefinedThrowsError} = entry;
+		if (!params || params?.cache !== false) {
+			// return cached value if exists
+			const cached = this.cache.get(key);
+			if (cached) {
+				return cached as LoaderTypeValue<Data[Key]>;
+			}
+		}
 		const configObject = (await getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params)) as LoaderTypeValue<Data[Key]>;
 		if (undefinedThrowsError && configObject.value === undefined) {
 			logger?.info(`ConfigMap key ${String(key)} is undefined (expect to throw error)`);
 			throw new VariableError(`ConfigMap key ${String(key)} is undefined`);
+		}
+		if (!params || params?.cache !== false) {
+			this.cache.set(key, configObject);
 		}
 		return configObject;
 	}

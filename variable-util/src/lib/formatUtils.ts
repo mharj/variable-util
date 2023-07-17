@@ -4,7 +4,14 @@ import {ILoggerLike} from '@avanio/logger-like';
  * Format parameters for the variables
  */
 export interface FormatParameters {
+	/**
+	 * Whether to show the value in the output, defaults to false
+	 */
 	showValue?: boolean;
+	/**
+	 * Whether to cache the value on first load, defaults to true
+	 */
+	cache?: boolean;
 }
 
 /**

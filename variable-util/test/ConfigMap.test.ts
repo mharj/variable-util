@@ -1,17 +1,34 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable sort-keys */
 /* eslint-disable sonarjs/no-duplicate-string */
 import 'cross-fetch/polyfill';
 import 'mocha';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
+import * as sinon from 'sinon';
 import * as z from 'zod';
-import {booleanParser, ConfigMap, env, integerParser, stringParser, UrlParser} from '../src/';
+import {booleanParser, ConfigMap, env, integerParser, setLogger, stringParser, UrlParser} from '../src/';
 import {Result} from 'mharj-result';
 import {URL} from 'url';
 
 dotenv.config();
 chai.use(chaiAsPromised);
 const expect = chai.expect;
+
+const debugSpy = sinon.spy();
+const infoSpy = sinon.spy();
+const errorSpy = sinon.spy();
+const warnSpy = sinon.spy();
+const traceSpy = sinon.spy();
+
+export const spyLogger = {
+	debug: debugSpy,
+	error: errorSpy,
+	info: infoSpy,
+	trace: traceSpy,
+	warn: warnSpy,
+};
 
 type TestEnv = {
 	PORT: number;
@@ -30,7 +47,7 @@ const testEnvSchema = z.object({
 });
 
 const config = new ConfigMap<TestEnv>({
-	DEBUG: {loaders: [env()], parser: booleanParser, defaultValue: false},
+	DEBUG: {loaders: [env()], parser: booleanParser, defaultValue: false, params: {cache: false}},
 	DEMO: {loaders: [env()], parser: stringParser},
 	HOST: {loaders: [env()], parser: stringParser, defaultValue: 'localhost'},
 	PORT: {loaders: [env()], parser: integerParser, defaultValue: 3000},
@@ -38,11 +55,28 @@ const config = new ConfigMap<TestEnv>({
 });
 
 describe('ConfigMap', () => {
+	before(() => {
+		setLogger(spyLogger);
+	});
+	beforeEach(() => {
+		debugSpy.resetHistory();
+		infoSpy.resetHistory();
+		errorSpy.resetHistory();
+		warnSpy.resetHistory();
+		traceSpy.resetHistory();
+	});
 	describe('get', () => {
 		it('should return PORT env value', async function () {
 			process.env.PORT = '6000';
 			const call: Promise<number> = config.get('PORT');
 			await expect(call).to.be.eventually.eq(6000);
+			expect(infoSpy.callCount).to.be.eq(1);
+		});
+		it('should return PORT env value (cached)', async function () {
+			process.env.PORT = '6000';
+			const call: Promise<number> = config.get('PORT');
+			await expect(call).to.be.eventually.eq(6000);
+			expect(infoSpy.callCount).to.be.eq(0);
 		});
 		it('should return HOST env value', async function () {
 			process.env.HOST = 'minecraft';
@@ -53,6 +87,13 @@ describe('ConfigMap', () => {
 			process.env.DEBUG = 'true';
 			const call: Promise<boolean> = config.get('DEBUG');
 			await expect(call).to.be.eventually.eq(true);
+			expect(infoSpy.callCount).to.be.eq(1);
+		});
+		it('should return DEBUG env value (not cached)', async function () {
+			process.env.DEBUG = 'true';
+			const call: Promise<boolean> = config.get('DEBUG');
+			await expect(call).to.be.eventually.eq(true);
+			expect(infoSpy.callCount).to.be.eq(1);
 		});
 		it('should return URL env value', async function () {
 			process.env.URL = 'https://www.google.com';
