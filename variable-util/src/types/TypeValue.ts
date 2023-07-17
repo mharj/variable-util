@@ -10,4 +10,5 @@ export type LoaderTypeValue<T> = {
 	 * Loader value
 	 */
 	value: T;
+	stringValue: string;
 };

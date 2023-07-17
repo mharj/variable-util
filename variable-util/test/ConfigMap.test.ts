@@ -101,6 +101,58 @@ describe('ConfigMap', () => {
 			await expect(call).to.be.eventually.eql(new URL('https://www.google.com'));
 		});
 	});
+	describe('getString', () => {
+		it('should return PORT env value', async function () {
+			process.env.PORT = '6000';
+			const call: Promise<string> = config.getString('PORT');
+			await expect(call).to.be.eventually.eq('6000');
+		});
+		it('should return HOST env value', async function () {
+			process.env.HOST = 'minecraft';
+			const call: Promise<string> = config.getString('HOST');
+			await expect(call).to.be.eventually.eq('minecraft');
+		});
+		it('should return DEBUG env value', async function () {
+			process.env.DEBUG = 'true';
+			const call: Promise<string> = config.getString('DEBUG');
+			await expect(call).to.be.eventually.eq('true');
+		});
+		it('should return DEMO env value', async function () {
+			const call: Promise<string | undefined> = config.getString('DEMO');
+			await expect(call).to.be.eventually.eq(undefined);
+		});
+		it('should return URL env value', async function () {
+			process.env.URL = 'https://www.google.com/';
+			const call: Promise<string> = config.getString('URL');
+			await expect(call).to.be.eventually.eq('https://www.google.com/');
+		});
+	});
+	describe('getStringResult', () => {
+		it('should return PORT env value', async function () {
+			process.env.PORT = '6000';
+			const call: Result<string, unknown> = await config.getStringResult('PORT');
+			expect(call.ok()).to.be.eq('6000');
+		});
+		it('should return HOST env value', async function () {
+			process.env.HOST = 'minecraft';
+			const call: Result<string, unknown> = await config.getStringResult('HOST');
+			expect(call.ok()).to.be.eq('minecraft');
+		});
+		it('should return DEBUG env value', async function () {
+			process.env.DEBUG = 'true';
+			const call: Result<string | undefined, unknown> = await config.getStringResult('DEBUG');
+			expect(call.ok()).to.be.eq('true');
+		});
+		it('should return DEMO env value', async function () {
+			const call: Result<string | undefined, unknown> = await config.getStringResult('DEMO');
+			expect(call.ok()).to.be.eq(undefined);
+		});
+		it('should return URL env value', async function () {
+			process.env.URL = 'https://www.google.com/';
+			const call: Result<string | undefined, unknown> = await config.getStringResult('URL');
+			expect(call.ok()).to.be.eq('https://www.google.com/');
+		});
+	});
 	describe('getResult', () => {
 		it('should return PORT env value', async function () {
 			process.env.PORT = '6000';
@@ -125,13 +177,13 @@ describe('ConfigMap', () => {
 	});
 	describe('getAll', () => {
 		it('should get all values', async function () {
-			const call = config.getAll();
+			const call = config.getAllObjects();
 			await expect(call).to.be.eventually.eql({
-				DEBUG: {type: 'env', value: true},
-				DEMO: {type: undefined, value: undefined},
-				HOST: {type: 'env', value: 'minecraft'},
-				PORT: {type: 'env', value: 6000},
-				URL: {type: 'env', value: new URL('https://www.google.com/')},
+				DEBUG: {type: 'env', value: true, stringValue: 'true'},
+				DEMO: {type: undefined, value: undefined, stringValue: undefined},
+				HOST: {type: 'env', value: 'minecraft', stringValue: 'minecraft'},
+				PORT: {type: 'env', value: 6000, stringValue: '6000'},
+				URL: {type: 'env', value: new URL('https://www.google.com/'), stringValue: 'https://www.google.com/'},
 			});
 		});
 	});

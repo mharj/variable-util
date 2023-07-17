@@ -120,7 +120,7 @@ export async function handleLoader<Output, RawOutput = unknown>(
 	loader: IConfigLoader,
 	parser: IConfigParser<Output, RawOutput>,
 	params?: FormatParameters,
-): Promise<{type: string; value: Output | undefined} | undefined> {
+): Promise<{type: string; value: Output | undefined; stringValue: string | undefined} | undefined> {
 	const logger = getLogger();
 	try {
 		const {type, value, path} = await loader.callback(rootKey);
@@ -157,8 +157,9 @@ export async function handleLoader<Output, RawOutput = unknown>(
 			/**
 			 * print log
 			 */
-			printLog(logger, loader.type, rootKey, parser.toString(output), path, params);
-			return {type, value: output};
+			const stringValue = parser.toString(output);
+			printLog(logger, loader.type, rootKey, stringValue, path, params);
+			return {type, value: output, stringValue};
 		}
 	} catch (err) {
 		logger?.error(err);
