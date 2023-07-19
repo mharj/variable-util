@@ -32,29 +32,29 @@
   "author": "mharj",
   "license": "MIT",
   "devDependencies": {
-    "@avanio/variable-util": "^0.2.6",
-    "@types/chai": "^4.3.4",
+    "@avanio/variable-util": "^0.3.0",
+    "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^16.18.23",
-    "@types/sinon": "^10.0.13",
-    "@typescript-eslint/eslint-plugin": "^5.59.1",
-    "@typescript-eslint/parser": "^5.59.1",
+    "@types/node": "^16.18.38",
+    "@types/sinon": "^10.0.15",
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "@typescript-eslint/parser": "^6.1.0",
     "chai": "^4.3.7",
-    "eslint": "^8.39.0",
+    "eslint": "^8.45.0",
     "eslint-config-prettier": "^8.8.0",
-    "eslint-config-standard": "^17.0.0",
+    "eslint-config-standard": "^17.1.0",
     "eslint-plugin-deprecation": "^1.4.1",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-sonarjs": "^0.19.0",
     "mocha": "^10.2.0",
     "prettier": "^2.8.8",
-    "sinon": "^15.0.3",
+    "sinon": "^15.2.0",
     "source-map-support": "^0.5.21",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.3"
+    "typescript": "^5.1.6"
   },
   "peerDependencies": {
-    "@avanio/variable-util": "^0.2.10"
+    "@avanio/variable-util": "^0.3.0"
   },
   "dependencies": {
     "@avanio/logger-like": "^0.1.1"

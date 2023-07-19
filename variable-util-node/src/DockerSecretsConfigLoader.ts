@@ -37,7 +37,7 @@ export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined> 
 			}
 		}
 		const value = await this.valuePromises[targetKey];
-		return {value, path: filePath};
+		return {value, path: filePath, type: this.type};
 	}
 
 	private filePath(key: string): string {

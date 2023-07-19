@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-expressions */
-import * as path from 'path';
-import {getConfigVariable, setLogger, stringParser} from '@avanio/variable-util';
-import {expect} from 'chai';
 import 'mocha';
+import * as path from 'path';
 import * as sinon from 'sinon';
 import {DockerSecretsConfigLoader, FileConfigLoader} from '../src';
+import {getConfigVariable, setLogger, stringParser} from '@avanio/variable-util';
+import {expect} from 'chai';
 
 const debugSpy = sinon.spy();
 const infoSpy = sinon.spy();
@@ -32,53 +32,53 @@ describe('config variable', () => {
 	describe('File loader', () => {
 		it('should return file variable value, filename from string', async function () {
 			const fileEnv = new FileConfigLoader({fileName: jsonFilename, type: 'json'}).getLoader;
-			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser, undefined, {showValue: true})).to.be.eq('settings_file');
+			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);
 		});
 		it('should return file variable value, filename from promise', async function () {
 			const fileEnv = new FileConfigLoader({fileName: Promise.resolve(jsonFilename), type: 'json'}).getLoader;
-			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser, undefined, {showValue: true})).to.be.eq('settings_file');
+			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);
 		});
 		it('should return file variable value, filename from callback', async function () {
 			const fileEnv = new FileConfigLoader({fileName: () => jsonFilename, type: 'json'}).getLoader;
-			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser, undefined, {showValue: true})).to.be.eq('settings_file');
+			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);
 		});
 		it('should return file variable value, filename from callback Promise', async function () {
 			const fileEnv = new FileConfigLoader({fileName: async () => jsonFilename, type: 'json'}).getLoader;
-			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser, undefined, {showValue: true})).to.be.eq('settings_file');
+			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);
 		});
 		it('should return file variable value, filename from promise callback', async function () {
 			const fileEnv = new FileConfigLoader({fileName: async () => jsonFilename, type: 'json'}).getLoader;
-			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser, undefined, {showValue: true})).to.be.eq('settings_file');
+			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);
 		});
 		it('should return error when isSilent = false and file not exists', async function () {
 			const fileEnv = new FileConfigLoader({fileName: './test/testSettings99.json', isSilent: false, type: 'json'}).getLoader;
-			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser, undefined, {showValue: true})).to.be.eq(undefined);
+			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq(undefined);
 			expect(errorSpy.calledOnce).to.be.true;
 		});
 	});
 	describe('Docker Secrets loader', () => {
 		it('should return docker secret value force lowercase key', async function () {
 			const dockerEnv = new DockerSecretsConfigLoader({path: './test', fileLowerCase: true}).getLoader;
-			expect(await getConfigVariable('DOCKERSECRET1', [dockerEnv()], stringParser, undefined, {showValue: true})).to.be.eq('docker_value');
+			expect(await getConfigVariable('DOCKERSECRET1', [dockerEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('docker_value');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(
 				`ConfigVariables[docker-secrets]: DOCKERSECRET1 [docker_value] from ${path.join(path.resolve('./test/'), 'dockersecret1')}`,
 			);
 		});
 		it('should return docker secret value', async function () {
 			const dockerEnv = new DockerSecretsConfigLoader({path: './test'}).getLoader;
-			expect(await getConfigVariable('dockersecret2', [dockerEnv()], stringParser, undefined, {showValue: true})).to.be.eq('docker_value');
+			expect(await getConfigVariable('dockersecret2', [dockerEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('docker_value');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(
 				`ConfigVariables[docker-secrets]: dockersecret2 [docker_value] from ${path.join(path.resolve('./test/'), 'dockersecret2')}`,
 			);
 		});
 		it('should return error when isSilent = false and file not exists', async function () {
 			const dockerEnv = new DockerSecretsConfigLoader({path: './test', fileLowerCase: true, isSilent: false}).getLoader;
-			expect(await getConfigVariable('DOCKERSECRET99', [dockerEnv()], stringParser, undefined, {showValue: true})).to.be.eq(undefined);
+			expect(await getConfigVariable('DOCKERSECRET99', [dockerEnv()], stringParser(), undefined, {showValue: true})).to.be.eq(undefined);
 			expect(errorSpy.calledOnce).to.be.true;
 		});
 	});

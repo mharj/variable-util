@@ -38,7 +38,7 @@ export class FileConfigLoader extends ConfigLoader<string | undefined> {
 		const fileName = await this.getFileName();
 		const data = await this.filePromise;
 		const targetKey = key || rootKey;
-		return {value: data[targetKey], path: fileName};
+		return {value: data[targetKey], path: fileName, type: this.type};
 	}
 
 	private async loadFile(): Promise<Record<string, string | undefined>> {
