@@ -23,7 +23,7 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined> {
 			value,
 			properties: {vaultUrl},
 		} = await client.getSecret(targetKey);
-		return {value, path: `${vaultUrl}/${targetKey}`};
+		return {value, path: `${vaultUrl}/${targetKey}`, type: this.type};
 	}
 
 	private async getClient(): Promise<SecretClient> {
