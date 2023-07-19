@@ -8,7 +8,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 import * as sinon from 'sinon';
 import * as z from 'zod';
-import {booleanParser, ConfigMap, env, integerParser, setLogger, stringParser, UrlParser} from '../src/';
+import {booleanParser, ConfigMap, env, integerParser, setLogger, stringParser, UrlParser, validLiteral} from '../src/';
 import {Result} from 'mharj-result';
 import {URL} from 'url';
 
@@ -36,6 +36,7 @@ type TestEnv = {
 	HOST: string;
 	DEBUG: boolean;
 	URL: URL;
+	CONSTANT: 'constant';
 };
 
 const testEnvSchema = z.object({
@@ -44,14 +45,16 @@ const testEnvSchema = z.object({
 	HOST: z.string(),
 	PORT: z.number(),
 	URL: z.instanceof(URL),
+	CONSTANT: z.literal('constant'),
 });
 
 const config = new ConfigMap<TestEnv>({
-	DEBUG: {loaders: [env()], parser: booleanParser, defaultValue: false, params: {cache: false}},
-	DEMO: {loaders: [env()], parser: stringParser},
-	HOST: {loaders: [env()], parser: stringParser, defaultValue: 'localhost'},
-	PORT: {loaders: [env()], parser: integerParser, defaultValue: 3000},
+	DEBUG: {loaders: [env()], parser: booleanParser(), defaultValue: false, params: {cache: false}},
+	DEMO: {loaders: [env()], parser: stringParser()},
+	HOST: {loaders: [env()], parser: stringParser(), defaultValue: 'localhost'},
+	PORT: {loaders: [env()], parser: integerParser(), defaultValue: 3000},
 	URL: {loaders: [env()], parser: new UrlParser({urlSanitize: true}), defaultValue: new URL('http://localhost:3000')},
+	CONSTANT: {loaders: [env()], parser: stringParser(validLiteral(['constant'] as const)), defaultValue: 'constant'},
 });
 
 describe('ConfigMap', () => {
@@ -99,6 +102,11 @@ describe('ConfigMap', () => {
 			process.env.URL = 'https://www.google.com';
 			const call: Promise<URL> = config.get('URL');
 			await expect(call).to.be.eventually.eql(new URL('https://www.google.com'));
+		});
+		it('should return CONSTANT env value', async function () {
+			process.env.CONSTANT = 'constant';
+			const call: Promise<'constant'> = config.get('CONSTANT');
+			await expect(call).to.be.eventually.eq('constant');
 		});
 	});
 	describe('getString', () => {
@@ -184,6 +192,7 @@ describe('ConfigMap', () => {
 				HOST: {type: 'env', value: 'minecraft', stringValue: 'minecraft'},
 				PORT: {type: 'env', value: 6000, stringValue: '6000'},
 				URL: {type: 'env', value: new URL('https://www.google.com/'), stringValue: 'https://www.google.com/'},
+				CONSTANT: {type: 'env', value: 'constant', stringValue: 'constant'},
 			});
 		});
 	});

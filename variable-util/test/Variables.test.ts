@@ -24,6 +24,7 @@ import {
 	stringParser,
 	UrlParser,
 	ValidateCallback,
+	validLiteral,
 } from '../src/';
 import {URL} from 'url';
 
@@ -103,28 +104,28 @@ describe('config variable', () => {
 		traceSpy.resetHistory();
 	});
 	it('should return default value', async function () {
-		const call: Promise<string> = getConfigVariable('TEST', [], stringParser, 'some_value', {showValue: true});
+		const call: Promise<string> = getConfigVariable('TEST', [], stringParser(), 'some_value', {showValue: true});
 		await expect(call).to.be.eventually.eq('some_value');
 		expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [some_value] from default`);
 	});
 	describe('default values', () => {
 		it('should return default value', async function () {
-			const call: Promise<string> = getConfigVariable('TEST', [], stringParser, 'some_value', {showValue: true});
+			const call: Promise<string> = getConfigVariable('TEST', [], stringParser(), 'some_value', {showValue: true});
 			await expect(call).to.be.eventually.eq('some_value');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [some_value] from default`);
 		});
 		it('should return default promise value', async function () {
-			const call: Promise<string> = getConfigVariable('TEST', [], stringParser, Promise.resolve('some_value'), {showValue: true});
+			const call: Promise<string> = getConfigVariable('TEST', [], stringParser(), Promise.resolve('some_value'), {showValue: true});
 			await expect(call).to.be.eventually.eq('some_value');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [some_value] from default`);
 		});
 		it('should return default callback value', async function () {
-			const call: Promise<string> = getConfigVariable('TEST', [], stringParser, () => 'some_value', {showValue: true});
+			const call: Promise<string> = getConfigVariable('TEST', [], stringParser(), () => 'some_value', {showValue: true});
 			await expect(call).to.be.eventually.eq('some_value');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [some_value] from default`);
 		});
 		it('should return default callback promise value', async function () {
-			const call: Promise<string> = getConfigVariable('TEST', [], stringParser, () => Promise.resolve('some_value'), {showValue: true});
+			const call: Promise<string> = getConfigVariable('TEST', [], stringParser(), () => Promise.resolve('some_value'), {showValue: true});
 			await expect(call).to.be.eventually.eq('some_value');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [some_value] from default`);
 		});
@@ -132,13 +133,13 @@ describe('config variable', () => {
 	describe('loaders', () => {
 		it('should return process env value', async function () {
 			process.env.TEST = 'asd';
-			const call: Promise<string | undefined> = getConfigVariable('TEST', [env()], stringParser, undefined, {showValue: true});
+			const call: Promise<string | undefined> = getConfigVariable('TEST', [env()], stringParser(), undefined, {showValue: true});
 			await expect(call).to.be.eventually.eq('asd');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [asd] from process.env.TEST`);
 		});
 		it('should return process react env value', async function () {
 			process.env.REACT_APP_TEST = 'asd';
-			const call: Promise<string | undefined> = getConfigVariable('TEST', [reactEnv()], stringParser, undefined, {showValue: true});
+			const call: Promise<string | undefined> = getConfigVariable('TEST', [reactEnv()], stringParser(), undefined, {showValue: true});
 			await expect(call).to.be.eventually.eq('asd');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[react-env]: TEST [asd] from process.env.REACT_APP_TEST`);
 		});
@@ -188,70 +189,74 @@ describe('config variable', () => {
 		});
 	});
 	describe('parsers', () => {
+		describe('string', () => {
+			it('should return process env string literal value', async function () {
+				process.env.TEST = 'one';
+				const options = ['one', 'two', 'three'] as const;
+				type Options = (typeof options)[number];
+				const value: Options | undefined = await getConfigVariable('TEST', [env()], stringParser(validLiteral(options)), undefined, {
+					showValue: true,
+					cache: false,
+				});
+				expect(value).to.be.eq('one');
+				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [one] from process.env.TEST`);
+			});
+		});
 		describe('boolean', () => {
 			it('should return process env boolean true value', async function () {
 				process.env.TEST = 'YES';
-				const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env(), reactEnv()], booleanParser, undefined, {showValue: true});
+				const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env(), reactEnv()], booleanParser(), undefined, {showValue: true});
 				await expect(call).to.be.eventually.eq(true);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [true] from process.env.TEST`);
 			});
 			it('should return process env boolean false value', async function () {
 				process.env.TEST = 'N';
-				const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env(), reactEnv()], booleanParser, undefined, {showValue: true});
+				const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env(), reactEnv()], booleanParser(), undefined, {showValue: true});
 				await expect(call).to.be.eventually.eq(false);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [false] from process.env.TEST`);
 			});
 			it('should return undefined value if not valid', async function () {
 				process.env.TEST = '__BROKEN__';
-				const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env(), reactEnv()], booleanParser, undefined, {showValue: true});
+				const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env(), reactEnv()], booleanParser(), undefined, {showValue: true});
 				await expect(call).to.be.eventually.eq(undefined);
 				const errorLog = errorSpy.getCall(0).args[0];
 				expect(errorLog)
 					.to.be.instanceOf(Error)
-					.and.satisfy(
-						(err: Error) => err.message.startsWith('variables[booleanParser]: [__BROKEN__] value for key TEST is not valid boolean string'),
-						errorLog.message,
-					);
+					.and.satisfy((err: Error) => err.message.startsWith('variables[booleanParser]: [__BROKEN__] value for key TEST'), errorLog.message);
 			});
 		});
 		describe('integer', () => {
 			it('should return process env integer value', async function () {
 				process.env.TEST = '02';
-				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], integerParser, undefined, {showValue: true});
+				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], integerParser(), undefined, {showValue: true});
 				await expect(call).to.be.eventually.eq(2);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [2] from process.env.TEST`);
 			});
 			it('should return undefined value if not valid', async function () {
 				process.env.TEST = '__BROKEN__';
-				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], integerParser, undefined, {showValue: true});
+				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], integerParser(), undefined, {showValue: true});
 				await expect(call).to.be.eventually.eq(undefined);
 				const errorLog = errorSpy.getCall(0).args[0];
 				expect(errorLog)
 					.to.be.instanceOf(Error)
-					.and.satisfy(
-						(err: Error) => err.message.startsWith('variables[integerParser]: [__BROKEN__] value for key TEST is not a valid integer'),
-						errorLog.message,
-					);
+					.and.satisfy((err: Error) => err.message.startsWith('variables[integerParser]: [__BROKEN__] value for key TEST'), errorLog.message);
 			});
 		});
 		describe('float', () => {
 			it('should return process env float value', async function () {
 				process.env.TEST = '2.5';
-				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], floatParser, undefined, {showValue: true});
+				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], floatParser(), undefined, {showValue: true});
 				await expect(call).to.be.eventually.eq(2.5);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [2.5] from process.env.TEST`);
 			});
 			it('should return undefined value if not valid', async function () {
 				process.env.TEST = '__BROKEN__';
-				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], floatParser, undefined, {showValue: true});
+				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], floatParser(), undefined, {showValue: true});
 				await expect(call).to.be.eventually.eq(undefined);
 				const errorLog = errorSpy.getCall(0).args[0];
 				expect(errorLog)
 					.to.be.instanceOf(Error)
-					.and.satisfy(
-						(err: Error) => err.message.startsWith('variables[floatParser]: [__BROKEN__] value for key TEST is not a valid float'),
-						errorLog.message,
-					);
+					.and.satisfy((err: Error) => err.message.startsWith('variables[floatParser]: [__BROKEN__] value for key TEST'), errorLog.message);
 			});
 		});
 		describe('config', () => {

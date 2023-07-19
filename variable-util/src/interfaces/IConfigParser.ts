@@ -1,3 +1,5 @@
+export type PostValidate<Output, RawOutput> = (key: string, value: RawOutput) => Promise<Output | undefined>;
+
 /**
  * Interface for config parsers
  * @template Output - Type of output
@@ -19,7 +21,7 @@ export interface IConfigParser<Output, RawOutput> {
 	 * Optional raw string value validation before parsing.
 	 * @throws Error if validation fails
 	 */
-	preValidate?(key: string, value: string): Promise<void>;
+	preValidate?(key: string, value: unknown): Promise<void>;
 
 	/**
 	 * Optional value validation after parsing
