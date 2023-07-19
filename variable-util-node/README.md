@@ -8,6 +8,8 @@ NodeJS loaders for @avanio/variable-util
 npm i @avanio/variable-util @avanio/variable-util-node --save
 ```
 
+## [Documentation](https://mharj.github.io/variable-util/)
+
 ### Examples
 
 ```typescript
