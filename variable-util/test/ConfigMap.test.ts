@@ -53,7 +53,7 @@ const config = new ConfigMap<TestEnv>({
 	DEMO: {loaders: [env()], parser: stringParser()},
 	HOST: {loaders: [env()], parser: stringParser(), defaultValue: 'localhost'},
 	PORT: {loaders: [env()], parser: integerParser(), defaultValue: 3000},
-	URL: {loaders: [env()], parser: new UrlParser({urlSanitize: true}), defaultValue: new URL('http://localhost:3000')},
+	URL: {loaders: [env()], parser: new UrlParser({urlSanitize: true}), defaultValue: new URL('http://localhost:3000'), params: {cache: false, showValue: true}},
 	CONSTANT: {loaders: [env()], parser: stringParser(validLiteral(['constant'] as const)), defaultValue: 'constant'},
 });
 
@@ -178,20 +178,22 @@ describe('ConfigMap', () => {
 			expect(call.ok()).to.be.eq(true);
 		});
 		it('should return URL env value', async function () {
-			process.env.URL = 'https://www.google.com';
+			process.env.URL = 'https://asd:qwe@www.google.com';
 			const call: Result<URL> = await config.getResult('URL');
-			expect(call.ok()).to.be.eql(new URL('https://www.google.com'));
+			expect(call.ok()?.href).to.be.eql(new URL('https://asd:qwe@www.google.com').href);
+			expect(infoSpy.args[0][0]).to.be.eq('ConfigVariables[env]: URL [https://***:***@www.google.com/] from process.env.URL');
 		});
 	});
 	describe('getAll', () => {
 		it('should get all values', async function () {
 			const call = config.getAllObjects();
+			const result = await call;
 			await expect(call).to.be.eventually.eql({
 				DEBUG: {type: 'env', value: true, stringValue: 'true'},
 				DEMO: {type: undefined, value: undefined, stringValue: undefined},
 				HOST: {type: 'env', value: 'minecraft', stringValue: 'minecraft'},
 				PORT: {type: 'env', value: 6000, stringValue: '6000'},
-				URL: {type: 'env', value: new URL('https://www.google.com/'), stringValue: 'https://www.google.com/'},
+				URL: {type: 'env', value: result.URL.value, stringValue: 'https://asd:qwe@www.google.com/'},
 				CONSTANT: {type: 'env', value: 'constant', stringValue: 'constant'},
 			});
 		});

@@ -38,10 +38,14 @@ export class UrlParser implements IConfigParser<URL, URL> {
 	}
 
 	public toString(value: URL): string {
+		return value.href;
+	}
+
+	public toLogString(value: URL): string {
 		if (this.urlSanitize) {
 			return this.handleUrlSanitize(value.href);
 		}
-		return value.href;
+		return value.toString();
 	}
 
 	/**

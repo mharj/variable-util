@@ -33,4 +33,10 @@ export interface IConfigParser<Output, RawOutput> {
 	 * Build readable string from value
 	 */
 	toString(value: Output): string;
+
+	/**
+	 * Optional build readable string from value for log (can hide sensitive part from logs) else toString is used
+	 * @param value - value to log
+	 */
+	toLogString?(value: Output): string;
 }

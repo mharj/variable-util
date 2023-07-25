@@ -44,6 +44,10 @@ export class SemicolonConfigParser<Out extends ConfigParseType = ConfigParseType
 	}
 
 	public toString(value: Out): string {
+		return stringifySemicolonConfig(value);
+	}
+
+	public toLogString(value: Out): string {
 		return stringifySemicolonConfig(value, this.keysToHide);
 	}
 }

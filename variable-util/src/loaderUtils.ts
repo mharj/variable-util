@@ -158,7 +158,8 @@ export async function handleLoader<Output, RawOutput = unknown>(
 			 * print log
 			 */
 			const stringValue = parser.toString(output);
-			printLog(logger, loader.type, rootKey, stringValue, path, params);
+			const logValue = parser.toLogString?.(output) ?? stringValue;
+			printLog(logger, loader.type, rootKey, logValue, path, params);
 			return {type, value: output, stringValue};
 		}
 	} catch (err) {

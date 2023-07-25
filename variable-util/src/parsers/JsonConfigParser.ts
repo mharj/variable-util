@@ -32,6 +32,17 @@ export class JsonConfigParser<Out extends JsonParseType> implements IConfigParse
 	public toString(value: Out): string {
 		return JSON.stringify(
 			Object.entries(value).reduce<Record<string, unknown>>((last, [key, value]) => {
+				if (value) {
+					last[`${key}`] = value;
+				}
+				return last;
+			}, {}),
+		);
+	}
+
+	public toLogString(value: Out): string {
+		return JSON.stringify(
+			Object.entries(value).reduce<Record<string, unknown>>((last, [key, value]) => {
 				if (value && (this.keysToHide === undefined || !this.keysToHide.includes(key))) {
 					last[`${key}`] = value;
 				}
