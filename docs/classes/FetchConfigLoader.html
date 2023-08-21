@@ -27,7 +27,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">FetchConfigLoader</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L49">src/loaders/FetchConfigLoader.ts:49</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L49">src/loaders/FetchConfigLoader.ts:49</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -49,7 +49,8 @@
 </div></section>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Methods</h3>
-<div class="tsd-index-list"><a href="FetchConfigLoader.html#checkIfValidCacheResponse" class="tsd-index-link tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-2048"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)"></path></g></svg><span>check<wbr/>If<wbr/>Valid<wbr/>Cache<wbr/>Response</span></a>
+<div class="tsd-index-list"><a href="FetchConfigLoader.html#buildErrorStr" class="tsd-index-link tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-2048"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)"></path></g></svg><span>build<wbr/>Error<wbr/>Str</span></a>
+<a href="FetchConfigLoader.html#checkIfValidCacheResponse" class="tsd-index-link tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>check<wbr/>If<wbr/>Valid<wbr/>Cache<wbr/>Response</span></a>
 <a href="FetchConfigLoader.html#fetchData" class="tsd-index-link tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>fetch<wbr/>Data</span></a>
 <a href="FetchConfigLoader.html#fetchRequestOrCacheResponse" class="tsd-index-link tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>fetch<wbr/>Request<wbr/>Or<wbr/>Cache<wbr/>Response</span></a>
 <a href="FetchConfigLoader.html#getLoader" class="tsd-index-link tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>get<wbr/>Loader</span></a>
@@ -81,47 +82,70 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="ConfigLoader.html">ConfigLoader</a>.<a href="ConfigLoader.html#constructor">constructor</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L70">src/loaders/FetchConfigLoader.ts:70</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L70">src/loaders/FetchConfigLoader.ts:70</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="_isLoaded" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>_is<wbr/>Loaded</span><a href="#_isLoaded" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">_is<wbr/>Loaded</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L55">src/loaders/FetchConfigLoader.ts:55</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L55">src/loaders/FetchConfigLoader.ts:55</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="dataPromise" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>data<wbr/>Promise</span><a href="#dataPromise" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">data<wbr/>Promise</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L52">src/loaders/FetchConfigLoader.ts:52</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L52">src/loaders/FetchConfigLoader.ts:52</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="defaultOptions" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>default<wbr/>Options</span><a href="#defaultOptions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">default<wbr/>Options</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/FetchConfigLoaderOptions.html" class="tsd-signature-type tsd-kind-interface">FetchConfigLoaderOptions</a><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L57">src/loaders/FetchConfigLoader.ts:57</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L57">src/loaders/FetchConfigLoader.ts:57</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="options" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>options</span><a href="#options" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">options</span><span class="tsd-signature-symbol">:</span> <a href="../interfaces/FetchConfigLoaderOptions.html" class="tsd-signature-type tsd-kind-interface">FetchConfigLoaderOptions</a></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L54">src/loaders/FetchConfigLoader.ts:54</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L54">src/loaders/FetchConfigLoader.ts:54</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="path" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>path</span><a href="#path" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">path</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &#39;undefined&#39;</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L53">src/loaders/FetchConfigLoader.ts:53</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L53">src/loaders/FetchConfigLoader.ts:53</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="request" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>request</span><a href="#request" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">request</span><span class="tsd-signature-symbol">:</span> <a href="../types/FetchConfigRequest.html" class="tsd-signature-type tsd-kind-type-alias">FetchConfigRequest</a></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L51">src/loaders/FetchConfigLoader.ts:51</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L51">src/loaders/FetchConfigLoader.ts:51</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member"><a id="type" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>type</span><a href="#type" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">type</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &#39;fetch&#39;</span></div><aside class="tsd-sources">
 <p>Overrides <a href="ConfigLoader.html">ConfigLoader</a>.<a href="ConfigLoader.html#type">type</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L50">src/loaders/FetchConfigLoader.ts:50</a></li></ul></aside></section></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L50">src/loaders/FetchConfigLoader.ts:50</a></li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
+<section class="tsd-panel tsd-member tsd-is-protected tsd-is-inherited"><a id="buildErrorStr" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagProtected">Protected</code> <span>build<wbr/>Error<wbr/>Str</span><a href="#buildErrorStr" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-is-protected tsd-is-inherited">
+<li class="tsd-signature tsd-anchor-link" id="buildErrorStr.buildErrorStr-1"><span class="tsd-kind-call-signature">build<wbr/>Error<wbr/>Str</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">message</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><a href="#buildErrorStr.buildErrorStr-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Build error string &quot;ConfigVariables[<type>]: <message>&quot;</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">message</span>: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>error message</p>
+</div>
+<div class="tsd-comment tsd-typography"></div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><ul>
+<li>error string</li>
+</ul>
+
+<div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
+<p>Inherited from <a href="ConfigLoader.html">ConfigLoader</a>.<a href="ConfigLoader.html#buildErrorStr">buildErrorStr</a></p>
+<ul>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/ConfigLoader.ts#L38">src/loaders/ConfigLoader.ts:38</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="checkIfValidCacheResponse" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>check<wbr/>If<wbr/>Valid<wbr/>Cache<wbr/>Response</span><a href="#checkIfValidCacheResponse" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-private">
@@ -139,7 +163,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Response</span><span class="tsd-signature-symbol">&gt;</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L167">src/loaders/FetchConfigLoader.ts:167</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L167">src/loaders/FetchConfigLoader.ts:167</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="fetchData" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>fetch<wbr/>Data</span><a href="#fetchData" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-private">
@@ -147,7 +171,7 @@
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L102">src/loaders/FetchConfigLoader.ts:102</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L102">src/loaders/FetchConfigLoader.ts:102</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="fetchRequestOrCacheResponse" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>fetch<wbr/>Request<wbr/>Or<wbr/>Cache<wbr/>Response</span><a href="#fetchRequestOrCacheResponse" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-private">
@@ -163,7 +187,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type ">Response</span><span class="tsd-signature-symbol">&gt;</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L152">src/loaders/FetchConfigLoader.ts:152</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L152">src/loaders/FetchConfigLoader.ts:152</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited"><a id="getLoader" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>get<wbr/>Loader</span><a href="#getLoader" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited">
@@ -186,7 +210,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Inherited from <a href="ConfigLoader.html">ConfigLoader</a>.<a href="ConfigLoader.html#getLoader">getLoader</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/ConfigLoader.ts#L19">src/loaders/ConfigLoader.ts:19</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/ConfigLoader.ts#L19">src/loaders/ConfigLoader.ts:19</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="getRequest" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>get<wbr/>Request</span><a href="#getRequest" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-private">
@@ -194,7 +218,7 @@
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../types/ConfigRequest.html" class="tsd-signature-type tsd-kind-type-alias">ConfigRequest</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L208">src/loaders/FetchConfigLoader.ts:208</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L208">src/loaders/FetchConfigLoader.ts:208</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="handleJson" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>handle<wbr/>Json</span><a href="#handleJson" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-private">
@@ -207,7 +231,7 @@
 <h5><span class="tsd-kind-parameter">res</span>: <span class="tsd-signature-type ">Response</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L191">src/loaders/FetchConfigLoader.ts:191</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L191">src/loaders/FetchConfigLoader.ts:191</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-protected"><a id="handleLoader" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagProtected">Protected</code> <span>handle<wbr/>Loader</span><a href="#handleLoader" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-protected">
@@ -232,7 +256,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="ConfigLoader.html">ConfigLoader</a>.<a href="ConfigLoader.html#handleLoader">handleLoader</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L91">src/loaders/FetchConfigLoader.ts:91</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L91">src/loaders/FetchConfigLoader.ts:91</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-private"><a id="handleNotModifiedCache" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>handle<wbr/>Not<wbr/>Modified<wbr/>Cache</span><a href="#handleNotModifiedCache" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-private">
@@ -250,7 +274,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type ">Response</span><span class="tsd-signature-symbol">&gt;</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L180">src/loaders/FetchConfigLoader.ts:180</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L180">src/loaders/FetchConfigLoader.ts:180</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="isLoaded" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>is<wbr/>Loaded</span><a href="#isLoaded" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -261,7 +285,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L87">src/loaders/FetchConfigLoader.ts:87</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L87">src/loaders/FetchConfigLoader.ts:87</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="reload" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>reload</span><a href="#reload" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -272,7 +296,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type ">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/mharj/variable-util/blob/c932a60/variable-util/src/loaders/FetchConfigLoader.ts#L79">src/loaders/FetchConfigLoader.ts:79</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/mharj/variable-util/blob/3f290ed/variable-util/src/loaders/FetchConfigLoader.ts#L79">src/loaders/FetchConfigLoader.ts:79</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -300,6 +324,7 @@
 <li><a href="#path" class="tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>path</span></a></li>
 <li><a href="#request" class="tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>request</span></a></li>
 <li><a href="#type" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-1024"></use></svg><span>type</span></a></li>
+<li><a href="#buildErrorStr" class="tsd-is-protected tsd-is-inherited"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>build<wbr/>Error<wbr/>Str</span></a></li>
 <li><a href="#checkIfValidCacheResponse" class="tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>check<wbr/>If<wbr/>Valid<wbr/>Cache<wbr/>Response</span></a></li>
 <li><a href="#fetchData" class="tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>fetch<wbr/>Data</span></a></li>
 <li><a href="#fetchRequestOrCacheResponse" class="tsd-is-private"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-2048"></use></svg><span>fetch<wbr/>Request<wbr/>Or<wbr/>Cache<wbr/>Response</span></a></li>
