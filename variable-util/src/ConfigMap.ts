@@ -186,10 +186,13 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 	 */
 	public async getAllStringValues(): Promise<Record<keyof Data, string>> {
 		const values = await this.getAllPromises();
-		return values.reduce<Record<keyof Data, string>>((result, [key, value]) => {
-			result[key] = value.stringValue;
-			return result;
-		}, {} as Record<keyof Data, string>);
+		return values.reduce<Record<keyof Data, string>>(
+			(result, [key, value]) => {
+				result[key] = value.stringValue;
+				return result;
+			},
+			{} as Record<keyof Data, string>,
+		);
 	}
 
 	/**
