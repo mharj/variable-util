@@ -29,4 +29,13 @@ export abstract class ConfigLoader<HandlerParams> {
 	 * @param params - optional passing params for handleLoader (i.e. lookup key override, settings etc.)
 	 */
 	protected abstract handleLoader(lookupKey: string, params?: HandlerParams): Promise<LoaderValue>;
+
+	/**
+	 * Build error string "ConfigVariables[<type>]: <message>"
+	 * @param message - error message
+	 * @returns {string} - error string
+	 */
+	protected buildErrorStr(message: string): string {
+		return `ConfigLoader[${this.type}]: ${message}`;
+	}
 }
