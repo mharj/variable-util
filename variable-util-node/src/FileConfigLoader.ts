@@ -9,6 +9,7 @@ export interface FileConfigLoaderOptions {
 	/** set to false if need errors */
 	isSilent?: boolean;
 	logger?: ILoggerLike;
+	disabled?: boolean;
 }
 
 export class FileConfigLoader extends ConfigLoader<string | undefined> {
@@ -32,6 +33,9 @@ export class FileConfigLoader extends ConfigLoader<string | undefined> {
 	}
 
 	protected async handleLoader(rootKey: string, key?: string): Promise<LoaderValue> {
+		if (this.options.disabled) {
+			return {value: undefined, path: 'undefined', type: this.type};
+		}
 		if (!this.filePromise) {
 			this.filePromise = this.loadFile();
 		}
@@ -44,20 +48,22 @@ export class FileConfigLoader extends ConfigLoader<string | undefined> {
 	private async loadFile(): Promise<Record<string, string | undefined>> {
 		const fileName = await this.getFileName();
 		if (!existsSync(fileName)) {
+			const msg = this.buildErrorStr(`file ${fileName} not found`);
 			if (this.options.isSilent) {
-				this.options.logger?.debug(`ConfigVariables[file]: file ${fileName} not found`);
+				this.options.logger?.debug(msg);
 				return {};
 			}
-			throw new VariableError(`ConfigVariables[file]: file ${fileName} not found`);
+			throw new VariableError(msg);
 		}
 		try {
 			return JSON.parse(await readFile(fileName, 'utf8'));
 		} catch (err) {
+			const msg = this.buildErrorStr(`file ${fileName} is not a valid JSON`);
 			if (this.options.isSilent) {
-				this.options.logger?.info(`ConfigVariables[file]: file ${fileName} is not a valid JSON`);
+				this.options.logger?.info(msg);
 				return {};
 			}
-			throw new VariableError(`ConfigVariables[file]: file ${fileName} is not a valid JSON`);
+			throw new VariableError(msg);
 		}
 	}
 
