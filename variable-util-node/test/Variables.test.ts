@@ -41,22 +41,22 @@ describe('config variable', () => {
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);
 		});
 		it('should return file variable value, filename from promise', async function () {
-			const fileEnv = new FileConfigLoader({fileName: Promise.resolve(jsonFilename), type: 'json'}).getLoader;
+			const fileEnv = new FileConfigLoader(Promise.resolve({fileName: jsonFilename, type: 'json'})).getLoader;
 			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);
 		});
 		it('should return file variable value, filename from callback', async function () {
-			const fileEnv = new FileConfigLoader({fileName: () => jsonFilename, type: 'json'}).getLoader;
+			const fileEnv = new FileConfigLoader(() => ({fileName: jsonFilename, type: 'json'})).getLoader;
 			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);
 		});
 		it('should return file variable value, filename from callback Promise', async function () {
-			const fileEnv = new FileConfigLoader({fileName: async () => jsonFilename, type: 'json'}).getLoader;
+			const fileEnv = new FileConfigLoader(async () => ({fileName: jsonFilename, type: 'json'})).getLoader;
 			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);
 		});
 		it('should return file variable value, filename from promise callback', async function () {
-			const fileEnv = new FileConfigLoader({fileName: async () => jsonFilename, type: 'json'}).getLoader;
+			const fileEnv = new FileConfigLoader(async () => ({fileName: jsonFilename, type: 'json'})).getLoader;
 			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);
 		});

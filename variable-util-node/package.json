@@ -32,7 +32,7 @@
   "author": "mharj",
   "license": "MIT",
   "devDependencies": {
-    "@avanio/variable-util": "^0.4.1",
+    "@avanio/variable-util": "^0.5.0",
     "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
     "@types/node": "^16.18.41",
@@ -54,7 +54,7 @@
     "typescript": "^5.1.6"
   },
   "peerDependencies": {
-    "@avanio/variable-util": "^0.4.1"
+    "@avanio/variable-util": "^0.5"
   },
   "dependencies": {
     "@avanio/logger-like": "^0.1.1"

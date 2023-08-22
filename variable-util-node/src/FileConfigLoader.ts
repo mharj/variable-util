@@ -4,27 +4,35 @@ import {ILoggerLike} from '@avanio/logger-like';
 import {readFile} from 'fs/promises';
 
 export interface FileConfigLoaderOptions {
-	fileName: Loadable<string>;
+	fileName: string;
 	type: 'json';
 	/** set to false if need errors */
-	isSilent?: boolean;
-	logger?: ILoggerLike;
-	disabled?: boolean;
+	isSilent: boolean;
+	logger: ILoggerLike | undefined;
+	disabled: boolean;
 }
 
 export class FileConfigLoader extends ConfigLoader<string | undefined> {
 	public type = 'file';
-	private options: FileConfigLoaderOptions;
+	private options: Loadable<Partial<FileConfigLoaderOptions>>;
 	private filePromise: Promise<Record<string, string | undefined>> | undefined;
 
-	public constructor(options: FileConfigLoaderOptions) {
+	private defaultOptions: FileConfigLoaderOptions = {
+		disabled: false,
+		fileName: 'config.json',
+		isSilent: true,
+		logger: undefined,
+		type: 'json',
+	};
+
+	public constructor(options: Loadable<Partial<FileConfigLoaderOptions>> = {}) {
 		super();
-		this.options = {isSilent: true, ...options};
+		this.options = options;
 		this.getLoader = this.getLoader.bind(this);
 	}
 
 	public async reload(): Promise<void> {
-		this.filePromise = this.loadFile();
+		this.filePromise = this.loadFile(await this.getOptions());
 		await this.filePromise;
 	}
 
@@ -33,41 +41,41 @@ export class FileConfigLoader extends ConfigLoader<string | undefined> {
 	}
 
 	protected async handleLoader(rootKey: string, key?: string): Promise<LoaderValue> {
-		if (this.options.disabled) {
-			return {value: undefined, path: 'undefined', type: this.type};
+		const options = await this.getOptions();
+		if (options.disabled) {
+			return {type: this.type, result: undefined};
 		}
 		if (!this.filePromise) {
-			this.filePromise = this.loadFile();
+			this.filePromise = this.loadFile(options);
 		}
-		const fileName = await this.getFileName();
 		const data = await this.filePromise;
 		const targetKey = key || rootKey;
-		return {value: data[targetKey], path: fileName, type: this.type};
+		return {type: this.type, result: {value: data[targetKey], path: options.fileName}};
 	}
 
-	private async loadFile(): Promise<Record<string, string | undefined>> {
-		const fileName = await this.getFileName();
-		if (!existsSync(fileName)) {
-			const msg = this.buildErrorStr(`file ${fileName} not found`);
-			if (this.options.isSilent) {
-				this.options.logger?.debug(msg);
+	private async loadFile(options: FileConfigLoaderOptions): Promise<Record<string, string | undefined>> {
+		if (!existsSync(options.fileName)) {
+			const msg = this.buildErrorStr(`file ${options.fileName} not found`);
+			if (options.isSilent) {
+				options.logger?.debug(msg);
 				return {};
 			}
 			throw new VariableError(msg);
 		}
 		try {
-			return JSON.parse(await readFile(fileName, 'utf8'));
+			return JSON.parse(await readFile(options.fileName, 'utf8'));
 		} catch (err) {
-			const msg = this.buildErrorStr(`file ${fileName} is not a valid JSON`);
-			if (this.options.isSilent) {
-				this.options.logger?.info(msg);
+			const msg = this.buildErrorStr(`file ${options.fileName} is not a valid JSON`);
+			if (options.isSilent) {
+				options.logger?.info(msg);
 				return {};
 			}
 			throw new VariableError(msg);
 		}
 	}
 
-	private async getFileName(): Promise<string> {
-		return typeof this.options.fileName === 'function' ? this.options.fileName() : this.options.fileName;
+	private async getOptions(): Promise<FileConfigLoaderOptions> {
+		const options = await (typeof this.options === 'function' ? this.options() : this.options);
+		return Object.assign({}, this.defaultOptions, options);
 	}
 }
