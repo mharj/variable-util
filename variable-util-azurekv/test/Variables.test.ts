@@ -44,7 +44,7 @@ describe('key vault config variable', () => {
 	it('should return fetch value', async function () {
 		this.timeout(600000);
 		const urlParser = new UrlParser({urlSanitize: true});
-		const fetchKv = new AzureSecretsConfigLoader({credentials: async () => new DefaultAzureCredential(), url: async () => `${process.env.KV_URI}`}).getLoader;
+		const fetchKv = new AzureSecretsConfigLoader(async () => ({credentials: new DefaultAzureCredential(), url: `${process.env.KV_URI}`})).getLoader;
 		const callback = getConfigVariable('MONGO_URL', [fetchKv(process.env.KV_MONGO_KEY)], urlParser, undefined, {showValue: true});
 		await callback;
 		expect(errorSpy.callCount, errorSpy.getCall(0)?.args[0]).to.be.eq(0);
