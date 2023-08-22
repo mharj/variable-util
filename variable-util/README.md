@@ -138,6 +138,7 @@ Note: **_getLoader_** is function generator which can override key we are lookin
 - options.isSilent (optional): No throw error if fetch fails. Returns empty object instead.
 - options.payload (optional): Only 'json' is supported. And default is 'json'.
 - options.validate (optional): An optional async function that can validate the fetched object to be valid `Record<string, string>`
+- options.cache (optional): An optional cache object that can be used to cache the fetched object [IRequestCache](./src/interfaces/IRequestCache.ts)
 
 ### How to build a custom loader:
 

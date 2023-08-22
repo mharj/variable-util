@@ -29,9 +29,10 @@ export interface FetchConfigLoaderOptions {
 	 *   return {success: true};
 	 * };
 	 */
-	validate?: ValidateCallback<Record<string, string | null>, Record<string, string>>;
-	logger?: ILoggerLike;
-	cache?: IRequestCache;
+	validate: ValidateCallback<Record<string, string | null>, Record<string, string>> | undefined;
+	logger: ILoggerLike | undefined;
+	cache: IRequestCache | undefined;
+	disabled: boolean;
 }
 
 export type ConfigRequest = Request | RequestNotReady;
@@ -56,8 +57,10 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 
 	private defaultOptions: FetchConfigLoaderOptions = {
 		cache: undefined,
+		disabled: false,
 		fetchClient: typeof window === 'object' ? fetch.bind(window) : fetch,
 		isSilent: false,
+		logger: undefined,
 		payload: 'json',
 		validate: undefined,
 	};
@@ -89,6 +92,10 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	}
 
 	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
+		// check if disabled
+		if (this.options.disabled) {
+			return {type: this.type, result: undefined};
+		}
 		// check if we have JSON data loaded, if not load it
 		if (!this.dataPromise || this._isLoaded === false) {
 			this.dataPromise = this.fetchData();
@@ -96,7 +103,7 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 		const data = await this.dataPromise;
 		const targetKey = overrideKey || lookupKey; // optional override key, else use actual lookupKey
 		const value = data?.[targetKey] || undefined;
-		return {type: this.type, value, path: this.path};
+		return {type: this.type, result: {value, path: this.path}};
 	}
 
 	private async fetchData(): Promise<Record<string, string | null>> {

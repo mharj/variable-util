@@ -14,7 +14,7 @@
  *     return undefined;
  *   },
  *   async storeRequest(req: Request, res: Response) {
- *     if (typeof window !== 'undefined' && window.caches) {
+ *     if (typeof window !== 'undefined' && window.caches && res.ok) {
  *       const cache = await window.caches.open('fetch');
  *       req.headers.delete('Authorization');
  *       await cache.put(req, res.clone());

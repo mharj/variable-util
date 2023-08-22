@@ -123,7 +123,12 @@ export async function handleLoader<Output, RawOutput = unknown>(
 ): Promise<{type: string; value: Output | undefined; stringValue: string | undefined} | undefined> {
 	const logger = getLogger();
 	try {
-		const {type, value, path} = await loader.callback(rootKey);
+		const {type, result} = await loader.callback(rootKey);
+		// check if result is undefined (disabled loaders)
+		if (!result) {
+			return undefined;
+		}
+		const {value, path} = result;
 		if (value) {
 			/**
 			 * parser pre-validate

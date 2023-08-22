@@ -52,6 +52,8 @@ Also have ability to parse (and verify) string, URL and JSON stringified or semi
 </li>
 <li><p>options.validate (optional): An optional async function that can validate the fetched object to be valid <code>Record&lt;string, string&gt;</code></p>
 </li>
+<li><p>options.cache (optional): An optional cache object that can be used to cache the fetched object <a href="./src/interfaces/IRequestCache.ts">IRequestCache</a></p>
+</li>
 </ul>
 <a id="md:how-to-build-a-custom-loader" class="tsd-anchor"></a><h3><a href="#md:how-to-build-a-custom-loader">How to build a custom loader:</a></h3><p>see <a href="./src/interfaces/IConfigLoader.ts">IConfigLoader</a> or extend abstract class <a href="./src/loaders/ConfigLoader.ts">ConfigLoader</a></p>
 <a id="md:current-parsers" class="tsd-anchor"></a><h2><a href="#md:current-parsers">Current parsers:</a></h2><a id="md:stringparservalue-string-iconfigparserltstringgt" class="tsd-anchor"></a><h3><a href="#md:stringparservalue-string-iconfigparserltstringgt"><code>stringParser(value: string): IConfigParser&lt;string&gt;</code></a></h3><p>A function that simply returns the given string value and validates this value to be a string.</p>
@@ -141,6 +143,7 @@ Allowed true values: <code>[&#39;true&#39;, &#39;1&#39;, &#39;yes&#39;, &#39;y&#
 <li><a href="interfaces/IConfigParser.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IConfig<wbr/>Parser</span></a></li>
 <li><a href="interfaces/IRequestCache.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>IRequest<wbr/>Cache</span></a></li>
 <li><a href="interfaces/LoaderValue.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Loader<wbr/>Value</span></a></li>
+<li><a href="interfaces/LoaderValueResult.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Loader<wbr/>Value<wbr/>Result</span></a></li>
 <li><a href="interfaces/RequestNotReady.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Request<wbr/>Not<wbr/>Ready</span></a></li>
 <li><a href="interfaces/SemicolonConfigParserOptions.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Semicolon<wbr/>Config<wbr/>Parser<wbr/>Options</span></a></li>
 <li><a href="interfaces/UrlParserProps.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-256"></use></svg><span>Url<wbr/>Parser<wbr/>Props</span></a></li>
