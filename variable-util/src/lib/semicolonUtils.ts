@@ -39,7 +39,7 @@ export function parseSemicolonConfig(config: string, keepCase = true): Record<st
  * @example
  * stringifySemicolonConfig({a: 'b', c: 'd'}) // 'a=b;c=d'
  */
-export function stringifySemicolonConfig(config: Record<string, string>, keysToHide?: string[]): string {
+export function stringifySemicolonConfig(config: Record<string, unknown>, keysToHide?: string[]): string {
 	return Object.entries(config)
 		.reduce<string[]>((last, [key, value]) => {
 			if (value && (keysToHide === undefined || !keysToHide.includes(key))) {

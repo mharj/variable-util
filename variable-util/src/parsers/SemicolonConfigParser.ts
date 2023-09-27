@@ -5,11 +5,16 @@ import {ValidateCallback} from '../interfaces/IValidate';
 /**
  * The base type of the parsed JSON object
  */
-export type ConfigParseType = Record<string, string>;
+export type RawConfigParseType = Record<string, string>;
 
-export interface SemicolonConfigParserOptions<Out extends ConfigParseType = ConfigParseType, RawType extends ConfigParseType = ConfigParseType> {
+export type OutConfigParseType = Record<string, unknown>;
+
+export interface SemicolonConfigParserOptions<
+	OutType extends OutConfigParseType = OutConfigParseType,
+	RawType extends RawConfigParseType = RawConfigParseType,
+> {
 	keysToHide?: string[];
-	validate?: ValidateCallback<Out, RawType>;
+	validate?: ValidateCallback<OutType, RawType>;
 	/**
 	 * keep case of keys, if set as false then will convert keys first letters to lower case (Js Style)
 	 */
@@ -21,7 +26,7 @@ export interface SemicolonConfigParserOptions<Out extends ConfigParseType = Conf
  * @implements {IConfigParser<Out, RawType>}
  * @category Parsers
  */
-export class SemicolonConfigParser<Out extends ConfigParseType = ConfigParseType, RawType extends ConfigParseType = ConfigParseType>
+export class SemicolonConfigParser<Out extends OutConfigParseType = OutConfigParseType, RawType extends RawConfigParseType = RawConfigParseType>
 	implements IConfigParser<Out, RawType>
 {
 	public name = 'semicolonConfigParser';
