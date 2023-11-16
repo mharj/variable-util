@@ -46,10 +46,10 @@ export async function getConfigObject<Output>(
 	/**
 	 * get default value before loaders (to throw error before loaders)
 	 */
-	if (defaultValueLoadable) {
+	if (defaultValueLoadable !== undefined) {
 		try {
 			const value = await (typeof defaultValueLoadable === 'function' ? defaultValueLoadable() : defaultValueLoadable);
-			if (!value) {
+			if (value === undefined) {
 				throw new VariableError('default value is empty');
 			}
 			defaultValue = value;
@@ -71,7 +71,7 @@ export async function getConfigObject<Output>(
 		}
 	}
 	let stringValue: string | undefined;
-	if (defaultValue) {
+	if (defaultValue !== undefined) {
 		stringValue = parser.toString(defaultValue);
 		printLog(logger, 'default', rootKey, stringValue, 'default', params);
 	}

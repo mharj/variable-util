@@ -114,6 +114,11 @@ describe('config variable', () => {
 			await expect(call).to.be.eventually.eq('some_value');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [some_value] from default`);
 		});
+		it('should return boolean default value', async function () {
+			const call: Promise<boolean> = getConfigVariable('TEST', [], booleanParser(), false, {showValue: true});
+			await expect(call).to.be.eventually.eq(false);
+			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [false] from default`);
+		});
 		it('should return default promise value', async function () {
 			const call: Promise<string> = getConfigVariable('TEST', [], stringParser(), Promise.resolve('some_value'), {showValue: true});
 			await expect(call).to.be.eventually.eq('some_value');
