@@ -1,4 +1,5 @@
 import {ConfigLoader, Loadable, LoaderValue} from '@avanio/variable-util';
+import {ILoggerLike} from '@avanio/logger-like';
 import {SecretClient} from '@azure/keyvault-secrets';
 import {TokenCredential} from '@azure/identity';
 
@@ -8,6 +9,7 @@ export interface AzureSecretsConfigLoaderOptions {
 	disabled?: boolean;
 	/** hide error messages, default is true */
 	isSilent?: boolean;
+	logger?: ILoggerLike;
 }
 
 export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined> {
@@ -24,9 +26,10 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined> {
 		if (options.disabled) {
 			return {type: this.type, result: undefined};
 		}
-		const client = await this.getClient(options);
-		const targetKey = key || rootKey;
 		try {
+			const client = await this.getClient(options);
+			const targetKey = key || rootKey;
+			options.logger?.debug(this.type, `getting ${targetKey} from ${options.url}`);
 			const {
 				value,
 				properties: {vaultUrl},
@@ -36,6 +39,8 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined> {
 			if (options.isSilent === false) {
 				throw e;
 			}
+			// if we have logger, log error as warning.
+			options.logger?.warn(this.type, e);
 			return {type: this.type, result: undefined};
 		}
 	}
