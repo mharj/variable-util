@@ -11,6 +11,7 @@ import * as z from 'zod';
 import {booleanParser, ConfigMap, env, integerParser, setLogger, stringParser, UrlParser, validLiteral} from '../src/';
 import {Result} from 'mharj-result';
 import {URL} from 'url';
+import {testObjectFinalSchema, testObjectParser, TestObjectType} from './testObjectParse';
 
 dotenv.config();
 chai.use(chaiAsPromised);
@@ -37,6 +38,7 @@ type TestEnv = {
 	DEBUG: boolean;
 	URL: URL;
 	CONSTANT: 'constant';
+	TEST_OBJECT: TestObjectType;
 };
 
 const testEnvSchema = z.object({
@@ -46,6 +48,7 @@ const testEnvSchema = z.object({
 	PORT: z.number(),
 	URL: z.instanceof(URL),
 	CONSTANT: z.literal('constant'),
+	TEST_OBJECT: testObjectFinalSchema,
 });
 
 const config = new ConfigMap<TestEnv>({
@@ -55,6 +58,7 @@ const config = new ConfigMap<TestEnv>({
 	PORT: {loaders: [env()], parser: integerParser(), defaultValue: 3000},
 	URL: {loaders: [env()], parser: new UrlParser({urlSanitize: true}), defaultValue: new URL('http://localhost:3000'), params: {cache: false, showValue: true}},
 	CONSTANT: {loaders: [env()], parser: stringParser(validLiteral(['constant'] as const)), defaultValue: 'constant'},
+	TEST_OBJECT: {loaders: [env()], parser: testObjectParser, defaultValue: {First: false, Second: false, Third: true}},
 });
 
 describe('ConfigMap', () => {
@@ -195,12 +199,26 @@ describe('ConfigMap', () => {
 				PORT: {type: 'env', value: 6000, stringValue: '6000'},
 				URL: {type: 'env', value: result.URL.value, stringValue: 'https://asd:qwe@www.google.com/'},
 				CONSTANT: {type: 'env', value: 'constant', stringValue: 'constant'},
+				TEST_OBJECT: {
+					stringValue: 'First=false;Second=false;Third=true',
+					type: 'default',
+					value: {
+						First: false,
+						Second: false,
+						Third: true,
+					},
+				},
 			});
 		});
 	});
 	describe('validateAll', () => {
 		it('should validate all with zod', async function () {
 			await config.validateAll((data) => testEnvSchema.parse(data));
+		});
+	});
+	describe('validate', () => {
+		it('should validate all with zod', async function () {
+			expect(await config.getString('TEST_OBJECT')).to.be.eq('First=false;Second=false;Third=true');
 		});
 	});
 });

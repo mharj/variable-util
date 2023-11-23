@@ -42,7 +42,7 @@ export function parseSemicolonConfig(config: string, keepCase = true): Record<st
 export function stringifySemicolonConfig(config: Record<string, unknown>, keysToHide?: string[]): string {
 	return Object.entries(config)
 		.reduce<string[]>((last, [key, value]) => {
-			if (value && (keysToHide === undefined || !keysToHide.includes(key))) {
+			if (value !== undefined && (keysToHide === undefined || !keysToHide.includes(key))) {
 				const encodedValue = encodeURIComponent(`${value}`);
 				last.push(`${key}=${encodedValue}`);
 			}
