@@ -33,6 +33,8 @@ export interface FetchConfigLoaderOptions {
 	logger: ILoggerLike | undefined;
 	cache: IRequestCache | undefined;
 	disabled: boolean;
+	/** if we get a cache hit code (defaults 304), we use the cached response instead */
+	cacheHitHttpCode: number;
 }
 
 export type ConfigRequest = Request | RequestNotReady;
@@ -57,6 +59,7 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 
 	private defaultOptions: FetchConfigLoaderOptions = {
 		cache: undefined,
+		cacheHitHttpCode: 304,
 		disabled: false,
 		fetchClient: typeof window === 'object' ? fetch.bind(window) : fetch,
 		isSilent: false,
@@ -121,7 +124,8 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 			return Promise.resolve({});
 		}
 		// if we have a cache and valid response, store to cache
-		if (res.status === 200 && this.options.cache) {
+		if (res.ok && this.options.cache) {
+			this.options.logger?.debug(`storing response in cache for FetchEnvConfig`);
 			await this.options.cache.storeRequest(req, res);
 		}
 		if (res.status >= 400) {
@@ -136,13 +140,14 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 				throw new VariableError(`http error ${res.status} from FetchEnvConfig`);
 			}
 		}
-		// if we have a cached response and we get a 304, use the cached response instead
-		if (res.status === 304) {
+		// if we have a cached response and we get a cache hit code (default 304), use the cached response instead
+		if (res.status === this.options.cacheHitHttpCode) {
 			res = await this.handleNotModifiedCache(req, res);
 		}
 		const contentType = res.headers.get('content-type');
 		if (contentType?.startsWith('application/json') && this.options.payload === 'json') {
 			const data = await this.handleJson(res);
+			this.options.logger?.debug('successfully loaded config from FetchEnvConfig');
 			this._isLoaded = true;
 			return data;
 		}
@@ -154,16 +159,26 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	}
 
 	/**
-	 * if client is offline, we will try return the cached response else get the response from the fetch request
+	 * if client is offline, we will try return the cached response else add cache validation (ETag) and try get the response from the fetch request
 	 */
 	private async fetchRequestOrCacheResponse(req: Request): Promise<Response | undefined> {
-		// if we have a cache and we are offline, use the cache
-		if (this.options.cache && this.options.cache.isOnline() === false) {
+		if (this.options.cache) {
 			const cacheRes = await this.options.cache.fetchRequest(req);
-			if (cacheRes) {
-				return cacheRes;
+			// if we have a cache and we are offline, use the cache else return undefined
+			if (this.options.cache.isOnline() === false) {
+				if (cacheRes) {
+					this.options.logger?.debug(`client is offline, returned cached response for FetchEnvConfig`);
+					return cacheRes;
+				}
+				return undefined;
 			}
-			return undefined;
+			// take ETag from last cache response and add to request headers as If-None-Match for automatic cache validation (if service supports it).
+			if (cacheRes) {
+				const etag = cacheRes.headers.get('etag');
+				if (etag) {
+					req.headers.set('If-None-Match', etag);
+				}
+			}
 		}
 		return this.options.fetchClient(req);
 	}
@@ -188,6 +203,7 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 		if (this.options.cache) {
 			const cacheRes = await this.options.cache.fetchRequest(req);
 			if (cacheRes) {
+				this.options.logger?.debug(`returned cached response for FetchEnvConfig`);
 				return cacheRes;
 			}
 			throw new VariableError(`http error ${res.status} from FetchEnvConfig (using cached version)`); // we have a cache but no cached response

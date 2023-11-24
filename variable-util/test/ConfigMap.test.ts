@@ -9,9 +9,9 @@ import * as dotenv from 'dotenv';
 import * as sinon from 'sinon';
 import * as z from 'zod';
 import {booleanParser, ConfigMap, env, integerParser, setLogger, stringParser, UrlParser, validLiteral} from '../src/';
+import {testObjectFinalSchema, testObjectParser, TestObjectType} from './testObjectParse';
 import {Result} from 'mharj-result';
 import {URL} from 'url';
-import {testObjectFinalSchema, testObjectParser, TestObjectType} from './testObjectParse';
 
 dotenv.config();
 chai.use(chaiAsPromised);

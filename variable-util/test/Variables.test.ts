@@ -4,6 +4,7 @@ import 'mocha';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
+import * as etag from 'etag';
 import * as sinon from 'sinon';
 import * as z from 'zod';
 import {
@@ -26,6 +27,7 @@ import {
 	ValidateCallback,
 	validLiteral,
 } from '../src/';
+import {testObjectParser} from './testObjectParse';
 import {URL} from 'url';
 
 chai.use(chaiAsPromised);
@@ -41,6 +43,25 @@ const traceSpy = sinon.spy();
 
 let isOnline = true;
 const resCache = new Map<string, Response>();
+const API_SERVER = 'http://localhost:123/api';
+
+const fetchResponsePayload = {
+	API_SERVER,
+	TEST_OBJECT: 'First=false;Second=false;Third=true',
+};
+
+function mockFetch(input: globalThis.URL | RequestInfo, init?: RequestInit | undefined): Promise<Response> {
+	const req = new Request(input, init);
+	const bodyData = JSON.stringify(fetchResponsePayload);
+	const etagValue = etag(bodyData);
+
+	// cache hit
+	if (req.headers.get('If-None-Match') === etagValue) {
+		return Promise.resolve(new Response(undefined, {status: 304}));
+	}
+
+	return Promise.resolve(new Response(bodyData, {status: 200, headers: {ETag: etagValue, 'Content-Type': 'application/json'}}));
+}
 
 const reqCacheSetup: IRequestCache = {
 	isOnline() {
@@ -51,7 +72,7 @@ const reqCacheSetup: IRequestCache = {
 		return Promise.resolve();
 	},
 	fetchRequest(req) {
-		return Promise.resolve(resCache.get(req.url));
+		return Promise.resolve(resCache.get(req.url)?.clone());
 	},
 };
 
@@ -83,12 +104,16 @@ let fetchEnv: (params?: string | undefined) => IConfigLoader;
 const urlDefault = new URL('http://localhost/api');
 let fetchRequestData: Request | undefined;
 
+const fetchLoaderOptions = {cache: reqCacheSetup, fetchClient: mockFetch, logger: spyLogger, validate: fetchValidate};
+
 function handleFetchRequest(): Request | RequestNotReady {
 	if (fetchRequestData) {
 		return fetchRequestData;
 	}
 	return createRequestNotReady('fetch request not ready');
 }
+
+const configRequestUrl = new URL('http://some/settings.json');
 
 describe('config variable', () => {
 	before(() => {
@@ -149,11 +174,8 @@ describe('config variable', () => {
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[react-env]: TEST [asd] from process.env.REACT_APP_TEST`);
 		});
 		describe('FetchConfigLoader', () => {
-			before(function () {
-				if (!process.env.FETCH_URI || !process.env.FETCH_API_SERVER) {
-					this.skip();
-				}
-				fetchEnv = new FetchConfigLoader(handleFetchRequest, {validate: fetchValidate, logger: spyLogger, cache: reqCacheSetup}).getLoader;
+			beforeEach(function () {
+				fetchEnv = new FetchConfigLoader(handleFetchRequest, fetchLoaderOptions).getLoader;
 			});
 			it('should return default if fetch request not ready yet', async function () {
 				expect(await getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true})).to.be.eql(urlDefault);
@@ -162,33 +184,61 @@ describe('config variable', () => {
 				expect(debugSpy.callCount).to.be.eq(1);
 				expect(debugSpy.getCall(0).args[0]).to.be.an('string').and.eq('FetchEnvConfig: fetch request not ready');
 			});
-			it('should return fetch value', async function () {
-				const src = new URL('' + process.env.FETCH_URI);
-				const value = new URL('' + process.env.FETCH_API_SERVER);
-				const req = new Request(src);
+			it('should return fetch URL value', async function () {
+				const value = new URL(API_SERVER);
+				const req = new Request(configRequestUrl);
 				fetchRequestData = req;
 				const call = getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
 				const output = await call;
 				expect(infoSpy.callCount).to.be.eq(1);
-				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[fetch]: API_SERVER [${value}] from ${src}`);
-				expect(debugSpy.callCount).to.be.eq(1);
-				expect(debugSpy.getCall(0).args[0]).to.be.an('string').and.eq(`fetching config from ${src}`);
+				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[fetch]: API_SERVER [${value}] from ${configRequestUrl}`);
+				expect(debugSpy.callCount).to.be.eq(3);
+				expect(debugSpy.getCall(0).args[0]).to.be.an('string').and.eq(`fetching config from ${configRequestUrl}`);
+				expect(debugSpy.getCall(1).args[0]).to.be.an('string').and.eq(`storing response in cache for FetchEnvConfig`);
+				expect(debugSpy.getCall(2).args[0]).to.be.an('string').and.eq(`successfully loaded config from FetchEnvConfig`);
+				expect(output).to.be.eql(value);
+			});
+			it('should return fetch Object value', async function () {
+				const req = new Request(configRequestUrl, {headers: {'If-None-Match': '123'}});
+				fetchRequestData = req;
+				const call = getConfigVariable('TEST_OBJECT', [fetchEnv()], testObjectParser, undefined, {showValue: true});
+				await call;
+				expect(infoSpy.callCount).to.be.eq(1);
+				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[fetch]: TEST_OBJECT [First=false;Second=false;Third=true] from ${configRequestUrl}`);
+				expect(debugSpy.callCount).to.be.eq(3);
+				expect(debugSpy.getCall(0).args[0]).to.be.an('string').and.eq(`fetching config from ${configRequestUrl}`);
+				expect(debugSpy.getCall(1).args[0]).to.be.an('string').and.eq(`returned cached response for FetchEnvConfig`);
+				expect(debugSpy.getCall(2).args[0]).to.be.an('string').and.eq(`successfully loaded config from FetchEnvConfig`);
+			});
+			it('should get cache hit', async function () {
+				const value = new URL(API_SERVER);
+				const req = new Request(configRequestUrl);
+				fetchRequestData = req;
+				const call = getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
+				const output = await call;
+				expect(infoSpy.callCount).to.be.eq(1);
+				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[fetch]: API_SERVER [${value}] from ${configRequestUrl}`);
+				expect(debugSpy.callCount).to.be.eq(3);
+				expect(debugSpy.getCall(0).args[0]).to.be.an('string').and.eq(`fetching config from ${configRequestUrl}`);
+				expect(debugSpy.getCall(1).args[0]).to.be.an('string').and.eq(`returned cached response for FetchEnvConfig`);
+				expect(debugSpy.getCall(2).args[0]).to.be.an('string').and.eq(`successfully loaded config from FetchEnvConfig`);
 				expect(output).to.be.eql(value);
 			});
 			it('should return cached fetch value when offline', async function () {
 				isOnline = false;
-				fetchEnv = new FetchConfigLoader(handleFetchRequest, {validate: fetchValidate, logger: spyLogger, cache: reqCacheSetup}).getLoader;
-				const src = new URL('' + process.env.FETCH_URI);
-				const value = new URL('' + process.env.FETCH_API_SERVER);
-				const req = new Request(src);
+				const value = new URL(API_SERVER);
+				const req = new Request(configRequestUrl);
 				fetchRequestData = req;
 				const call = getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
 				const output = await call;
 				expect(errorSpy.callCount, errorSpy.getCall(0)?.args.join(' ')).to.be.eq(0);
 				expect(infoSpy.callCount).to.be.eq(1);
-				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[fetch]: API_SERVER [${value}] from ${src}`);
-				expect(debugSpy.callCount).to.be.eq(1);
-				expect(debugSpy.getCall(0).args[0]).to.be.an('string').and.eq(`fetching config from ${src}`);
+				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[fetch]: API_SERVER [${value}] from ${configRequestUrl}`);
+				expect(debugSpy.callCount).to.be.eq(4);
+				expect(debugSpy.getCall(0).args[0]).to.be.an('string').and.eq(`fetching config from ${configRequestUrl}`);
+				expect(debugSpy.getCall(1).args[0]).to.be.an('string').and.eq(`client is offline, returned cached response for FetchEnvConfig`);
+				expect(debugSpy.getCall(2).args[0]).to.be.an('string').and.eq(`storing response in cache for FetchEnvConfig`);
+				expect(debugSpy.getCall(3).args[0]).to.be.an('string').and.eq(`successfully loaded config from FetchEnvConfig`);
 				expect(output).to.be.eql(value);
 			});
 		});
