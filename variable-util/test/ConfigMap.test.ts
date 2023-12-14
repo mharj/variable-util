@@ -10,7 +10,7 @@ import * as sinon from 'sinon';
 import * as z from 'zod';
 import {booleanParser, ConfigMap, env, integerParser, setLogger, stringParser, UrlParser, validLiteral} from '../src/';
 import {testObjectFinalSchema, testObjectParser, TestObjectType} from './testObjectParse';
-import {Result} from 'mharj-result';
+import {Result} from '@luolapeikko/result-option';
 import {URL} from 'url';
 
 dotenv.config();

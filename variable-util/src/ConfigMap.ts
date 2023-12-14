@@ -1,4 +1,4 @@
-import {Err, Ok, Result} from 'mharj-result';
+import {Err, Ok, Result} from '@luolapeikko/result-option';
 import {EnvMapSchema} from './types/EnvMapSchema';
 import {FormatParameters} from './lib/formatUtils';
 import {getConfigObject} from './getConfigObject';
