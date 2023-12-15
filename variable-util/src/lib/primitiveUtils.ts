@@ -18,7 +18,10 @@ const booleanFalseStringValues = ['false', '0', 'no', 'n', 'off'];
 
 const allBooleanStringValues = [...booleanFalseStringValues, ...booleanTrueStringValues];
 
-export function getBoolean(value: string): Result<boolean, TypeError> {
+export function getBoolean(value: string | boolean): Result<boolean, TypeError> {
+	if (typeof value === 'boolean') {
+		return Ok(value);
+	}
 	const output = value.toLowerCase();
 	if (!allBooleanStringValues.includes(output)) {
 		return Err(new TypeError(`${value} is not an boolean string`));

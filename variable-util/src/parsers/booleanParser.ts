@@ -24,6 +24,10 @@ export function booleanParser<Output extends boolean = boolean>(postValidate?: P
 		},
 		postValidate,
 		preValidate: async (key: string, value: string): Promise<void> => {
+			// allow boolean values to be passed in as getBoolean can handle them
+			if (typeof value === 'boolean') {
+				return;
+			}
 			if (typeof value !== 'string') {
 				throw new TypeError(`value for key ${key} is not a string`);
 			}
