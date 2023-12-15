@@ -63,7 +63,12 @@ export class FileConfigLoader extends ConfigLoader<string | undefined> {
 			throw new VariableError(msg);
 		}
 		try {
-			return JSON.parse(await readFile(options.fileName, 'utf8'));
+			// TODO: force all object values to be a string
+			const data = JSON.parse(await readFile(options.fileName, 'utf8'));
+			if (typeof data !== 'object' || Array.isArray(data)) {
+				throw new TypeError('file is not a valid JSON');
+			}
+			return this.parseFile(data);
 		} catch (err) {
 			const msg = this.buildErrorStr(`file ${options.fileName} is not a valid JSON`);
 			if (options.isSilent) {
@@ -72,6 +77,27 @@ export class FileConfigLoader extends ConfigLoader<string | undefined> {
 			}
 			throw new VariableError(msg);
 		}
+	}
+
+	private parseFile(data: Record<string, unknown>): Record<string, string | undefined> {
+		const result: Record<string, string | undefined> = {};
+		for (const [key, value] of Object.entries(data)) {
+			if (value === null || value === undefined) {
+				result[key] = undefined;
+			} else {
+				switch (typeof value) {
+					case 'bigint':
+					case 'boolean':
+					case 'number':
+						result[key] = value.toString();
+						break;
+					case 'string':
+						result[key] = value;
+						break;
+				}
+			}
+		}
+		return result;
 	}
 
 	private async getOptions(): Promise<FileConfigLoaderOptions> {

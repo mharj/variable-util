@@ -2,7 +2,7 @@
 import 'mocha';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import {ConfigMap, getConfigVariable, setLogger, stringParser} from '@avanio/variable-util';
+import {ConfigMap, booleanParser, getConfigVariable, integerParser, setLogger, stringParser} from '@avanio/variable-util';
 import {DockerSecretsConfigLoader, FileConfigLoader} from '../src';
 import {expect} from 'chai';
 import {ILoggerLike} from '@avanio/logger-like';
@@ -38,6 +38,10 @@ describe('config variable', () => {
 			const fileEnv = new FileConfigLoader({fileName: jsonFilename, type: 'json'}).getLoader;
 			const fileDevEnv = new FileConfigLoader({fileName: './test/testDevSettings.json', type: 'json', disabled: true}).getLoader;
 			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileDevEnv(), fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
+			expect(await getConfigVariable('SETTINGS_VARIABLE3', [fileDevEnv(), fileEnv()], booleanParser(), undefined, {showValue: true})).to.be.eq(true); // src: boolean
+			expect(await getConfigVariable('SETTINGS_VARIABLE4', [fileDevEnv(), fileEnv()], booleanParser(), undefined, {showValue: true})).to.be.eq(true); // src: string format
+			expect(await getConfigVariable('SETTINGS_VARIABLE5', [fileDevEnv(), fileEnv()], integerParser(), undefined, {showValue: true})).to.be.eq(1); // src: number
+			expect(await getConfigVariable('SETTINGS_VARIABLE6', [fileDevEnv(), fileEnv()], integerParser(), undefined, {showValue: true})).to.be.eq(1); // src: string format
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);
 		});
 		it('should return file variable value, filename from promise', async function () {
