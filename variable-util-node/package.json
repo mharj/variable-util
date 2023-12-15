@@ -1,6 +1,6 @@
 {
   "name": "@avanio/variable-util-node",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "nodejs env util",
   "main": "./dist/index.js",
   "private": false,
