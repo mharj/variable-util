@@ -1,3 +1,4 @@
+import {buildStringObject, isValidObject} from '../lib';
 import {isRequestNotReadMessage, type RequestNotReady} from '../types/RequestNotReady';
 import {ConfigLoader} from './ConfigLoader';
 import type {ILoggerLike} from '@avanio/logger-like';
@@ -16,7 +17,7 @@ export interface FetchConfigLoaderOptions {
 	isSilent: boolean;
 	payload: 'json';
 	/**
-	 * optional validator for JSON response
+	 * optional validator for JSON response (Record<string, string | undefined>)
 	 *
 	 * @example
 	 * // using zod
@@ -29,7 +30,7 @@ export interface FetchConfigLoaderOptions {
 	 *   return {success: true};
 	 * };
 	 */
-	validate: ValidateCallback<Record<string, string | null>, Record<string, string>> | undefined;
+	validate: ValidateCallback<Record<string, string | undefined>, Record<string, string | undefined>> | undefined;
 	logger: ILoggerLike | undefined;
 	cache: IRequestCache | undefined;
 	disabled: boolean;
@@ -52,7 +53,7 @@ export type FetchConfigRequest = ConfigRequest | Promise<ConfigRequest> | (() =>
 export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 	public type = 'fetch';
 	private request: FetchConfigRequest;
-	private dataPromise: Promise<Record<string, string | null>> | undefined;
+	private dataPromise: Promise<Record<string, string | undefined>> | undefined;
 	private path = 'undefined';
 	private options: FetchConfigLoaderOptions;
 	private _isLoaded = false;
@@ -109,7 +110,7 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 		return {type: this.type, result: {value, path: this.path}};
 	}
 
-	private async fetchData(): Promise<Record<string, string | null>> {
+	private async fetchData(): Promise<Record<string, string | undefined>> {
 		this._isLoaded = false;
 		const req = await this.getRequest();
 		if (isRequestNotReadMessage(req)) {
@@ -211,21 +212,29 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 		return res;
 	}
 
-	private async handleJson(res: Response): Promise<Record<string, string | null>> {
-		const data = await res.json();
-		if (this.options.validate) {
-			try {
-				return await this.options.validate(data);
-			} catch (error) {
-				const err = error instanceof Error ? error : new Error('unknown error');
-				if (this.options.isSilent) {
-					this.options.logger?.info(`invalid json response from FetchEnvConfig: ${err.message}`);
-					return Promise.resolve({}); // set as empty so we prevent fetch spamming
-				}
-				throw new VariableError(`invalid json response from FetchEnvConfig: ${err.message}`);
+	private async handleJson(res: Response): Promise<Record<string, string | undefined>> {
+		try {
+			const contentType = res.headers.get('content-type');
+			if (!contentType?.startsWith('application/json')) {
+				throw new Error(`unsupported content-type ${contentType}`);
 			}
+			const rawData: unknown = await res.json();
+			if (!isValidObject(rawData)) {
+				throw new Error(`is not valid JSON object`);
+			}
+			const data = buildStringObject(rawData);
+			if (this.options.validate) {
+				return await this.options.validate(data);
+			}
+			return data;
+		} catch (error) {
+			const err = error instanceof Error ? error : new Error('unknown error');
+			if (this.options.isSilent) {
+				this.options.logger?.info(`FetchEnvConfig JSON error: ${err.message}`);
+				return Promise.resolve({}); // set as empty so we prevent fetch spamming
+			}
+			throw new VariableError(`FetchEnvConfig JSON error: ${err.message}`);
 		}
-		return data;
 	}
 
 	private async getRequest(): Promise<ConfigRequest> {

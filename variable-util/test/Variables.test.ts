@@ -94,9 +94,9 @@ const validate: ValidateCallback<ObjectSchema, Record<string, unknown>> = async 
 	return objectSchema.parseAsync(data);
 };
 
-const stringRecordSchema = z.record(z.string().min(1), z.string().nullable());
+const stringRecordSchema = z.record(z.string().min(1), z.string().optional());
 
-const fetchValidate: ValidateCallback<Record<string, string | null>, Record<string, unknown>> = async (data: Record<string, unknown>) => {
+const fetchValidate: ValidateCallback<Record<string, string | undefined>, Record<string, unknown>> = async (data: Record<string, unknown>) => {
 	return stringRecordSchema.parseAsync(data);
 };
 
