@@ -1,4 +1,4 @@
-import {ConfigLoader, Loadable, LoaderValue, VariableError} from '@avanio/variable-util';
+import {buildStringObject, ConfigLoader, isValidObject, Loadable, LoaderValue, ValidateCallback, VariableError} from '@avanio/variable-util';
 import {existsSync} from 'fs';
 import {ILoggerLike} from '@avanio/logger-like';
 import {readFile} from 'fs/promises';
@@ -10,6 +10,21 @@ export interface FileConfigLoaderOptions {
 	isSilent: boolean;
 	logger: ILoggerLike | undefined;
 	disabled: boolean;
+	/**
+	 * optional validator for JSON data (Record<string, string | undefined>)
+	 *
+	 * @example
+	 * // using zod
+	 * const stringRecordSchema = z.record(z.string().min(1), z.string());
+	 * const validate: ValidateCallback<Record<string, string>> = async (data) => {
+	 *   const result = await stringRecordSchema.safeParseAsync(data);
+	 *   if (!result.success) {
+	 *     return {success: false, message: result.error.message};
+	 *   }
+	 *   return {success: true};
+	 * };
+	 */
+	validate: ValidateCallback<Record<string, string | undefined>, Record<string, string | undefined>> | undefined;
 }
 
 export class FileConfigLoader extends ConfigLoader<string | undefined> {
@@ -23,6 +38,7 @@ export class FileConfigLoader extends ConfigLoader<string | undefined> {
 		isSilent: true,
 		logger: undefined,
 		type: 'json',
+		validate: undefined,
 	};
 
 	public constructor(options: Loadable<Partial<FileConfigLoaderOptions>> = {}) {
@@ -63,12 +79,16 @@ export class FileConfigLoader extends ConfigLoader<string | undefined> {
 			throw new VariableError(msg);
 		}
 		try {
-			// TODO: force all object values to be a string
-			const data = JSON.parse(await readFile(options.fileName, 'utf8'));
-			if (typeof data !== 'object' || Array.isArray(data)) {
-				throw new TypeError('file is not a valid JSON');
+			const options = await this.getOptions();
+			const rawData = JSON.parse(await readFile(options.fileName, 'utf8'));
+			if (!isValidObject(rawData)) {
+				throw new Error(`is not valid JSON object`);
 			}
-			return this.parseFile(data);
+			const data = buildStringObject(rawData);
+			if (options.validate) {
+				return await options.validate(data);
+			}
+			return data;
 		} catch (err) {
 			const msg = this.buildErrorStr(`file ${options.fileName} is not a valid JSON`);
 			if (options.isSilent) {
@@ -77,27 +97,6 @@ export class FileConfigLoader extends ConfigLoader<string | undefined> {
 			}
 			throw new VariableError(msg);
 		}
-	}
-
-	private parseFile(data: Record<string, unknown>): Record<string, string | undefined> {
-		const result: Record<string, string | undefined> = {};
-		for (const [key, value] of Object.entries(data)) {
-			if (value === null || value === undefined) {
-				result[key] = undefined;
-			} else {
-				switch (typeof value) {
-					case 'bigint':
-					case 'boolean':
-					case 'number':
-						result[key] = value.toString();
-						break;
-					case 'string':
-						result[key] = value;
-						break;
-				}
-			}
-		}
-		return result;
 	}
 
 	private async getOptions(): Promise<FileConfigLoaderOptions> {

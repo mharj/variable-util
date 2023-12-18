@@ -2,7 +2,7 @@
 import 'mocha';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import {ConfigMap, booleanParser, getConfigVariable, integerParser, setLogger, stringParser} from '@avanio/variable-util';
+import {booleanParser, ConfigMap, getConfigVariable, integerParser, setLogger, stringParser} from '@avanio/variable-util';
 import {DockerSecretsConfigLoader, FileConfigLoader} from '../src';
 import {expect} from 'chai';
 import {ILoggerLike} from '@avanio/logger-like';
