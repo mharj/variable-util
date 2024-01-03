@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "variable-util"
+		},
+		{
+			"path": "variable-util-azurekv"
+		},
+		{
+			"path": "variable-util-node"
+		},
+		{
+			"path": ".github"
+		}
+	],
+	"settings": {}
+}
