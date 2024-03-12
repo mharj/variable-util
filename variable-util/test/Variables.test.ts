@@ -327,7 +327,7 @@ describe('config variable', () => {
 					},
 				);
 				await expect(call).to.be.eventually.eql({foo: 'bar', baz: 'qux'});
-				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [foo=bar] from process.env.TEST`);
+				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [foo=bar;baz=***] from process.env.TEST`);
 			});
 			it('should return undefined value if not valid', async function () {
 				process.env.TEST = '__BROKEN__';
@@ -360,7 +360,7 @@ describe('config variable', () => {
 					},
 				);
 				await expect(call).to.be.eventually.eql({foo: 'bar', baz: 'qux'});
-				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [{"foo":"bar"}] from process.env.TEST`);
+				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [{"foo":"bar","baz":"***"}] from process.env.TEST`);
 			});
 			it('should return undefined value if not valid', async function () {
 				process.env.TEST = '__BROKEN__';

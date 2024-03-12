@@ -48,3 +48,10 @@ export function printValue(value: string | undefined, config: FormatParameters |
 	}
 	return ` [${value}]`;
 }
+
+/**
+ * Builds a hidden value string, replacing each character with an asterisk.
+ */
+export function buildHiddenValueString(value: string): string {
+	return '*'.repeat(value.length);
+}

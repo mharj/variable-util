@@ -1,5 +1,6 @@
 import {IConfigParser} from '../interfaces/IConfigParser';
 import {ValidateCallback} from '../interfaces/IValidate';
+import {buildHiddenValueString} from '../lib/formatUtils';
 
 /**
  * The base type of the parsed JSON object
@@ -13,11 +14,11 @@ export type JsonParseType = Record<string, unknown>;
  */
 export class JsonConfigParser<Out extends JsonParseType> implements IConfigParser<Out, JsonParseType> {
 	public name = 'jsonConfigParser';
-	private keysToHide: string[] | undefined;
+	private keysToHide: (keyof Out)[];
 	private validate: ValidateCallback<Out, JsonParseType> | undefined;
 
-	constructor({keysToHide, validate}: {keysToHide?: string[]; validate?: ValidateCallback<Out, JsonParseType>} = {}) {
-		this.keysToHide = keysToHide;
+	constructor({keysToHide, validate}: {keysToHide?: (keyof Out)[]; validate?: ValidateCallback<Out, JsonParseType>} = {}) {
+		this.keysToHide = keysToHide || [];
 		this.validate = validate;
 	}
 
@@ -43,8 +44,12 @@ export class JsonConfigParser<Out extends JsonParseType> implements IConfigParse
 	public toLogString(value: Out): string {
 		return JSON.stringify(
 			Object.entries(value).reduce<Record<string, unknown>>((last, [key, value]) => {
-				if (value && (this.keysToHide === undefined || !this.keysToHide.includes(key))) {
-					last[`${key}`] = value;
+				if (value) {
+					if (!this.keysToHide.includes(key)) {
+						last[`${key}`] = value;
+					} else {
+						last[`${key}`] = buildHiddenValueString(`${value}`);
+					}
 				}
 				return last;
 			}, {}),

@@ -1,3 +1,5 @@
+import {buildHiddenValueString} from './formatUtils';
+
 /**
  * Make the first character of a string lowercase
  * @param {string} data String to make lowercase
@@ -39,12 +41,28 @@ export function parseSemicolonConfig(config: string, keepCase = true): Record<st
  * @example
  * stringifySemicolonConfig({a: 'b', c: 'd'}) // 'a=b;c=d'
  */
-export function stringifySemicolonConfig(config: Record<string, unknown>, keysToHide?: string[]): string {
+export function stringifySemicolonConfig(config: Record<string, unknown>): string {
 	return Object.entries(config)
 		.reduce<string[]>((last, [key, value]) => {
-			if (value !== undefined && (keysToHide === undefined || !keysToHide.includes(key))) {
+			if (value !== undefined) {
 				const encodedValue = encodeURIComponent(`${value}`);
 				last.push(`${key}=${encodedValue}`);
+			}
+			return last;
+		}, [])
+		.join(';');
+}
+
+export function logStringifySemicolonConfig<Out extends Record<string, unknown>>(config: Out, keysToHide: (keyof Out)[] = []): string {
+	return Object.entries(config)
+		.reduce<string[]>((last, [key, value]) => {
+			if (value !== undefined) {
+				if (!keysToHide.includes(key as keyof Out)) {
+					last.push(`${key}=${value}`);
+				} else {
+					const hiddenValue = buildHiddenValueString(`${value}`);
+					last.push(`${key}=${hiddenValue}`);
+				}
 			}
 			return last;
 		}, [])
