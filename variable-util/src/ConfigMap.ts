@@ -2,8 +2,9 @@ import {Err, Ok, Result} from '@luolapeikko/result-option';
 import {EnvMapSchema} from './types/EnvMapSchema';
 import {FormatParameters} from './lib/formatUtils';
 import {getConfigObject} from './getConfigObject';
-import {getLogger} from './logger';
+import {ILoggerLike} from '@avanio/logger-like';
 import {LoaderTypeValue} from './types/TypeValue';
+import {resolveLogger} from './logger';
 import {VariableError} from './VariableError';
 
 /**
@@ -35,8 +36,15 @@ function useCache({cache}: FormatParameters | undefined = {}): boolean {
 export class ConfigMap<Data extends Record<string, unknown>> {
 	private schema: EnvMapSchema<Data>;
 	private cache = new Map<string, Promise<LoaderTypeValue<Data[keyof Data]>>>();
-	constructor(schema: EnvMapSchema<Data>) {
+	private logger: ILoggerLike | undefined | null;
+	/**
+	 * ConfigMap constructor
+	 * @param schema - schema of config map
+	 * @param logger - undefined = use global logger, null = no logger, else use ILoggerLike custom logger
+	 */
+	constructor(schema: EnvMapSchema<Data>, logger?: ILoggerLike | null) {
 		this.schema = schema;
+		this.logger = logger;
 	}
 
 	/**
@@ -47,7 +55,6 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 	 * console.log(valueObject.type, valueObject.value); // 'env', 3000
 	 */
 	public async getObject<Key extends keyof Data = keyof Data>(key: Key): Promise<LoaderTypeValue<Data[Key]>> {
-		const logger = getLogger();
 		const entry = this.schema[key];
 		if (!entry) {
 			throw new VariableError(`ConfigMap key ${String(key)} not found in config map`);
@@ -62,13 +69,14 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 			configObjectPromise = this.cache.get(key) as Promise<LoaderTypeValue<Data[Key]>> | undefined;
 		}
 		if (!configObjectPromise) {
-			configObjectPromise = getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params) as Promise<LoaderTypeValue<Data[Key]>>;
+			configObjectPromise = getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params, this.logger) as Promise<LoaderTypeValue<Data[Key]>>;
 			if (useCache(params)) {
 				this.cache.set(key, configObjectPromise);
 			}
 		}
 		const configObject = await configObjectPromise;
 		if (undefinedThrowsError && configObject.value === undefined) {
+			const logger = resolveLogger(this.logger);
 			logger?.info(`ConfigMap key ${String(key)} is undefined (expect to throw error)`);
 			throw new VariableError(`ConfigMap key ${String(key)} is undefined`);
 		}
@@ -81,7 +89,7 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 	 * @example
 	 * const valueObject: Result<LoaderTypeValue<number>> = await config.getObjectResult('PORT');
 	 * if (valueObject.isOk()) {
-	 *   cpmst {type, value} = valueObject.ok();
+	 *   const {type, value} = valueObject.ok();
 	 * 	 console.log(type, value); // 'env', 3000
 	 * }
 	 */

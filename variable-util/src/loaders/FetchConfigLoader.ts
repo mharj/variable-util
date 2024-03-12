@@ -71,8 +71,8 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 
 	/**
 	 * Constructor for FetchConfigLoader
-	 * @param requestCallback - callback that returns a fetch request or a message object that the request is not ready
-	 * @param _options
+	 * @param request - callback that returns a fetch request or a message object that the request is not ready
+	 * @param _options - optional options for FetchConfigLoader
 	 */
 	constructor(request: FetchConfigRequest, _options: Partial<FetchConfigLoaderOptions> = {}) {
 		super();

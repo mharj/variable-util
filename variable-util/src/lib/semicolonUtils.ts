@@ -35,7 +35,6 @@ export function parseSemicolonConfig(config: string, keepCase = true): Record<st
 /**
  * Stringify a config object to a semicolon separated string
  * @param {Record<string, string>} config Object to stringify
- * @param {string[]} [keysToHide] Keys to hide from the output log
  * @returns {string} Stringified config
  * @category Utils
  * @example
@@ -53,6 +52,15 @@ export function stringifySemicolonConfig(config: Record<string, unknown>): strin
 		.join(';');
 }
 
+/**
+ * Stringify a config object to a semicolon separated string for logging
+ * @param {Record<string, string>} config Object to stringify
+ * @param {string[]} keysToHide Keys to hide
+ * @returns {string} Stringified config
+ * @category Utils
+ * @example
+ * logStringifySemicolonConfig({a: 'b', c: 'd'}) // 'a=b;c=d'
+ */
 export function logStringifySemicolonConfig<Out extends Record<string, unknown>>(config: Out, keysToHide: (keyof Out)[] = []): string {
 	return Object.entries(config)
 		.reduce<string[]>((last, [key, value]) => {

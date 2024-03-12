@@ -38,7 +38,6 @@ export function urlSanitize(value: string, logger?: ILoggerLike): string {
  * Returns a formatted string representation of a value, enclosed in square brackets.
  * @param {string | undefined} value - The value to format.
  * @param {FormatParameters | undefined} config - An optional configuration object.
- * @param {boolean} config.showValue - Whether to include the value in the output.
  * @returns {string} The formatted string representation of the value.
  * @category Utils
  */

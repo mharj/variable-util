@@ -19,7 +19,7 @@ export function printLog(logger: ILoggerLike | undefined, type: string, key: str
 }
 
 /**
- * Rebuid Error as VariableError
+ * Rebuild Error as VariableError
  * @param {string} value - value of variable
  * @param {Error} error - error to rebuild
  * @param {IConfigParser<Output, RawOutput>} parser - parser used
@@ -120,8 +120,8 @@ export async function handleLoader<Output, RawOutput = unknown>(
 	loader: IConfigLoader,
 	parser: IConfigParser<Output, RawOutput>,
 	params?: FormatParameters,
+	logger: ILoggerLike | undefined | null = getLogger(),
 ): Promise<{type: string; value: Output | undefined; stringValue: string | undefined} | undefined> {
-	const logger = getLogger();
 	try {
 		const {type, result} = await loader.callback(rootKey);
 		// check if result is undefined (disabled loaders)
@@ -164,7 +164,7 @@ export async function handleLoader<Output, RawOutput = unknown>(
 			 */
 			const stringValue = parser.toString(output);
 			const logValue = parser.toLogString?.(output) ?? stringValue;
-			printLog(logger, loader.type, rootKey, logValue, path, params);
+			printLog(logger || undefined, loader.type, rootKey, logValue, path, params);
 			return {type, value: output, stringValue};
 		}
 	} catch (err) {
