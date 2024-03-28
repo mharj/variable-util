@@ -1,8 +1,8 @@
+import {buildOptions, ConfigOptions} from './ConfigOptions';
 import {handleLoader, printLog} from './loaderUtils';
 import {IConfigLoader, IConfigParser} from './interfaces/';
+import {LoaderTypeValue, LoaderTypeValueStrict} from './types/TypeValue';
 import {FormatParameters} from './lib/formatUtils';
-import {getLogger} from './logger';
-import {ILoggerLike} from '@avanio/logger-like';
 import {Loadable} from './types/Loadable';
 import {VariableError} from './VariableError';
 
@@ -26,24 +26,25 @@ export async function getConfigObject<Output>(
 	parser: IConfigParser<Output, unknown>,
 	defaultValueLoadable: Loadable<Output>,
 	params?: FormatParameters,
-	logger?: ILoggerLike | null,
-): Promise<{type: string | undefined; value: Output; stringValue: string | undefined}>;
+	options?: ConfigOptions,
+): Promise<LoaderTypeValueStrict<Output>>;
 export async function getConfigObject<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
 	defaultValueLoadable?: Loadable<Output> | undefined,
 	params?: FormatParameters,
-	logger?: ILoggerLike | null,
-): Promise<{type: string | undefined; value: Output | undefined; stringValue: string | undefined}>;
+	options?: ConfigOptions,
+): Promise<LoaderTypeValue<Output>>;
 export async function getConfigObject<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
 	defaultValueLoadable?: Loadable<Output> | undefined,
 	params?: FormatParameters,
-	logger: ILoggerLike | undefined | null = getLogger(),
-): Promise<{type: string | undefined; value: Output | undefined; stringValue: string | undefined}> {
+	options?: ConfigOptions,
+): Promise<LoaderTypeValue<Output>> {
+	const currentOptions = buildOptions(options);
 	let defaultValue: Output | undefined;
 	let type: string | undefined;
 	/**
@@ -58,16 +59,16 @@ export async function getConfigObject<Output>(
 			defaultValue = value;
 			type = 'default';
 		} catch (err) {
-			logger?.error(err);
+			currentOptions.logger?.error(err);
 			throw err;
 		}
 	}
 	for (const loader of loaders) {
-		let output: {type: string; value: Output | undefined; stringValue: string | undefined} | undefined;
+		let output: LoaderTypeValue<Output> | undefined;
 		try {
-			output = await handleLoader(rootKey, loader, parser, params, logger);
+			output = await handleLoader(rootKey, loader, parser, params, currentOptions);
 		} catch (err) {
-			logger?.error(err);
+			currentOptions.logger?.error(err);
 		}
 		if (output !== undefined) {
 			return output;
@@ -76,7 +77,8 @@ export async function getConfigObject<Output>(
 	let stringValue: string | undefined;
 	if (defaultValue !== undefined) {
 		stringValue = parser.toString(defaultValue);
-		printLog(logger || undefined, 'default', rootKey, stringValue, 'default', params);
+		printLog(currentOptions, 'default', rootKey, stringValue, 'default', params);
+		return {namespace: currentOptions.namespace, stringValue, type: 'default', value: defaultValue};
 	}
-	return {type, value: defaultValue, stringValue};
+	return {namespace: currentOptions.namespace, stringValue, type, value: defaultValue};
 }

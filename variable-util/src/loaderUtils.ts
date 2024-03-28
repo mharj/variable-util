@@ -1,7 +1,7 @@
+import {buildOptions, ConfigOptions, SolvedConfigOptions} from './ConfigOptions';
 import {FormatParameters, printValue} from './lib/formatUtils';
 import {IConfigLoader, IConfigParser} from './interfaces';
-import {getLogger} from './logger';
-import {ILoggerLike} from '@avanio/logger-like';
+import {LoaderTypeValue} from './types/TypeValue';
 import {VariableError} from './VariableError';
 
 /**
@@ -14,8 +14,9 @@ import {VariableError} from './VariableError';
  * @param params - optional format parameters
  * @category Utils
  */
-export function printLog(logger: ILoggerLike | undefined, type: string, key: string, value: string, path: string, params?: FormatParameters): void {
-	logger?.info(`ConfigVariables[${type}]: ${key}${printValue(value, params)} from ${path}`);
+export function printLog({logger, namespace}: SolvedConfigOptions, type: string, key: string, value: string, path: string, params?: FormatParameters): void {
+	const namespaceString = namespace ? `:${namespace}` : '';
+	logger?.info(`ConfigVariables${namespaceString}[${type}]: ${key}${printValue(value, params)} from ${path}`);
 }
 
 /**
@@ -120,8 +121,9 @@ export async function handleLoader<Output, RawOutput = unknown>(
 	loader: IConfigLoader,
 	parser: IConfigParser<Output, RawOutput>,
 	params?: FormatParameters,
-	logger: ILoggerLike | undefined | null = getLogger(),
-): Promise<{type: string; value: Output | undefined; stringValue: string | undefined} | undefined> {
+	options?: ConfigOptions,
+): Promise<LoaderTypeValue<Output> | undefined> {
+	const currentOptions = buildOptions(options);
 	try {
 		const {type, result} = await loader.callback(rootKey);
 		// check if result is undefined (disabled loaders)
@@ -164,11 +166,11 @@ export async function handleLoader<Output, RawOutput = unknown>(
 			 */
 			const stringValue = parser.toString(output);
 			const logValue = parser.toLogString?.(output) ?? stringValue;
-			printLog(logger || undefined, loader.type, rootKey, logValue, path, params);
-			return {type, value: output, stringValue};
+			printLog(currentOptions, loader.type, rootKey, logValue, path, params);
+			return {namespace: currentOptions.namespace, stringValue, type, value: output};
 		}
 	} catch (err) {
-		logger?.error(err);
+		currentOptions.logger?.error(err);
 	}
 	return undefined;
 }

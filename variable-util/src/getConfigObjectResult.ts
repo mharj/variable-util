@@ -1,5 +1,6 @@
 import {Err, Ok, Result} from '@luolapeikko/result-option';
 import {IConfigLoader, IConfigParser} from './interfaces';
+import {ConfigOptions} from './ConfigOptions';
 import {FormatParameters} from './lib/formatUtils';
 import {getConfigObject} from './getConfigObject';
 import {Loadable} from './types/Loadable';
@@ -27,6 +28,7 @@ export async function getConfigObjectResult<Output>(
 	parser: IConfigParser<Output, unknown>,
 	defaultValueLoadable: Loadable<Output>,
 	params?: FormatParameters,
+	options?: ConfigOptions,
 ): Promise<Result<{type: string | undefined; value: Output}>>;
 export async function getConfigObjectResult<Output>(
 	rootKey: string,
@@ -34,6 +36,7 @@ export async function getConfigObjectResult<Output>(
 	parser: IConfigParser<Output, unknown>,
 	defaultValueLoadable?: Loadable<Output> | undefined,
 	params?: FormatParameters,
+	options?: ConfigOptions,
 ): Promise<Result<{type: string | undefined; value: Output | undefined}>>;
 export async function getConfigObjectResult<Output>(
 	rootKey: string,
@@ -41,9 +44,10 @@ export async function getConfigObjectResult<Output>(
 	parser: IConfigParser<Output, unknown>,
 	defaultValueLoadable?: Loadable<Output> | undefined,
 	params?: FormatParameters,
+	options?: ConfigOptions,
 ): Promise<Result<{type: string | undefined; value: Output | undefined}>> {
 	try {
-		return Ok(await getConfigObject(rootKey, loaders, parser, defaultValueLoadable, params));
+		return Ok(await getConfigObject(rootKey, loaders, parser, defaultValueLoadable, params, options));
 	} catch (err) {
 		return Err(err);
 	}

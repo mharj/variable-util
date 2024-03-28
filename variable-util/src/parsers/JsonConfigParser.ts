@@ -1,6 +1,6 @@
+import {buildHiddenValueString} from '../lib/formatUtils';
 import {IConfigParser} from '../interfaces/IConfigParser';
 import {ValidateCallback} from '../interfaces/IValidate';
-import {buildHiddenValueString} from '../lib/formatUtils';
 
 /**
  * The base type of the parsed JSON object

@@ -11,3 +11,4 @@ export * from './VariableLookupError';
 export * from './ConfigMap';
 export * from './logger';
 export * from './lib';
+export * from './ConfigOptions';
