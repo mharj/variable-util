@@ -1,18 +1,10 @@
 {
+    "extends": "@tsconfig/node18/tsconfig.json",
     "compilerOptions": {
-        "lib": [
-            "es2018",
-            "dom"
-        ],
-        "module": "commonjs",
-        "target": "es5",
         "rootDir": "./src",
         "outDir": "./dist",
-        "moduleResolution": "node",
         "sourceRoot": "./src",
-        "types": [
-            "node",
-        ],
+        "types": ["node"],
         "declaration": true,
         "removeComments": false,
         "inlineSources": false,
