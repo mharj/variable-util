@@ -5,11 +5,15 @@ import {ILoggerLike} from '@avanio/logger-like';
 import {readFile} from 'fs/promises';
 
 export interface DockerSecretsConfigLoaderOptions {
+	/** force file name to lower case */
 	fileLowerCase: boolean;
+	/** path to docker secrets, default is '/run/secrets' */
 	path: string;
 	/** set to false if need errors */
 	isSilent: boolean;
+	/** optional logger */
 	logger: ILoggerLike | undefined;
+	/** set to true to disable loader, default is false */
 	disabled: boolean;
 }
 

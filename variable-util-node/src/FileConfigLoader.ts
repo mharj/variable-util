@@ -4,11 +4,15 @@ import {ILoggerLike} from '@avanio/logger-like';
 import {readFile} from 'fs/promises';
 
 export interface FileConfigLoaderOptions {
+	/** file name to load, default is 'config.json' */
 	fileName: string;
+	/** file type to load, only 'json' supported atm */
 	type: 'json';
 	/** set to false if need errors */
 	isSilent: boolean;
+	/** optional logger */
 	logger: ILoggerLike | undefined;
+	/** set to true to disable loader, default is false */
 	disabled: boolean;
 	/**
 	 * optional validator for JSON data (Record<string, string | undefined>)
