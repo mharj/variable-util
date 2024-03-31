@@ -39,11 +39,12 @@
     "@tsconfig/node18": "^18.2.4",
     "@types/chai": "^4.3.14",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^18.19.26",
+    "@types/node": "^18.19.28",
     "@types/sinon": "^17.0.3",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
     "@typescript-eslint/parser": "^7.4.0",
     "chai": "^4.4.1",
+    "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard": "^17.1.0",
@@ -58,7 +59,8 @@
     "typescript": "^5.4.3"
   },
   "peerDependencies": {
-    "@avanio/variable-util": "^0.6.0"
+    "@avanio/variable-util": "^0.6.0",
+    "dotenv": "^16"
   },
   "dependencies": {
     "@avanio/logger-like": "^0.1.1"

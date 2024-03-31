@@ -1,7 +1,7 @@
 import * as path from 'path';
 import {ConfigLoader, Loadable, LoaderValue, VariableLookupError} from '@avanio/variable-util';
 import {existsSync} from 'fs';
-import {ILoggerLike} from '@avanio/logger-like';
+import type {ILoggerLike} from '@avanio/logger-like';
 import {readFile} from 'fs/promises';
 
 export interface DockerSecretsConfigLoaderOptions {
@@ -18,7 +18,7 @@ export interface DockerSecretsConfigLoaderOptions {
 }
 
 export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined> {
-	public type = 'docker-secrets';
+	public readonly type = 'docker-secrets';
 	private options: Loadable<Partial<DockerSecretsConfigLoaderOptions>>;
 	private valuePromises: Record<string, Promise<string | undefined> | undefined> = {};
 	private defaultOptions: DockerSecretsConfigLoaderOptions = {
