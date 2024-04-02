@@ -36,13 +36,13 @@ export abstract class AbstractFileRecordLoader<
 	Options extends AbstractFileRecordLoaderOptions<string> = AbstractFileRecordLoaderOptions<string>,
 > extends ConfigLoader<string | undefined> {
 	abstract readonly type: string;
-	protected options: Loadable<Partial<Options>>;
+	protected options: Loadable<Partial<Options>> | undefined;
 	private filePromise: Promise<Record<string, string | undefined>> | undefined;
 	private watcher: FSWatcher | undefined;
 
 	protected abstract defaultOptions: Options;
 
-	public constructor(options: Loadable<Partial<Options>>) {
+	public constructor(options?: Loadable<Partial<Options>>) {
 		super();
 		this.options = options;
 		this.getLoader = this.getLoader.bind(this);
@@ -132,6 +132,6 @@ export abstract class AbstractFileRecordLoader<
 
 	private async getOptions(): Promise<Options> {
 		const options = await (typeof this.options === 'function' ? this.options() : this.options);
-		return Object.assign({}, this.defaultOptions, options);
+		return Object.assign({}, this.defaultOptions, options || {});
 	}
 }
