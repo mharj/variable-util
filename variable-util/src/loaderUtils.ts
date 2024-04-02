@@ -1,7 +1,7 @@
-import {buildOptions, ConfigOptions, SolvedConfigOptions} from './ConfigOptions';
 import {FormatParameters, printValue} from './lib/formatUtils';
 import {IConfigLoader, IConfigParser} from './interfaces';
 import {LoaderTypeValue} from './types/TypeValue';
+import {SolvedConfigOptions} from './ConfigOptions';
 import {VariableError} from './VariableError';
 
 /**
@@ -120,10 +120,9 @@ export async function handleLoader<Output, RawOutput = unknown>(
 	rootKey: string,
 	loader: IConfigLoader,
 	parser: IConfigParser<Output, RawOutput>,
-	params?: FormatParameters,
-	options?: ConfigOptions,
+	params: FormatParameters | undefined,
+	options: SolvedConfigOptions,
 ): Promise<LoaderTypeValue<Output> | undefined> {
-	const currentOptions = buildOptions(options);
 	try {
 		const {type, result} = await loader.callback(rootKey);
 		// check if result is undefined (disabled loaders)
@@ -166,11 +165,11 @@ export async function handleLoader<Output, RawOutput = unknown>(
 			 */
 			const stringValue = parser.toString(output);
 			const logValue = parser.toLogString?.(output) ?? stringValue;
-			printLog(currentOptions, loader.type, rootKey, logValue, path, params);
-			return {namespace: currentOptions.namespace, stringValue, type, value: output};
+			printLog(options, loader.type, rootKey, logValue, path, params);
+			return {namespace: options.namespace, stringValue, type, value: output};
 		}
 	} catch (err) {
-		currentOptions.logger?.error(err);
+		options.logger?.error(err);
 	}
 	return undefined;
 }

@@ -1,4 +1,4 @@
-import {buildOptions, ConfigOptions, SolvedConfigOptions} from './ConfigOptions';
+import {buildOptions, ConfigOptions} from './ConfigOptions';
 import {Err, Ok, Result} from '@luolapeikko/result-option';
 import type {ILoggerLike, ISetOptionalLogger} from '@avanio/logger-like';
 import {EnvMapSchema} from './types/EnvMapSchema';
@@ -36,15 +36,15 @@ function useCache({cache}: FormatParameters | undefined = {}): boolean {
 export class ConfigMap<Data extends Record<string, unknown>> implements ISetOptionalLogger {
 	private schema: EnvMapSchema<Data>;
 	private cache = new Map<string, Promise<LoaderTypeValueStrict<Data[keyof Data]>>>();
-	private options: SolvedConfigOptions;
+	private options: ConfigOptions;
 	/**
 	 * ConfigMap constructor
 	 * @param {EnvMapSchema<Data>} schema - schema of config map
 	 * @param {ConfigOptions} options - optional config options (logger, namespace)
 	 */
-	constructor(schema: EnvMapSchema<Data>, options?: ConfigOptions) {
+	constructor(schema: EnvMapSchema<Data>, options: ConfigOptions = {logger: undefined, namespace: undefined}) {
 		this.schema = schema;
-		this.options = buildOptions(options);
+		this.options = options;
 	}
 
 	/**
@@ -84,7 +84,7 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 		}
 		const configObject = await configObjectPromise;
 		if (undefinedThrowsError && configObject.value === undefined) {
-			this.options.logger?.info(`ConfigMap key ${String(key)} is undefined (expect to throw error)`);
+			buildOptions(this.options).logger?.info(`ConfigMap key ${String(key)} is undefined (expect to throw error)`);
 			throw new VariableError(`ConfigMap key ${String(key)} is undefined`);
 		}
 		return configObject;
