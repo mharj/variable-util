@@ -90,6 +90,10 @@ export abstract class AbstractFileRecordLoader<
 	}
 
 	private async loadFile(options: Options): Promise<Record<string, string | undefined>> {
+		// if file is disabled, return empty object
+		if (options.disabled) {
+			return {};
+		}
 		if (!existsSync(options.fileName)) {
 			const msg = this.buildErrorStr(`file ${options.fileName} not found`);
 			if (options.isSilent) {
