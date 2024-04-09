@@ -1,9 +1,9 @@
 import {buildStringObject, isValidObject} from '../lib';
 import {isRequestNotReadMessage, type RequestNotReady} from '../types/RequestNotReady';
-import {ConfigLoader} from './ConfigLoader';
 import type {ILoggerLike} from '@avanio/logger-like';
 import type {IRequestCache} from '../interfaces/IRequestCache';
 import type {LoaderValue} from '../interfaces/IConfigLoader';
+import {RecordConfigLoader} from './RecordConfigLoader';
 import {urlSanitize} from '../lib/formatUtils';
 import type {ValidateCallback} from '../interfaces/IValidate';
 import {VariableError} from '../VariableError';
@@ -50,13 +50,11 @@ export type FetchConfigRequest = ConfigRequest | Promise<ConfigRequest> | (() =>
  * @category Loaders
  * @implements {IConfigLoader}
  */
-export class FetchConfigLoader extends ConfigLoader<string | undefined> {
+export class FetchConfigLoader extends RecordConfigLoader<string | undefined> {
 	public type = 'fetch';
 	private request: FetchConfigRequest;
-	private dataPromise: Promise<Record<string, string | undefined>> | undefined;
 	private path = 'undefined';
 	private options: FetchConfigLoaderOptions;
-	private _isLoaded = false;
 
 	private defaultOptions: FetchConfigLoaderOptions = {
 		cache: undefined,
@@ -80,21 +78,6 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 		this.request = request;
 	}
 
-	/**
-	 * reloads the data from the fetch request
-	 */
-	public async reload(): Promise<void> {
-		this.dataPromise = this.fetchData();
-		await this.dataPromise;
-	}
-
-	/**
-	 * is the data loaded
-	 */
-	public isLoaded(): boolean {
-		return this._isLoaded;
-	}
-
 	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
 		// check if disabled
 		if (this.options.disabled) {
@@ -102,7 +85,7 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 		}
 		// check if we have JSON data loaded, if not load it
 		if (!this.dataPromise || this._isLoaded === false) {
-			this.dataPromise = this.fetchData();
+			this.dataPromise = this.handleData();
 		}
 		const data = await this.dataPromise;
 		const targetKey = overrideKey || lookupKey; // optional override key, else use actual lookupKey
@@ -110,7 +93,7 @@ export class FetchConfigLoader extends ConfigLoader<string | undefined> {
 		return {type: this.type, result: {value, path: this.path}};
 	}
 
-	private async fetchData(): Promise<Record<string, string | undefined>> {
+	protected async handleData(): Promise<Record<string, string | undefined>> {
 		this._isLoaded = false;
 		const req = await this.getRequest();
 		if (isRequestNotReadMessage(req)) {

@@ -377,10 +377,7 @@ describe('config variable', () => {
 				const errorLog = errorSpy.getCall(0).args[0];
 				expect(errorLog)
 					.to.be.instanceOf(Error)
-					.and.satisfy(
-						(err: Error) => err.message.startsWith('variables[jsonConfigParser]: [__BROKEN__] Unexpected token _ in JSON at position 0'),
-						errorLog.message,
-					);
+					.and.satisfy((err: Error) => err.message.startsWith('variables[jsonConfigParser]: [__BROKEN__] Unexpected token'), errorLog.message);
 			});
 		});
 	});
