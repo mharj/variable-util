@@ -52,11 +52,12 @@ describe('config variable', () => {
 			const fileEnvInstance = new FileConfigLoader({fileName: jsonFilename, logger: testLogger, watch: true});
 			const fileEnv = fileEnvInstance.getLoader;
 			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
-			expect(debugSpy.getCall(0).args[0]).to.be.eq(`ConfigLoader[file]: opening file watcher for ./test/testSettings.json`);
+			expect(debugSpy.getCall(0).args[0]).to.be.eq(`ConfigLoader[file]: loading file ./test/testSettings.json`);
+			expect(debugSpy.getCall(1).args[0]).to.be.eq(`ConfigLoader[file]: opening file watcher for ./test/testSettings.json`);
 			await fileEnvInstance.reload();
-			expect(debugSpy.getCall(1).args[0]).to.be.eq(`ConfigLoader[file]: reloading file ./test/testSettings.json`);
+			expect(debugSpy.getCall(2).args[0]).to.be.eq(`ConfigLoader[file]: loading file ./test/testSettings.json`);
 			await fileEnvInstance.close();
-			expect(debugSpy.getCall(2).args[0]).to.be.eq(`ConfigLoader[file]: closing file watcher for ./test/testSettings.json`);
+			expect(debugSpy.getCall(3).args[0]).to.be.eq(`ConfigLoader[file]: closing file watcher for ./test/testSettings.json`);
 		});
 		it('should return file variable value, filename from promise', async function () {
 			const fileEnv = new FileConfigLoader(Promise.resolve({fileName: jsonFilename})).getLoader;

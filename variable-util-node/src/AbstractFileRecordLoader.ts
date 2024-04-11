@@ -1,5 +1,5 @@
-import {ConfigLoader, Loadable, LoaderValue, ValidateCallback, VariableError} from '@avanio/variable-util';
 import {existsSync, FSWatcher, watch} from 'fs';
+import {Loadable, LoaderValue, RecordConfigLoader, ValidateCallback, VariableError} from '@avanio/variable-util';
 import type {ILoggerLike} from '@avanio/logger-like';
 import {readFile} from 'fs/promises';
 
@@ -34,10 +34,9 @@ export type AbstractFileRecordLoaderOptions<FileType extends string> = {
 
 export abstract class AbstractFileRecordLoader<
 	Options extends AbstractFileRecordLoaderOptions<string> = AbstractFileRecordLoaderOptions<string>,
-> extends ConfigLoader<string | undefined> {
+> extends RecordConfigLoader<string | undefined> {
 	abstract readonly type: string;
 	protected options: Loadable<Partial<Options>> | undefined;
-	private filePromise: Promise<Record<string, string | undefined>> | undefined;
 	private watcher: FSWatcher | undefined;
 
 	protected abstract defaultOptions: Options;
@@ -46,23 +45,6 @@ export abstract class AbstractFileRecordLoader<
 		super();
 		this.options = options;
 		this.getLoader = this.getLoader.bind(this);
-	}
-
-	/**
-	 * Reload the file.
-	 */
-	public async reload(): Promise<void> {
-		const options = await this.getOptions();
-		options.logger?.debug(this.buildErrorStr(`reloading file ${options.fileName}`));
-		this.filePromise = this.loadFile(options);
-		await this.filePromise;
-	}
-
-	/**
-	 * Check if the file is loaded.
-	 */
-	public isLoaded(): boolean {
-		return this.filePromise !== undefined;
 	}
 
 	/**
@@ -81,15 +63,17 @@ export abstract class AbstractFileRecordLoader<
 		if (options.disabled) {
 			return {type: this.type, result: undefined};
 		}
-		if (!this.filePromise) {
-			this.filePromise = this.loadFile(options);
+		if (!this.dataPromise) {
+			this.dataPromise = this.handleData();
 		}
-		const data = await this.filePromise;
+		const data = await this.dataPromise;
 		const targetKey = key || rootKey;
 		return {type: this.type, result: {value: data[targetKey], path: options.fileName}};
 	}
 
-	private async loadFile(options: Options): Promise<Record<string, string | undefined>> {
+	protected async handleData(): Promise<Record<string, string | undefined>> {
+		const options = await this.getOptions();
+		options.logger?.debug(this.buildErrorStr(`loading file ${options.fileName}`));
 		// if file is disabled, return empty object
 		if (options.disabled) {
 			return {};
@@ -129,7 +113,7 @@ export abstract class AbstractFileRecordLoader<
 			options.logger?.debug(this.buildErrorStr(`opening file watcher for ${options.fileName}`));
 			this.watcher = watch(options.fileName, () => {
 				options.logger?.debug(this.buildErrorStr(`file ${options.fileName} changed`));
-				this.filePromise = undefined; // reset file promise
+				this.dataPromise = undefined; // reset file promise
 			});
 		}
 	}

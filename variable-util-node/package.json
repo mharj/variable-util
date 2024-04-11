@@ -9,9 +9,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "prepublishOnly": "npm run test && npm run build",
+    "prepublishOnly": "npm run validate && npm run test && npm run lint && npm run build",
     "test": "mocha",
-    "lint": "eslint src"
+    "lint": "eslint src test",
+    "validate": "tsc --noEmit --project tsconfig.test.json"
   },
   "files": [
     "dist"
@@ -35,14 +36,14 @@
   "author": "mharj",
   "license": "MIT",
   "devDependencies": {
-    "@avanio/variable-util": "^0.6.0",
+    "@avanio/variable-util": "^0.6.2",
     "@tsconfig/node18": "^18.2.4",
     "@types/chai": "^4.3.14",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^18.19.28",
+    "@types/node": "^18.19.31",
     "@types/sinon": "^17.0.3",
-    "@typescript-eslint/eslint-plugin": "^7.4.0",
-    "@typescript-eslint/parser": "^7.4.0",
+    "@typescript-eslint/eslint-plugin": "^7.6.0",
+    "@typescript-eslint/parser": "^7.6.0",
     "chai": "^4.4.1",
     "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
@@ -50,16 +51,16 @@
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-deprecation": "^2.0.0",
     "eslint-plugin-prettier": "^5.1.3",
-    "eslint-plugin-sonarjs": "^0.24.0",
+    "eslint-plugin-sonarjs": "^0.25.1",
     "mocha": "^10.4.0",
     "prettier": "^3.2.5",
     "sinon": "^17.0.1",
     "source-map-support": "^0.5.21",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.5"
   },
   "peerDependencies": {
-    "@avanio/variable-util": "^0.6.0",
+    "@avanio/variable-util": "^0.6.2",
     "dotenv": "^16"
   },
   "dependencies": {
