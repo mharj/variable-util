@@ -12,6 +12,7 @@ import {
 	createRequestNotReady,
 	env,
 	FetchConfigLoader,
+	FetchConfigLoaderOptions,
 	floatParser,
 	getConfigVariable,
 	IConfigLoader,
@@ -103,8 +104,17 @@ const fetchValidate: ValidateCallback<Record<string, string | undefined>, Record
 let fetchEnv: (params?: string | undefined) => IConfigLoader;
 const urlDefault = new URL('http://localhost/api');
 let fetchRequestData: Request | undefined;
-
-const fetchLoaderOptions = {cache: reqCacheSetup, fetchClient: mockFetch, logger: spyLogger, validate: fetchValidate};
+let isFetchDisabled = false;
+function getIsFetchDisabled(): boolean {
+	return isFetchDisabled;
+}
+const fetchLoaderOptions = {
+	cache: reqCacheSetup,
+	disabled: getIsFetchDisabled,
+	fetchClient: mockFetch,
+	logger: spyLogger,
+	validate: fetchValidate,
+} satisfies Partial<FetchConfigLoaderOptions>;
 
 function handleFetchRequest(): Request | RequestNotReady {
 	if (fetchRequestData) {
@@ -176,6 +186,7 @@ describe('config variable', () => {
 		describe('FetchConfigLoader', () => {
 			beforeEach(function () {
 				fetchEnv = new FetchConfigLoader(handleFetchRequest, fetchLoaderOptions).getLoader;
+				isFetchDisabled = false;
 			});
 			it('should return default if fetch request not ready yet', async function () {
 				expect(await getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true})).to.be.eql(urlDefault);
@@ -240,6 +251,18 @@ describe('config variable', () => {
 				expect(debugSpy.getCall(2).args[0]).to.be.an('string').and.eq(`storing response in cache for FetchEnvConfig`);
 				expect(debugSpy.getCall(3).args[0]).to.be.an('string').and.eq(`successfully loaded config from FetchEnvConfig`);
 				expect(output).to.be.eql(value);
+			});
+			it('should return default if fetch disabled', async function () {
+				isFetchDisabled = true; // disable fetch
+				isOnline = false;
+				const req = new Request(configRequestUrl);
+				fetchRequestData = req;
+				const call = getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
+				const output = await call;
+				expect(errorSpy.callCount, errorSpy.getCall(0)?.args.join(' ')).to.be.eq(0);
+				expect(infoSpy.callCount).to.be.eq(1);
+				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: API_SERVER [http://localhost/api] from default`);
+				expect(output).to.be.eql(urlDefault);
 			});
 		});
 	});

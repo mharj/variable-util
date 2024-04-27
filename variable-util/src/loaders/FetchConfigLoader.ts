@@ -1,5 +1,6 @@
 import {buildStringObject, isValidObject} from '../lib';
 import {isRequestNotReadMessage, type RequestNotReady} from '../types/RequestNotReady';
+import type {IConfigLoaderProps} from './ConfigLoader';
 import type {ILoggerLike} from '@avanio/logger-like';
 import type {IRequestCache} from '../interfaces/IRequestCache';
 import type {LoaderValue} from '../interfaces/IConfigLoader';
@@ -11,7 +12,7 @@ import {VariableError} from '../VariableError';
 /**
  * Options for the FetchConfigLoader
  */
-export interface FetchConfigLoaderOptions {
+export interface FetchConfigLoaderOptions extends IConfigLoaderProps {
 	fetchClient: typeof fetch;
 	/** this prevents Error to be thrown if have http error */
 	isSilent: boolean;
@@ -33,7 +34,6 @@ export interface FetchConfigLoaderOptions {
 	validate: ValidateCallback<Record<string, string | undefined>, Record<string, string | undefined>> | undefined;
 	logger: ILoggerLike | undefined;
 	cache: IRequestCache | undefined;
-	disabled: boolean;
 	/** if we get a cache hit code (defaults 304), we use the cached response instead */
 	cacheHitHttpCode: number;
 }
@@ -73,16 +73,12 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined> {
 	 * @param _options - optional options for FetchConfigLoader
 	 */
 	constructor(request: FetchConfigRequest, _options: Partial<FetchConfigLoaderOptions> = {}) {
-		super();
+		super(_options);
 		this.options = {...this.defaultOptions, ..._options};
 		this.request = request;
 	}
 
 	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
-		// check if disabled
-		if (this.options.disabled) {
-			return {type: this.type, result: undefined};
-		}
 		// check if we have JSON data loaded, if not load it
 		if (!this.dataPromise || this._isLoaded === false) {
 			this.dataPromise = this.handleData();
