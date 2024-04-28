@@ -72,10 +72,7 @@ describe('az key vault config variable', () => {
 		expect(infoSpy.getCall(0).args[0]).to.be.eq(
 			`ConfigVariables[azure-secrets]: MONGO_URL [${mongoString}] from ${process.env.KV_URI}${process.env.KV_MONGO_KEY}`,
 		);
-		expect(infoSpy.getCall(1).args[0]).to.be.eq(
-			`ConfigVariables[azure-secrets]: MONGO_URL [${mongoString}] from ${process.env.KV_URI}${process.env.KV_MONGO_KEY}`,
-		);
-		expect(infoSpy.callCount).to.be.eq(2);
+		expect(infoSpy.callCount).to.be.eq(1);
 		expect(debugSpy.callCount).to.be.eq(1);
 		expect(debugSpy.getCall(0).args).to.be.eql(['azure-secrets', `getting ${process.env.KV_MONGO_KEY} from ${process.env.KV_URI}`]);
 		expect(await callback1).to.be.eql(mongoUrl);

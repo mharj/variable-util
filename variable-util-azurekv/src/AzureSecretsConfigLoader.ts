@@ -16,24 +16,24 @@ export interface AzureSecretsConfigLoaderOptions {
 	expireMs?: number;
 }
 
-export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined> {
+export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined, AzureSecretsConfigLoaderOptions, AzureSecretsConfigLoaderOptions> {
 	public type = 'azure-secrets';
 	private client: SecretClient | undefined;
-	private options: Loadable<AzureSecretsConfigLoaderOptions>;
+	private valuePromises = new ExpireCache<Promise<{value: string | undefined; path: string}>>();
 
-	private loaderValuePromises = new ExpireCache<Promise<LoaderValue>>();
+	protected defaultOptions: undefined;
 
 	constructor(options: Loadable<AzureSecretsConfigLoaderOptions>) {
-		super();
+		super(options);
 		this.options = options;
 		// update expireMs from options
 		this.getOptions()
 			.then((options) => {
 				if (options.cacheLogger) {
-					this.loaderValuePromises.setLogger(options.cacheLogger);
+					this.valuePromises.setLogger(options.cacheLogger);
 				}
 				if (options.expireMs !== undefined) {
-					this.loaderValuePromises.setExpireMs(options.expireMs);
+					this.valuePromises.setExpireMs(options.expireMs);
 				}
 			})
 			.catch((e) => {
@@ -45,7 +45,7 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined> {
 	 * Force reload all Azure Key Vault secret values
 	 */
 	public reload(): void {
-		this.loaderValuePromises.clear();
+		this.valuePromises.clear();
 	}
 
 	protected async handleLoader(rootKey: string, key?: string): Promise<LoaderValue> {
@@ -56,12 +56,15 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined> {
 		try {
 			const targetKey = key || rootKey;
 			// only read once per key
-			let loaderValuePromise = this.loaderValuePromises.get(targetKey);
-			if (!loaderValuePromise) {
-				loaderValuePromise = this.handleLoaderPromise(targetKey, options);
-				this.loaderValuePromises.set(targetKey, loaderValuePromise);
+			let seen = true;
+			let lastValuePromise = this.valuePromises.get(targetKey);
+			if (!lastValuePromise) {
+				seen = false;
+				lastValuePromise = this.handleLoaderPromise(targetKey);
+				this.valuePromises.set(targetKey, lastValuePromise);
 			}
-			return await loaderValuePromise;
+			const {value, path} = await lastValuePromise;
+			return {type: this.type, result: {value, path, seen}};
 		} catch (e) {
 			if (options.isSilent === false) {
 				throw e;
@@ -72,14 +75,15 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined> {
 		}
 	}
 
-	private async handleLoaderPromise(targetKey: string, options: AzureSecretsConfigLoaderOptions): Promise<LoaderValue> {
+	private async handleLoaderPromise(targetKey: string): Promise<{value: string | undefined; path: string}> {
+		const options = await this.getOptions();
 		const client = await this.getClient(options);
 		options.logger?.debug(this.type, `getting ${targetKey} from ${options.url}`);
 		const {
 			value,
 			properties: {vaultUrl},
 		} = await client.getSecret(targetKey);
-		return {type: this.type, result: {value, path: `${vaultUrl}/${targetKey}`}};
+		return {value, path: `${vaultUrl}/${targetKey}`};
 	}
 
 	private async getClient(options: AzureSecretsConfigLoaderOptions): Promise<SecretClient> {
@@ -87,9 +91,5 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined> {
 			this.client = new SecretClient(options.url, options.credentials);
 		}
 		return this.client;
-	}
-
-	private async getOptions(): Promise<AzureSecretsConfigLoaderOptions> {
-		return typeof this.options === 'function' ? this.options() : this.options;
 	}
 }

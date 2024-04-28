@@ -35,7 +35,7 @@
   "author": "mharj",
   "license": "MIT",
   "devDependencies": {
-    "@avanio/variable-util": "^0.6.2",
+    "@avanio/variable-util": "^0.8.0",
     "@azure/identity": "^4.1.0",
     "@azure/keyvault-secrets": "^4.8.0",
     "@tsconfig/node18": "^18.2.4",
@@ -43,8 +43,8 @@
     "@types/mocha": "^10.0.6",
     "@types/node": "^18.19.31",
     "@types/sinon": "^17.0.3",
-    "@typescript-eslint/eslint-plugin": "^7.6.0",
-    "@typescript-eslint/parser": "^7.6.0",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
     "chai": "^4.4.1",
     "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
@@ -60,7 +60,7 @@
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
-    "@avanio/variable-util": "^0.6",
+    "@avanio/variable-util": "^0.8",
     "@azure/identity": "3 - 4",
     "@azure/keyvault-secrets": "4.6 - 4.8"
   },
