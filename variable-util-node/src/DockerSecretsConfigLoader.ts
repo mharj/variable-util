@@ -17,11 +17,10 @@ export interface DockerSecretsConfigLoaderOptions {
 	disabled: boolean;
 }
 
-export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined> {
+export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined, Partial<DockerSecretsConfigLoaderOptions>, DockerSecretsConfigLoaderOptions> {
 	public readonly type = 'docker-secrets';
-	private options: Loadable<Partial<DockerSecretsConfigLoaderOptions>>;
 	private valuePromises: Record<string, Promise<string | undefined> | undefined> = {};
-	private defaultOptions: DockerSecretsConfigLoaderOptions = {
+	protected defaultOptions: DockerSecretsConfigLoaderOptions = {
 		disabled: false,
 		fileLowerCase: false,
 		isSilent: true,
@@ -29,9 +28,8 @@ export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined> 
 		path: '/run/secrets',
 	};
 
-	public constructor(options: Loadable<Partial<DockerSecretsConfigLoaderOptions>> = {}) {
-		super();
-		this.options = options;
+	public constructor(options: Loadable<Partial<DockerSecretsConfigLoaderOptions>>) {
+		super(options);
 		this.getLoader = this.getLoader.bind(this);
 	}
 
@@ -42,7 +40,9 @@ export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined> 
 		}
 		const targetKey = overrideKey || lookupKey;
 		const filePath = this.filePath(targetKey, options);
-		if (!this.valuePromises[targetKey]) {
+		const valuePromise = this.valuePromises[targetKey];
+		const seen = !!valuePromise; // if valuePromise exists, it means we have seen this key before
+		if (!valuePromise) {
 			if (!existsSync(filePath)) {
 				if (!options.isSilent) {
 					throw new VariableLookupError(targetKey, `ConfigVariables[${this.type}]: ${lookupKey} from ${filePath} not found`);
@@ -54,15 +54,10 @@ export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined> 
 			}
 		}
 		const value = await this.valuePromises[targetKey];
-		return {type: this.type, result: {path: filePath, value}};
+		return {type: this.type, result: {path: filePath, value, seen}};
 	}
 
 	private filePath(key: string, options: DockerSecretsConfigLoaderOptions): string {
 		return path.join(path.resolve(options.path), options.fileLowerCase ? key.toLowerCase() : key);
-	}
-
-	private async getOptions(): Promise<DockerSecretsConfigLoaderOptions> {
-		const options = await (typeof this.options === 'function' ? this.options() : this.options);
-		return Object.assign({}, this.defaultOptions, options);
 	}
 }
