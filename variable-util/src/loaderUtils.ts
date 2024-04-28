@@ -129,7 +129,7 @@ export async function handleLoader<Output, RawOutput = unknown>(
 		if (!result) {
 			return undefined;
 		}
-		const {value, path} = result;
+		const {value, path, seen} = result;
 		if (value) {
 			/**
 			 * parser pre-validate
@@ -164,8 +164,10 @@ export async function handleLoader<Output, RawOutput = unknown>(
 			 * print log
 			 */
 			const stringValue = parser.toString(output);
-			const logValue = parser.toLogString?.(output) ?? stringValue;
-			printLog(options, loader.type, rootKey, logValue, path, params);
+			if (!seen) {
+				const logValue = parser.toLogString?.(output) ?? stringValue;
+				printLog(options, loader.type, rootKey, logValue, path, params);
+			}
 			return {namespace: options.namespace, stringValue, type, value: output};
 		}
 	} catch (err) {

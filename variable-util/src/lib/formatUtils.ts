@@ -8,10 +8,6 @@ export interface FormatParameters {
 	 * Whether to show the value in the output, defaults to false
 	 */
 	showValue?: boolean;
-	/**
-	 * Whether to cache the value on first load, defaults to true
-	 */
-	cache?: boolean;
 }
 
 /**

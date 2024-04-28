@@ -3,6 +3,7 @@ import {isRequestNotReadMessage, type RequestNotReady} from '../types/RequestNot
 import type {IConfigLoaderProps} from './ConfigLoader';
 import type {ILoggerLike} from '@avanio/logger-like';
 import type {IRequestCache} from '../interfaces/IRequestCache';
+import type {Loadable} from '../types/Loadable';
 import type {LoaderValue} from '../interfaces/IConfigLoader';
 import {RecordConfigLoader} from './RecordConfigLoader';
 import {urlSanitize} from '../lib/formatUtils';
@@ -50,13 +51,12 @@ export type FetchConfigRequest = ConfigRequest | Promise<ConfigRequest> | (() =>
  * @category Loaders
  * @implements {IConfigLoader}
  */
-export class FetchConfigLoader extends RecordConfigLoader<string | undefined> {
+export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Partial<FetchConfigLoaderOptions>, FetchConfigLoaderOptions> {
 	public type = 'fetch';
 	private request: FetchConfigRequest;
 	private path = 'undefined';
-	private options: FetchConfigLoaderOptions;
 
-	private defaultOptions: FetchConfigLoaderOptions = {
+	protected defaultOptions: FetchConfigLoaderOptions = {
 		cache: undefined,
 		cacheHitHttpCode: 304,
 		disabled: false,
@@ -70,11 +70,10 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined> {
 	/**
 	 * Constructor for FetchConfigLoader
 	 * @param request - callback that returns a fetch request or a message object that the request is not ready
-	 * @param _options - optional options for FetchConfigLoader
+	 * @param options - optional options for FetchConfigLoader
 	 */
-	constructor(request: FetchConfigRequest, _options: Partial<FetchConfigLoaderOptions> = {}) {
-		super(_options);
-		this.options = {...this.defaultOptions, ..._options};
+	constructor(request: FetchConfigRequest, options: Loadable<Partial<FetchConfigLoaderOptions>> = {}) {
+		super(options);
 		this.request = request;
 	}
 
@@ -86,53 +85,54 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined> {
 		const data = await this.dataPromise;
 		const targetKey = overrideKey || lookupKey; // optional override key, else use actual lookupKey
 		const value = data?.[targetKey] || undefined;
-		return {type: this.type, result: {value, path: this.path}};
+		return {type: this.type, result: {value, path: this.path, seen: this.handleSeen(targetKey, value)}};
 	}
 
 	protected async handleData(): Promise<Record<string, string | undefined>> {
+		const {logger, cache, isSilent, cacheHitHttpCode, payload} = await this.getOptions();
 		this._isLoaded = false;
 		const req = await this.getRequest();
 		if (isRequestNotReadMessage(req)) {
-			this.options.logger?.debug(`FetchEnvConfig: ${req.message}`);
+			logger?.debug(`FetchEnvConfig: ${req.message}`);
 			return Promise.resolve({});
 		}
 		this.path = urlSanitize(req.url); // hide username/passwords from URL in logs
-		this.options.logger?.debug(`fetching config from ${this.path}`);
+		logger?.debug(`fetching config from ${this.path}`);
 		let res = await this.fetchRequestOrCacheResponse(req);
 		if (!res) {
-			this.options.logger?.info(`client is offline and not have cached response for FetchEnvConfig`);
+			logger?.info(`client is offline and not have cached response for FetchEnvConfig`);
 			return Promise.resolve({});
 		}
 		// if we have a cache and valid response, store to cache
-		if (res.ok && this.options.cache) {
-			this.options.logger?.debug(`storing response in cache for FetchEnvConfig`);
-			await this.options.cache.storeRequest(req, res);
+		if (res.ok && cache) {
+			logger?.debug(`storing response in cache for FetchEnvConfig`);
+			await cache.storeRequest(req, res);
 		}
 		if (res.status >= 400) {
 			// if we have an error and a cached response, use that instead
 			res = await this.checkIfValidCacheResponse(req, res);
 			// if we still have an error, throw it
 			if (res.status >= 400) {
-				if (this.options.isSilent) {
-					this.options.logger?.info(`http error ${res.status} from FetchEnvConfig`);
+				if (isSilent) {
+					logger?.info(`http error ${res.status} from FetchEnvConfig`);
 					return Promise.resolve({}); // set as empty so we prevent fetch spamming
 				}
 				throw new VariableError(`http error ${res.status} from FetchEnvConfig`);
 			}
 		}
 		// if we have a cached response and we get a cache hit code (default 304), use the cached response instead
-		if (res.status === this.options.cacheHitHttpCode) {
+		if (res.status === cacheHitHttpCode) {
 			res = await this.handleNotModifiedCache(req, res);
 		}
 		const contentType = res.headers.get('content-type');
-		if (contentType?.startsWith('application/json') && this.options.payload === 'json') {
+		if (contentType?.startsWith('application/json') && payload === 'json') {
 			const data = await this.handleJson(res);
-			this.options.logger?.debug('successfully loaded config from FetchEnvConfig');
+			logger?.debug('successfully loaded config from FetchEnvConfig');
 			this._isLoaded = true;
 			return data;
 		}
-		if (this.options.isSilent) {
-			this.options.logger?.info(`unsupported content-type ${contentType} from FetchEnvConfig`);
+		if (isSilent) {
+			logger?.info(`unsupported content-type ${contentType} from FetchEnvConfig`);
 			return Promise.resolve({}); // set as empty so we prevent fetch spamming
 		}
 		throw new VariableError(`unsupported content-type ${contentType} from FetchEnvConfig`);
@@ -142,12 +142,13 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined> {
 	 * if client is offline, we will try return the cached response else add cache validation (ETag) and try get the response from the fetch request
 	 */
 	private async fetchRequestOrCacheResponse(req: Request): Promise<Response | undefined> {
-		if (this.options.cache) {
-			const cacheRes = await this.options.cache.fetchRequest(req);
+		const {logger, cache, fetchClient} = await this.getOptions();
+		if (cache) {
+			const cacheRes = await cache.fetchRequest(req);
 			// if we have a cache and we are offline, use the cache else return undefined
-			if (this.options.cache.isOnline() === false) {
+			if (cache.isOnline() === false) {
 				if (cacheRes) {
-					this.options.logger?.debug(`client is offline, returned cached response for FetchEnvConfig`);
+					logger?.debug(`client is offline, returned cached response for FetchEnvConfig`);
 					return cacheRes;
 				}
 				return undefined;
@@ -160,15 +161,16 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined> {
 				}
 			}
 		}
-		return this.options.fetchClient(req);
+		return fetchClient(req);
 	}
 
 	/**
 	 * on error, check if we have a valid cached response
 	 */
 	private async checkIfValidCacheResponse(req: Request, res: Response): Promise<Response> {
-		if (this.options.cache) {
-			const cacheRes = await this.options.cache.fetchRequest(req);
+		const {cache} = await this.getOptions();
+		if (cache) {
+			const cacheRes = await cache.fetchRequest(req);
 			if (cacheRes) {
 				return cacheRes;
 			}
@@ -180,10 +182,11 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined> {
 	 * if we get a 304, get the cached response
 	 */
 	private async handleNotModifiedCache(req: Request, res: Response): Promise<Response> {
-		if (this.options.cache) {
-			const cacheRes = await this.options.cache.fetchRequest(req);
+		const {cache, logger} = await this.getOptions();
+		if (cache) {
+			const cacheRes = await cache.fetchRequest(req);
 			if (cacheRes) {
-				this.options.logger?.debug(`returned cached response for FetchEnvConfig`);
+				logger?.debug(`returned cached response for FetchEnvConfig`);
 				return cacheRes;
 			}
 			throw new VariableError(`http error ${res.status} from FetchEnvConfig (using cached version)`); // we have a cache but no cached response
@@ -192,6 +195,7 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined> {
 	}
 
 	private async handleJson(res: Response): Promise<Record<string, string | undefined>> {
+		const {validate, isSilent, logger} = await this.getOptions();
 		try {
 			const contentType = res.headers.get('content-type');
 			if (!contentType?.startsWith('application/json')) {
@@ -202,14 +206,14 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined> {
 				throw new Error(`is not valid JSON object`);
 			}
 			const data = buildStringObject(rawData);
-			if (this.options.validate) {
-				return await this.options.validate(data);
+			if (validate) {
+				return await validate(data);
 			}
 			return data;
 		} catch (error) {
 			const err = error instanceof Error ? error : new Error('unknown error');
-			if (this.options.isSilent) {
-				this.options.logger?.info(`FetchEnvConfig JSON error: ${err.message}`);
+			if (isSilent) {
+				logger?.info(`FetchEnvConfig JSON error: ${err.message}`);
 				return Promise.resolve({}); // set as empty so we prevent fetch spamming
 			}
 			throw new VariableError(`FetchEnvConfig JSON error: ${err.message}`);

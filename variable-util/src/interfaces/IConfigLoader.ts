@@ -3,6 +3,8 @@ export interface LoaderValueResult {
 	value: string | undefined;
 	/** this is shown on logs "ConfigVariables[type]: KEY [VALUE] from {___path___}" */
 	path: string;
+	/** is key and value already seen (for logging) */
+	seen: boolean;
 }
 
 /**

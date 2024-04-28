@@ -105,12 +105,9 @@ let fetchEnv: (params?: string | undefined) => IConfigLoader;
 const urlDefault = new URL('http://localhost/api');
 let fetchRequestData: Request | undefined;
 let isFetchDisabled = false;
-function getIsFetchDisabled(): boolean {
-	return isFetchDisabled;
-}
 const fetchLoaderOptions = {
 	cache: reqCacheSetup,
-	disabled: getIsFetchDisabled,
+	disabled: (): boolean => isFetchDisabled,
 	fetchClient: mockFetch,
 	logger: spyLogger,
 	validate: fetchValidate,
@@ -274,7 +271,6 @@ describe('config variable', () => {
 				type Options = (typeof options)[number];
 				const value: Options | undefined = await getConfigVariable('TEST', [env()], stringParser(validLiteral(options)), undefined, {
 					showValue: true,
-					cache: false,
 				});
 				expect(value).to.be.eq('one');
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [one] from process.env.TEST`);

@@ -2,7 +2,6 @@ import {buildOptions, ConfigOptions} from './ConfigOptions';
 import {Err, Ok, Result} from '@luolapeikko/result-option';
 import type {ILoggerLike, ISetOptionalLogger} from '@avanio/logger-like';
 import {EnvMapSchema} from './types/EnvMapSchema';
-import {FormatParameters} from './lib/formatUtils';
 import {getConfigObject} from './getConfigObject';
 import {LoaderTypeValueStrict} from './types/TypeValue';
 import {VariableError} from './VariableError';
@@ -11,10 +10,6 @@ import {VariableError} from './VariableError';
  * TypeValueRecords
  */
 export type TypeValueRecords<T> = Record<keyof T, LoaderTypeValueStrict<T[keyof T]>>;
-
-function useCache({cache}: FormatParameters | undefined = {}): boolean {
-	return cache !== false;
-}
 
 /**
  * ConfigMap
@@ -35,7 +30,6 @@ function useCache({cache}: FormatParameters | undefined = {}): boolean {
  */
 export class ConfigMap<Data extends Record<string, unknown>> implements ISetOptionalLogger {
 	private schema: EnvMapSchema<Data>;
-	private cache = new Map<string, Promise<LoaderTypeValueStrict<Data[keyof Data]>>>();
 	private options: ConfigOptions;
 	/**
 	 * ConfigMap constructor
@@ -70,22 +64,11 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 		if (typeof key !== 'string') {
 			throw new VariableError(`ConfigMap key ${String(key)} is not a string`);
 		}
-		const {loaders, parser, defaultValue, params, undefinedThrowsError} = entry;
-		let configObjectPromise: Promise<LoaderTypeValueStrict<Data[Key]>> | undefined;
-		if (useCache(params)) {
-			// return cached Promise value if exists
-			configObjectPromise = this.cache.get(key) as Promise<LoaderTypeValueStrict<Data[Key]>> | undefined;
-		}
-		if (!configObjectPromise) {
-			configObjectPromise = getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params, this.options) as Promise<LoaderTypeValueStrict<Data[Key]>>;
-			if (useCache(params)) {
-				this.cache.set(key, configObjectPromise);
-			}
-		}
-		const configObject = await configObjectPromise;
+		const {loaders, parser, defaultValue, params, undefinedThrowsError, undefinedErrorMessage} = entry;
+		const configObject = (await getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params, this.options)) as LoaderTypeValueStrict<Data[Key]>;
 		if (undefinedThrowsError && configObject.value === undefined) {
 			buildOptions(this.options).logger?.info(`ConfigMap key ${String(key)} is undefined (expect to throw error)`);
-			throw new VariableError(`ConfigMap key ${String(key)} is undefined`);
+			throw new VariableError(undefinedErrorMessage || `ConfigMap key ${String(key)} is undefined`);
 		}
 		return configObject;
 	}

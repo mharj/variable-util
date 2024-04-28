@@ -24,6 +24,10 @@ export type OptionalEnvEntry<Value> = {
 	 * Whether to throw an error if the variable is undefined
 	 */
 	undefinedThrowsError?: boolean;
+	/**
+	 * Replaces the default throw error message with this message
+	 */
+	undefinedErrorMessage?: string;
 };
 
 export type RequiredEnvEntry<Value> = {
@@ -47,6 +51,10 @@ export type RequiredEnvEntry<Value> = {
 	 * Whether to throw an error if the variable is undefined
 	 */
 	undefinedThrowsError?: boolean;
+	/**
+	 * Replaces the default throw error message with this message
+	 */
+	undefinedErrorMessage?: string;
 };
 
 export type RequiredUndefinedThrowEntry<Value> = {
@@ -70,6 +78,10 @@ export type RequiredUndefinedThrowEntry<Value> = {
 	 * Whether to throw an error if the variable is undefined
 	 */
 	undefinedThrowsError: true;
+	/**
+	 * Replaces the default throw error message with this message
+	 */
+	undefinedErrorMessage?: string;
 };
 
 export type EnvMapSchema<Output extends Record<string, unknown>> = {

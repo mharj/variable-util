@@ -39,6 +39,7 @@ type TestEnv = {
 	URL: URL;
 	CONSTANT: 'constant';
 	TEST_OBJECT: TestObjectType;
+	NOT_EXISTS: string;
 };
 
 const testEnvSchema = z.object({
@@ -49,11 +50,12 @@ const testEnvSchema = z.object({
 	URL: z.instanceof(URL),
 	CONSTANT: z.literal('constant'),
 	TEST_OBJECT: testObjectFinalSchema,
+	NOT_EXISTS: z.string(),
 });
 
 const config = new ConfigMap<TestEnv>(
 	{
-		DEBUG: {loaders: [env()], parser: booleanParser(), defaultValue: false, params: {cache: false}},
+		DEBUG: {loaders: [env()], parser: booleanParser(), defaultValue: false},
 		DEMO: {loaders: [env()], parser: stringParser()},
 		HOST: {loaders: [env()], parser: stringParser(), defaultValue: 'localhost'},
 		PORT: {loaders: [env()], parser: integerParser(), defaultValue: 3000},
@@ -61,10 +63,11 @@ const config = new ConfigMap<TestEnv>(
 			loaders: [env()],
 			parser: new UrlParser({urlSanitize: true}),
 			defaultValue: new URL('http://localhost:3000'),
-			params: {cache: false, showValue: true},
+			params: {showValue: true},
 		},
 		CONSTANT: {loaders: [env()], parser: stringParser(validLiteral(['constant'] as const)), defaultValue: 'constant'},
 		TEST_OBJECT: {loaders: [env()], parser: testObjectParser, defaultValue: {First: false, Second: false, Third: true}},
+		NOT_EXISTS: {loaders: [env()], parser: stringParser(), undefinedThrowsError: true, undefinedErrorMessage: 'add NOT_EXISTS to env'},
 	},
 	{namespace: 'Demo'},
 );
@@ -87,12 +90,6 @@ describe('ConfigMap', () => {
 			await expect(call).to.be.eventually.eq(6000);
 			expect(infoSpy.callCount).to.be.eq(1);
 		});
-		it('should return PORT env value (cached)', async function () {
-			process.env.PORT = '6000';
-			const call: Promise<number> = config.get('PORT');
-			await expect(call).to.be.eventually.eq(6000);
-			expect(infoSpy.callCount).to.be.eq(0);
-		});
 		it('should return HOST env value', async function () {
 			process.env.HOST = 'minecraft';
 			const call: Promise<string> = config.get('HOST');
@@ -104,10 +101,16 @@ describe('ConfigMap', () => {
 			await expect(call).to.be.eventually.eq(true);
 			expect(infoSpy.callCount).to.be.eq(1);
 		});
-		it('should return DEBUG env value (not cached)', async function () {
+		it('should return DEBUG env value (already seen)', async function () {
 			process.env.DEBUG = 'true';
 			const call: Promise<boolean> = config.get('DEBUG');
 			await expect(call).to.be.eventually.eq(true);
+			expect(infoSpy.callCount).to.be.eq(0);
+		});
+		it('should return DEBUG env value (change)', async function () {
+			process.env.DEBUG = 'false';
+			const call: Promise<boolean> = config.get('DEBUG');
+			await expect(call).to.be.eventually.eq(false);
 			expect(infoSpy.callCount).to.be.eq(1);
 		});
 		it('should return URL env value', async function () {
@@ -119,6 +122,10 @@ describe('ConfigMap', () => {
 			process.env.CONSTANT = 'constant';
 			const call: Promise<'constant'> = config.get('CONSTANT');
 			await expect(call).to.be.eventually.eq('constant');
+		});
+		it('should return CONSTANT env value', async function () {
+			const call: Promise<string> = config.get('NOT_EXISTS');
+			await expect(call).to.be.eventually.rejectedWith('add NOT_EXISTS to env');
 		});
 	});
 	describe('getString', () => {
@@ -198,12 +205,14 @@ describe('ConfigMap', () => {
 	});
 	describe('getAll', () => {
 		it('should get all values', async function () {
+			process.env.NOT_EXISTS = 'not_exists'; // else it will throw error
 			const call = config.getAllObjects();
 			const result = await call;
 			await expect(call).to.be.eventually.eql({
 				DEBUG: {type: 'env', value: true, stringValue: 'true', namespace: 'Demo'},
 				DEMO: {type: undefined, value: undefined, stringValue: undefined, namespace: 'Demo'},
 				HOST: {type: 'env', value: 'minecraft', stringValue: 'minecraft', namespace: 'Demo'},
+				NOT_EXISTS: {type: 'env', value: 'not_exists', stringValue: 'not_exists', namespace: 'Demo'},
 				PORT: {type: 'env', value: 6000, stringValue: '6000', namespace: 'Demo'},
 				URL: {type: 'env', value: result.URL.value, stringValue: 'https://asd:qwe@www.google.com/', namespace: 'Demo'},
 				CONSTANT: {type: 'env', value: 'constant', stringValue: 'constant', namespace: 'Demo'},
@@ -222,6 +231,7 @@ describe('ConfigMap', () => {
 	});
 	describe('validateAll', () => {
 		it('should validate all with zod', async function () {
+			process.env.NOT_EXISTS = 'not_exists'; // else it will throw error
 			await config.validateAll((data) => testEnvSchema.parse(data));
 		});
 	});

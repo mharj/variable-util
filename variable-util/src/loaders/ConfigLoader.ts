@@ -1,4 +1,5 @@
 import {IConfigLoader, LoaderValue} from '../interfaces/';
+import {Loadable} from '../types/Loadable';
 
 export interface IConfigLoaderProps {
 	disabled?: boolean | Promise<boolean> | (() => boolean | Promise<boolean>);
@@ -9,12 +10,14 @@ export interface IConfigLoaderProps {
  * @category Loaders
  * @abstract
  */
-export abstract class ConfigLoader<HandlerParams> {
+export abstract class ConfigLoader<HandlerParams, Props extends IConfigLoaderProps, DefaultProps extends Props = Props> {
 	public abstract type: string;
-	private loaderOptions: IConfigLoaderProps;
-	constructor(props: IConfigLoaderProps) {
+	protected options: Loadable<Props>;
+	protected abstract defaultOptions: DefaultProps | undefined;
+
+	constructor(props: Loadable<Props>) {
 		this.getLoader = this.getLoader.bind(this); // bind this to getLoader
-		this.loaderOptions = props;
+		this.options = props;
 	}
 
 	/**
@@ -43,11 +46,21 @@ export abstract class ConfigLoader<HandlerParams> {
 	}
 
 	/**
-	 * Check if current loader is disabled
-	 * @returns {boolean | undefined | Promise<boolean | undefined>} - boolean if loader is disabled, undefined if not
+	 * Check if loader is disabled
+	 * @returns {Promise<boolean | undefined>} - Promise of boolean or undefined
 	 */
-	private isDisabled(): boolean | undefined | Promise<boolean | undefined> {
-		return typeof this.loaderOptions.disabled === 'function' ? this.loaderOptions.disabled() : this.loaderOptions.disabled;
+	public async isDisabled(): Promise<boolean | undefined> {
+		const loadableDisabled = (await this.getOptions()).disabled;
+		return typeof loadableDisabled === 'function' ? loadableDisabled() : loadableDisabled;
+	}
+
+	/**
+	 * Get options from loader and merge with default options
+	 * @returns {Promise<DefaultProps>} - Promise of DefaultProps & Props
+	 */
+	protected async getOptions(): Promise<DefaultProps & Props> {
+		const resolvedOptions = await (typeof this.options === 'function' ? this.options() : this.options);
+		return Object.assign({}, this.defaultOptions, resolvedOptions);
 	}
 
 	/**
