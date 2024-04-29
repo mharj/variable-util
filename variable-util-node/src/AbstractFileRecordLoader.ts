@@ -1,5 +1,6 @@
 import {existsSync, FSWatcher, watch} from 'fs';
 import {IConfigLoaderProps, Loadable, LoaderValue, RecordConfigLoader, ValidateCallback, VariableError} from '@avanio/variable-util';
+import {getError} from './errorUtil';
 import type {ILoggerLike} from '@avanio/logger-like';
 import {readFile} from 'fs/promises';
 
@@ -110,9 +111,13 @@ export abstract class AbstractFileRecordLoader<
 	private handleFileWatch(options: Options): void {
 		if (options.watch && !this.watcher) {
 			options.logger?.debug(this.buildErrorStr(`opening file watcher for ${options.fileName}`));
-			this.watcher = watch(options.fileName, () => {
-				options.logger?.debug(this.buildErrorStr(`file ${options.fileName} changed`));
-				this.dataPromise = undefined; // reset file promise
+			this.watcher = watch(options.fileName, async () => {
+				try {
+					options.logger?.debug(this.buildErrorStr(`file ${options.fileName} changed`));
+					await this.reload();
+				} catch (err) {
+					options.logger?.error(this.buildErrorStr(`error reloading file ${options.fileName}: ${getError(err).message}`));
+				}
 			});
 		}
 	}
