@@ -3,8 +3,21 @@ import {handleLoader, printLog} from './loaderUtils';
 import {IConfigLoader, IConfigParser} from './interfaces/';
 import {LoaderTypeValue, LoaderTypeValueStrict} from './types/TypeValue';
 import {FormatParameters} from './lib/formatUtils';
+import {handleSeen} from './lib/seenUtils';
 import {Loadable} from './types/Loadable';
 import {VariableError} from './VariableError';
+
+/**
+ * Map of seen default values
+ */
+const defaultValueSeenMap = new Map<string, string>();
+
+/**
+ * Clear the seen map for default values (for unit testing purposes)
+ */
+export function clearDefaultValueSeenMap(): void {
+	defaultValueSeenMap.clear();
+}
 
 /**
  * get config object which contains value and type of loader
@@ -77,7 +90,9 @@ export async function getConfigObject<Output>(
 	let stringValue: string | undefined;
 	if (defaultValue !== undefined) {
 		stringValue = parser.toString(defaultValue);
-		printLog(currentOptions, 'default', rootKey, stringValue, 'default', params);
+		if (!handleSeen(defaultValueSeenMap, rootKey, stringValue)) {
+			printLog(currentOptions, 'default', rootKey, stringValue, 'default', params);
+		}
 		return {namespace: currentOptions.namespace, stringValue, type: 'default', value: defaultValue};
 	}
 	return {namespace: currentOptions.namespace, stringValue, type, value: defaultValue};

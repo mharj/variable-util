@@ -9,6 +9,7 @@ import * as sinon from 'sinon';
 import * as z from 'zod';
 import {
 	booleanParser,
+	clearDefaultValueSeenMap,
 	createRequestNotReady,
 	env,
 	FetchConfigLoader,
@@ -127,6 +128,7 @@ describe('config variable', () => {
 		setLogger(spyLogger);
 	});
 	beforeEach(() => {
+		clearDefaultValueSeenMap();
 		delete process.env.REACT_APP_TEST;
 		delete process.env.TEST;
 		debugSpy.resetHistory();
@@ -182,6 +184,7 @@ describe('config variable', () => {
 		});
 		describe('FetchConfigLoader', () => {
 			beforeEach(function () {
+				clearDefaultValueSeenMap();
 				fetchEnv = new FetchConfigLoader(handleFetchRequest, fetchLoaderOptions).getLoader;
 				isFetchDisabled = false;
 			});
