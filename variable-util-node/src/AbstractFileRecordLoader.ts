@@ -38,12 +38,14 @@ export abstract class AbstractFileRecordLoader<
 > extends RecordConfigLoader<string | undefined, Partial<Options>, Options> {
 	abstract readonly type: string;
 	private watcher: FSWatcher | undefined;
+	private timeout: ReturnType<typeof setTimeout> | undefined;
 
 	protected abstract defaultOptions: Options;
 
 	public constructor(options: Loadable<Partial<Options>>) {
 		super(options);
 		this.getLoader = this.getLoader.bind(this);
+		this.handleFileChange = this.handleFileChange.bind(this);
 	}
 
 	/**
@@ -111,14 +113,22 @@ export abstract class AbstractFileRecordLoader<
 	private handleFileWatch(options: Options): void {
 		if (options.watch && !this.watcher) {
 			options.logger?.debug(this.buildErrorStr(`opening file watcher for ${options.fileName}`));
-			this.watcher = watch(options.fileName, async () => {
-				try {
-					options.logger?.debug(this.buildErrorStr(`file ${options.fileName} changed`));
-					await this.reload();
-				} catch (err) {
-					options.logger?.error(this.buildErrorStr(`error reloading file ${options.fileName}: ${getError(err).message}`));
+			this.watcher = watch(options.fileName, () => {
+				if (this.timeout) {
+					clearTimeout(this.timeout);
 				}
+				// delay to prevent multiple reloads
+				this.timeout = setTimeout(() => this.handleFileChange(options), 200);
 			});
+		}
+	}
+
+	private async handleFileChange(options: Options): Promise<void> {
+		try {
+			options.logger?.debug(this.buildErrorStr(`file ${options.fileName} changed`));
+			await this.reload();
+		} catch (err) {
+			options.logger?.error(this.buildErrorStr(`error reloading file ${options.fileName}: ${getError(err).message}`));
 		}
 	}
 }
