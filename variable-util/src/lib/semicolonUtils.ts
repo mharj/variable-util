@@ -1,4 +1,4 @@
-import {buildHiddenValueString} from './formatUtils';
+import {buildHiddenValue, ShowValueType} from './formatUtils';
 
 /**
  * Make the first character of a string lowercase
@@ -61,14 +61,18 @@ export function stringifySemicolonConfig(config: Record<string, unknown>): strin
  * @example
  * logStringifySemicolonConfig({a: 'b', c: 'd'}) // 'a=b;c=d'
  */
-export function logStringifySemicolonConfig<Out extends Record<string, unknown>>(config: Out, keysToHide: (keyof Out)[] = []): string {
+export function logStringifySemicolonConfig<Out extends Record<string, unknown>>(
+	config: Out,
+	show: ShowValueType | undefined,
+	keysToHide: (keyof Out)[] = [],
+): string {
 	return Object.entries(config)
 		.reduce<string[]>((last, [key, value]) => {
 			if (value !== undefined) {
 				if (!keysToHide.includes(key as keyof Out)) {
 					last.push(`${key}=${value}`);
 				} else {
-					const hiddenValue = buildHiddenValueString(`${value}`);
+					const hiddenValue = buildHiddenValue(`${value}`, show);
 					last.push(`${key}=${hiddenValue}`);
 				}
 			}

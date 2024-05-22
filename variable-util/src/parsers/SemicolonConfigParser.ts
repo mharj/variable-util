@@ -1,5 +1,6 @@
 import {logStringifySemicolonConfig, parseSemicolonConfig, stringifySemicolonConfig} from '../lib/semicolonUtils';
 import {IConfigParser} from '../interfaces/IConfigParser';
+import {ShowValueType} from '../lib';
 import {ValidateCallback} from '../interfaces/IValidate';
 
 /**
@@ -15,6 +16,7 @@ export interface SemicolonConfigParserOptions<
 > {
 	keysToHide?: (keyof OutType)[];
 	validate?: ValidateCallback<OutType, RawType>;
+	showValue?: ShowValueType;
 	/**
 	 * keep case of keys, if set as false then will convert keys first letters to lower case (Js Style)
 	 */
@@ -33,11 +35,13 @@ export class SemicolonConfigParser<Out extends OutConfigParseType = OutConfigPar
 	private keysToHide: (keyof Out)[] | undefined;
 	private validate: ValidateCallback<Out, RawType> | undefined;
 	private keepCase: boolean;
+	private showValue: ShowValueType | undefined;
 
-	constructor({keepCase, keysToHide, validate}: SemicolonConfigParserOptions<Out> = {}) {
+	constructor({keepCase, keysToHide, validate, showValue}: SemicolonConfigParserOptions<Out> = {}) {
 		this.keysToHide = keysToHide;
 		this.validate = validate;
 		this.keepCase = keepCase ?? true;
+		this.showValue = showValue;
 	}
 
 	public parse(key: string, value: string): Promise<RawType> {
@@ -53,6 +57,6 @@ export class SemicolonConfigParser<Out extends OutConfigParseType = OutConfigPar
 	}
 
 	public toLogString(value: Out): string {
-		return logStringifySemicolonConfig(value, this.keysToHide);
+		return logStringifySemicolonConfig(value, this.showValue, this.keysToHide);
 	}
 }

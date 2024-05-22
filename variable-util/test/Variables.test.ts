@@ -168,6 +168,26 @@ describe('config variable', () => {
 			await expect(call).to.be.eventually.eq('some_value');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [some_value] from default`);
 		});
+		it('should return default value with partial show prefix', async function () {
+			const call: Promise<string> = getConfigVariable('TEST', [], stringParser(), '7469ef1f-98f0-460a-b3db-5ea31d9e80c0', {showValue: 'prefix'});
+			await expect(call).to.be.eventually.eq('7469ef1f-98f0-460a-b3db-5ea31d9e80c0');
+			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [746*********************************] from default`);
+		});
+		it('should return default value with partial show suffix', async function () {
+			const call: Promise<string> = getConfigVariable('TEST', [], stringParser(), '7469ef1f-98f0-460a-b3db-5ea31d9e80c0', {showValue: 'suffix'});
+			await expect(call).to.be.eventually.eq('7469ef1f-98f0-460a-b3db-5ea31d9e80c0');
+			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [*********************************0c0] from default`);
+		});
+		it('should return default value with partial show both', async function () {
+			const call: Promise<string> = getConfigVariable('TEST', [], stringParser(), '7469ef1f-98f0-460a-b3db-5ea31d9e80c0', {showValue: 'prefix-suffix'});
+			await expect(call).to.be.eventually.eq('7469ef1f-98f0-460a-b3db-5ea31d9e80c0');
+			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [74********************************c0] from default`);
+		});
+		it('should return default value with partial show both', async function () {
+			const call: Promise<string> = getConfigVariable('TEST', [], stringParser(), '7469ef1f-98f0-460a-b3db-5ea31d9e80c0', {showValue: false});
+			await expect(call).to.be.eventually.eq('7469ef1f-98f0-460a-b3db-5ea31d9e80c0');
+			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: TEST [************************************] from default`);
+		});
 	});
 	describe('loaders', () => {
 		it('should return process env value', async function () {
