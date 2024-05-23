@@ -60,6 +60,7 @@ describe('az key vault config variable', () => {
 		const fetchKvInstance = new AzureSecretsConfigLoader(async () => ({
 			credentials: new DefaultAzureCredential(),
 			expireMs: 100,
+			isSilent: false,
 			logger: debugLogger,
 			url: `${process.env.KV_URI}`,
 		}));
