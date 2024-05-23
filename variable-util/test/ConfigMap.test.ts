@@ -8,7 +8,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 import * as sinon from 'sinon';
 import * as z from 'zod';
-import {booleanParser, ConfigMap, env, integerParser, setLogger, stringParser, UrlParser, validLiteral} from '../src/';
+import {arrayParser, booleanParser, ConfigMap, env, integerParser, setLogger, stringParser, UrlParser, validLiteral} from '../src/';
 import {testObjectFinalSchema, testObjectParser, TestObjectType} from './testObjectParse';
 import {Result} from '@luolapeikko/result-option';
 import {URL} from 'url';
@@ -40,6 +40,7 @@ type TestEnv = {
 	CONSTANT: 'constant';
 	TEST_OBJECT: TestObjectType;
 	NOT_EXISTS: string;
+	ARRAY: string[];
 };
 
 const testEnvSchema = z.object({
@@ -51,6 +52,7 @@ const testEnvSchema = z.object({
 	CONSTANT: z.literal('constant'),
 	TEST_OBJECT: testObjectFinalSchema,
 	NOT_EXISTS: z.string(),
+	ARRAY: z.array(z.string()),
 });
 
 const config = new ConfigMap<TestEnv>(
@@ -68,6 +70,7 @@ const config = new ConfigMap<TestEnv>(
 		CONSTANT: {loaders: [env()], parser: stringParser(validLiteral(['constant'] as const)), defaultValue: 'constant'},
 		TEST_OBJECT: {loaders: [env()], parser: testObjectParser, defaultValue: {First: false, Second: false, Third: true}},
 		NOT_EXISTS: {loaders: [env()], parser: stringParser(), undefinedThrowsError: true, undefinedErrorMessage: 'add NOT_EXISTS to env'},
+		ARRAY: {loaders: [env()], parser: arrayParser(stringParser()), defaultValue: ['a', 'b', 'c'], params: {showValue: true}},
 	},
 	{namespace: 'Demo'},
 );
@@ -126,6 +129,11 @@ describe('ConfigMap', () => {
 		it('should return CONSTANT env value', async function () {
 			const call: Promise<string> = config.get('NOT_EXISTS');
 			await expect(call).to.be.eventually.rejectedWith('add NOT_EXISTS to env');
+		});
+		it('should return CONSTANT env value', async function () {
+			const call: Promise<string[]> = config.get('ARRAY');
+			await expect(call).to.be.eventually.eql(['a', 'b', 'c']);
+			expect(infoSpy.args[0][0]).to.be.eq('ConfigVariables:Demo[default]: ARRAY [a;b;c] from default');
 		});
 	});
 	describe('getString', () => {
@@ -226,6 +234,7 @@ describe('ConfigMap', () => {
 					},
 					namespace: 'Demo',
 				},
+				ARRAY: {type: 'default', value: ['a', 'b', 'c'], stringValue: 'a;b;c', namespace: 'Demo'},
 			});
 		});
 	});
