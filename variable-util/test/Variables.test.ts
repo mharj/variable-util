@@ -20,6 +20,7 @@ import {
 	integerParser,
 	IRequestCache,
 	JsonConfigParser,
+	MemoryConfigLoader,
 	reactEnv,
 	RequestNotReady,
 	SemicolonConfigParser,
@@ -29,6 +30,7 @@ import {
 	ValidateCallback,
 	validLiteral,
 } from '../src/';
+import {ILoggerLike} from '@avanio/logger-like';
 import {testObjectParser} from './testObjectParse';
 import {URL} from 'url';
 
@@ -84,7 +86,7 @@ const spyLogger = {
 	info: infoSpy,
 	trace: traceSpy,
 	warn: warnSpy,
-};
+} satisfies ILoggerLike;
 
 const objectSchema = z.object({
 	foo: z.string(),
@@ -113,6 +115,10 @@ const fetchLoaderOptions = {
 	logger: spyLogger,
 	validate: fetchValidate,
 } satisfies Partial<FetchConfigLoaderOptions>;
+
+let memoryEnv: MemoryConfigLoader<{
+	TEST: undefined;
+}>;
 
 function handleFetchRequest(): Request | RequestNotReady {
 	if (fetchRequestData) {
@@ -283,6 +289,60 @@ describe('config variable', () => {
 				expect(infoSpy.callCount).to.be.eq(1);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: API_SERVER [http://localhost/api] from default`);
 				expect(output).to.be.eql(urlDefault);
+			});
+		});
+		describe('MemoryConfigLoader', () => {
+			beforeEach(function () {
+				clearDefaultValueSeenMap();
+				memoryEnv = new MemoryConfigLoader(
+					{
+						TEST: undefined,
+					},
+					{logger: spyLogger},
+				);
+			});
+			it('should return undefined value', async function () {
+				const call: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnv.getLoader()], stringParser(), undefined, {showValue: true});
+				await expect(call).to.be.eventually.eq(undefined);
+				expect(infoSpy.callCount).to.be.eq(0);
+			});
+			it('should return memory env value', async function () {
+				await memoryEnv.set('TEST', 'asd');
+				expect(debugSpy.callCount).to.be.eq(1);
+				expect(debugSpy.getCall(0).args[0]).to.be.eq(`ConfigLoader[memory]: setting key TEST to 'asd'`);
+				const call: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnv.getLoader()], stringParser(), undefined, {showValue: true});
+				await expect(call).to.be.eventually.eq('asd');
+				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[memory]: TEST [asd] from key:TEST`);
+			});
+			it('should return memory env value and changed value after first', async function () {
+				await memoryEnv.set('TEST', 'asd');
+				expect(debugSpy.callCount).to.be.eq(1);
+				expect(debugSpy.getCall(0).args[0]).to.be.eq(`ConfigLoader[memory]: setting key TEST to 'asd'`);
+				const call1: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnv.getLoader()], stringParser(), undefined, {showValue: true});
+				await expect(call1).to.be.eventually.eq('asd');
+				expect(infoSpy.callCount).to.be.eq(1);
+				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[memory]: TEST [asd] from key:TEST`);
+				// update value
+				await memoryEnv.set('TEST', 'asd2');
+				expect(debugSpy.callCount).to.be.eq(2);
+				expect(debugSpy.getCall(1).args[0]).to.be.eq(`ConfigLoader[memory]: setting key TEST to 'asd2'`);
+				const call2: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnv.getLoader()], stringParser(), undefined, {showValue: true});
+				await expect(call2).to.be.eventually.eq('asd2');
+				expect(infoSpy.callCount).to.be.eq(2);
+				expect(infoSpy.getCall(1).args[0]).to.be.eq(`ConfigVariables[memory]: TEST [asd2] from key:TEST`);
+			});
+			it('should return memory env value and after reset undefined return from ENV', async function () {
+				process.env.TEST = 'asd2';
+				await memoryEnv.set('TEST', 'asd');
+				expect(debugSpy.callCount).to.be.eq(1);
+				expect(debugSpy.getCall(0).args[0]).to.be.eq(`ConfigLoader[memory]: setting key TEST to 'asd'`);
+				const call1: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnv.getLoader(), env()], stringParser(), undefined, {showValue: true});
+				await expect(call1).to.be.eventually.eq('asd');
+				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[memory]: TEST [asd] from key:TEST`);
+				await memoryEnv.set('TEST', undefined);
+				const call2: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnv.getLoader(), env()], stringParser(), undefined, {showValue: true});
+				await expect(call2).to.be.eventually.eq('asd2');
+				expect(infoSpy.getCall(1).args[0]).to.be.eq(`ConfigVariables[env]: TEST [asd2] from process.env.TEST`);
 			});
 		});
 	});
