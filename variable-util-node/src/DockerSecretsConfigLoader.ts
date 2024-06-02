@@ -1,5 +1,5 @@
 import * as path from 'path';
-import {ConfigLoader, Loadable, LoaderValue, VariableLookupError} from '@avanio/variable-util';
+import {ConfigLoader, type Loadable, type LoaderValue, VariableLookupError} from '@avanio/variable-util';
 import {existsSync} from 'fs';
 import type {ILoggerLike} from '@avanio/logger-like';
 import {readFile} from 'fs/promises';

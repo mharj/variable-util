@@ -1,5 +1,5 @@
-import {existsSync, FSWatcher, watch} from 'fs';
-import {IConfigLoaderProps, Loadable, LoaderValue, RecordConfigLoader, ValidateCallback, VariableError} from '@avanio/variable-util';
+import {existsSync, type FSWatcher, watch} from 'fs';
+import {type IConfigLoaderProps, type Loadable, type LoaderValue, RecordConfigLoader, type ValidateCallback, VariableError} from '@avanio/variable-util';
 import {getError} from './errorUtil';
 import type {ILoggerLike} from '@avanio/logger-like';
 import {readFile} from 'fs/promises';
@@ -118,7 +118,9 @@ export abstract class AbstractFileRecordLoader<
 					clearTimeout(this.timeout);
 				}
 				// delay to prevent multiple reloads
-				this.timeout = setTimeout(() => this.handleFileChange(options), 200);
+				this.timeout = setTimeout(() => {
+					void this.handleFileChange(options);
+				}, 200);
 			});
 		}
 	}

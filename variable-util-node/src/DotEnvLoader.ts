@@ -1,4 +1,4 @@
-import {AbstractFileRecordLoader, AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
+import {AbstractFileRecordLoader, type AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
 import {parse} from 'dotenv';
 
 /**

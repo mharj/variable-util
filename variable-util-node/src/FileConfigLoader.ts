@@ -1,4 +1,4 @@
-import {AbstractFileRecordLoader, AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
+import {AbstractFileRecordLoader, type AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
 
 export class FileConfigLoader extends AbstractFileRecordLoader<AbstractFileRecordLoaderOptions<'json'>> {
 	public readonly type = 'file';
@@ -13,6 +13,6 @@ export class FileConfigLoader extends AbstractFileRecordLoader<AbstractFileRecor
 	};
 
 	protected handleParse(rawData: Buffer): Record<string, string | undefined> {
-		return JSON.parse(rawData.toString());
+		return JSON.parse(rawData.toString()) as Record<string, string | undefined>;
 	}
 }
