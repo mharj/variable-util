@@ -1,40 +1,30 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import 'mocha';
 import * as dotenv from 'dotenv';
 import * as sinon from 'sinon';
-import {getConfigVariable, setLogger, UrlParser} from '@avanio/variable-util';
+import {getConfigVariable, setLogger, UrlParser, urlSanitize} from '@avanio/variable-util';
 import {AzureSecretsConfigLoader} from '../src/';
 import {DefaultAzureCredential} from '@azure/identity';
 import {expect} from 'chai';
-import {ILoggerLike} from '@avanio/logger-like';
-import {urlSanitize} from '@avanio/variable-util/dist/lib/formatUtils';
+import {type ILoggerLike} from '@avanio/logger-like';
 
 dotenv.config();
-
-const debugSpy = sinon.spy();
-const infoSpy = sinon.spy();
-const errorSpy = sinon.spy();
-const warnSpy = sinon.spy();
-const traceSpy = sinon.spy();
 
 function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-setLogger({
-	debug: debugSpy,
-	error: errorSpy,
-	info: infoSpy,
-	trace: traceSpy,
-	warn: warnSpy,
-});
+const debugLogger = {
+	debug: sinon.spy(),
+	error: sinon.spy(),
+	info: sinon.spy(),
+	trace: sinon.spy(),
+	warn: sinon.spy(),
+} satisfies ILoggerLike;
 
-const debugLogger: ILoggerLike = {
-	debug: debugSpy,
-	error: errorSpy,
-	info: infoSpy,
-	trace: traceSpy,
-	warn: warnSpy,
-};
+setLogger(debugLogger);
 
 let mongoUrl: URL;
 let mongoString: string;
@@ -48,16 +38,14 @@ describe('az key vault config variable', () => {
 		mongoString = urlSanitize(mongoUrl.href);
 	});
 	beforeEach(() => {
-		debugSpy.resetHistory();
-		infoSpy.resetHistory();
-		errorSpy.resetHistory();
-		warnSpy.resetHistory();
-		traceSpy.resetHistory();
+		for (const logger of Object.values(debugLogger)) {
+			logger.resetHistory();
+		}
 	});
 	it('should return fetch value', async function () {
 		this.timeout(600000);
 		const urlParser = new UrlParser({urlSanitize: true});
-		const fetchKvInstance = new AzureSecretsConfigLoader(async () => ({
+		const fetchKvInstance = new AzureSecretsConfigLoader(() => ({
 			credentials: new DefaultAzureCredential(),
 			expireMs: 100,
 			isSilent: false,
@@ -69,18 +57,18 @@ describe('az key vault config variable', () => {
 		const callback2 = getConfigVariable('MONGO_URL', [fetchKv(process.env.KV_MONGO_KEY)], urlParser, undefined, {showValue: true});
 		await callback1;
 		await callback2;
-		expect(errorSpy.callCount, errorSpy.getCall(0)?.args[0]).to.be.eq(0);
-		expect(infoSpy.getCall(0).args[0]).to.be.eq(
+		expect(debugLogger.error.callCount, debugLogger.error.getCall(0)?.args[0]).to.be.eq(0);
+		expect(debugLogger.info.getCall(0).args[0]).to.be.eq(
 			`ConfigVariables[azure-secrets]: MONGO_URL [${mongoString}] from ${process.env.KV_URI}${process.env.KV_MONGO_KEY}`,
 		);
-		expect(infoSpy.callCount).to.be.eq(1);
-		expect(debugSpy.callCount).to.be.eq(1);
-		expect(debugSpy.getCall(0).args).to.be.eql(['azure-secrets', `getting ${process.env.KV_MONGO_KEY} from ${process.env.KV_URI}`]);
+		expect(debugLogger.info.callCount).to.be.eq(1);
+		expect(debugLogger.debug.callCount).to.be.eq(1);
+		expect(debugLogger.debug.getCall(0).args).to.be.eql(['azure-secrets', `getting ${process.env.KV_MONGO_KEY} from ${process.env.KV_URI}`]);
 		expect(await callback1).to.be.eql(mongoUrl);
 		// should be expired after 100ms
 		await sleep(200);
 		await getConfigVariable('MONGO_URL', [fetchKv(process.env.KV_MONGO_KEY)], urlParser, undefined, {showValue: true});
-		expect(debugSpy.callCount).to.be.eq(2);
-		expect(debugSpy.getCall(1).args).to.be.eql(['azure-secrets', `getting ${process.env.KV_MONGO_KEY} from ${process.env.KV_URI}`]);
+		expect(debugLogger.debug.callCount).to.be.eq(2);
+		expect(debugLogger.debug.getCall(1).args).to.be.eql(['azure-secrets', `getting ${process.env.KV_MONGO_KEY} from ${process.env.KV_URI}`]);
 	});
 });

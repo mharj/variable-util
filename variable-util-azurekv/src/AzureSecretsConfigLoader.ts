@@ -1,13 +1,12 @@
-import {ConfigLoader, Loadable, LoaderValue} from '@avanio/variable-util';
+import {ConfigLoader, type IConfigLoaderProps, type Loadable, type LoaderValue} from '@avanio/variable-util';
 import {ExpireCache} from '@avanio/expire-cache';
-import {ILoggerLike} from '@avanio/logger-like';
+import {type ILoggerLike} from '@avanio/logger-like';
 import {SecretClient} from '@azure/keyvault-secrets';
-import {TokenCredential} from '@azure/identity';
+import {type TokenCredential} from '@azure/identity';
 
-export interface AzureSecretsConfigLoaderOptions {
+export interface AzureSecretsConfigLoaderOptions extends IConfigLoaderProps {
 	credentials: TokenCredential;
 	url: string;
-	disabled?: boolean;
 	/** hide error messages, default is true */
 	isSilent?: boolean;
 	logger?: ILoggerLike;
@@ -17,28 +16,36 @@ export interface AzureSecretsConfigLoaderOptions {
 }
 
 export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined, AzureSecretsConfigLoaderOptions, AzureSecretsConfigLoaderOptions> {
-	public type = 'azure-secrets';
+	public readonly type = 'azure-secrets';
 	private client: SecretClient | undefined;
-	private valuePromises = new ExpireCache<Promise<{value: string | undefined; path: string}>>();
+	private readonly valuePromises = new ExpireCache<Promise<{value: string | undefined; path: string}>>();
 
 	protected defaultOptions: undefined;
 
 	constructor(options: Loadable<AzureSecretsConfigLoaderOptions>) {
 		super(options);
 		this.options = options;
-		// update expireMs from options
-		this.getOptions()
-			.then((options) => {
-				if (options.cacheLogger) {
-					this.valuePromises.setLogger(options.cacheLogger);
-				}
-				if (options.expireMs !== undefined) {
-					this.valuePromises.setExpireMs(options.expireMs);
-				}
-			})
-			.catch((e) => {
-				console.log(e); // error getting options
-			});
+		void this.init();
+	}
+
+	/**
+	 * Initialize AzureSecretsConfigLoader
+	 * - set optional cacheLogger for cache logging
+	 * - set optional expireMs for value cache
+	 * @returns Promise<void> - this never throws
+	 */
+	public async init(): Promise<void> {
+		try {
+			const options = await this.getOptions();
+			if (options.cacheLogger) {
+				this.valuePromises.setLogger(options.cacheLogger);
+			}
+			if (options.expireMs !== undefined) {
+				this.valuePromises.setExpireMs(options.expireMs);
+			}
+		} catch (e) {
+			console.error(e);
+		}
 	}
 
 	/**
@@ -77,7 +84,7 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined, A
 
 	private async handleLoaderPromise(targetKey: string): Promise<{value: string | undefined; path: string}> {
 		const options = await this.getOptions();
-		const client = await this.getClient(options);
+		const client = this.getAzureSecretClient(options);
 		options.logger?.debug(this.type, `getting ${targetKey} from ${options.url}`);
 		const {
 			value,
@@ -86,7 +93,7 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined, A
 		return {value, path: `${vaultUrl}/${targetKey}`};
 	}
 
-	private async getClient(options: AzureSecretsConfigLoaderOptions): Promise<SecretClient> {
+	private getAzureSecretClient(options: AzureSecretsConfigLoaderOptions): SecretClient {
 		if (!this.client) {
 			this.client = new SecretClient(options.url, options.credentials);
 		}
