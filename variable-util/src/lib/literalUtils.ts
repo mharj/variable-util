@@ -1,4 +1,4 @@
-import {PostValidate} from '../interfaces/IConfigParser';
+import {type PostValidate} from '../interfaces/IConfigParser';
 
 function isLiteral<RawType, Type extends RawType>(value: RawType, values: readonly Type[]): value is Type {
 	return values.includes(value as Type);

@@ -1,8 +1,9 @@
-import {ConfigLoader, IConfigLoaderProps} from './ConfigLoader';
+import {ConfigLoader, type IConfigLoaderProps} from './ConfigLoader';
 import {handleSeen} from '../lib/seenUtils';
 
 /**
  * RecordConfigLoader is a class that extends ConfigLoader and adds the ability to reload the data.
+ * @since v0.8.0
  */
 export abstract class RecordConfigLoader<HandlerParams, Props extends IConfigLoaderProps, DefaultProps extends Props = Props> extends ConfigLoader<
 	HandlerParams,

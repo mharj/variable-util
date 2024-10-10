@@ -17,7 +17,7 @@ export function buildStringObject(obj: Record<string, unknown>): Record<string, 
 		if (value === undefined || value === null) {
 			last[key] = undefined;
 		} else {
-			last[key] = `${value}`;
+			last[key] = String(value);
 		}
 		return last;
 	}, {});

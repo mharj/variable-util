@@ -1,8 +1,12 @@
-import {FormatParameters} from '../lib/formatUtils';
-import {IConfigLoader} from '../interfaces/IConfigLoader';
-import {IConfigParser} from '../interfaces/IConfigParser';
-import {Loadable} from './Loadable';
+import {type FormatParameters} from '../lib/formatUtils';
+import {type IConfigLoader} from '../interfaces/IConfigLoader';
+import {type IConfigParser} from '../interfaces/IConfigParser';
+import {type Loadable} from './Loadable';
 
+/**
+ * Optional environment entry
+ * @since v0.8.0
+ */
 export type OptionalEnvEntry<Value> = {
 	/**
 	 * The loaders to use to load the value
@@ -30,6 +34,10 @@ export type OptionalEnvEntry<Value> = {
 	undefinedErrorMessage?: string;
 };
 
+/**
+ * Required environment entry
+ * @since v0.8.0
+ */
 export type RequiredEnvEntry<Value> = {
 	/**
 	 * The loaders to use to load the value
@@ -57,6 +65,10 @@ export type RequiredEnvEntry<Value> = {
 	undefinedErrorMessage?: string;
 };
 
+/**
+ * Required environment entry with undefinedThrowsError
+ * @since v0.8.0
+ */
 export type RequiredUndefinedThrowEntry<Value> = {
 	/**
 	 * The loaders to use to load the value
@@ -84,6 +96,10 @@ export type RequiredUndefinedThrowEntry<Value> = {
 	undefinedErrorMessage?: string;
 };
 
+/**
+ * Environment map schema
+ * @since v0.2.15
+ */
 export type EnvMapSchema<Output extends Record<string, unknown>> = {
 	[K in keyof Required<Output>]: undefined extends Output[K]
 		? OptionalEnvEntry<Output[K]>

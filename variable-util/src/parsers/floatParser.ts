@@ -1,4 +1,4 @@
-import {IConfigParser, PostValidate} from '../interfaces/IConfigParser';
+import {type IConfigParser, type PostValidate} from '../interfaces/IConfigParser';
 import {getFloat} from '../lib/primitiveUtils';
 
 /**
@@ -7,15 +7,16 @@ import {getFloat} from '../lib/primitiveUtils';
  * @param {PostValidate<Output, number>} [postValidate] - optional post validation
  * @returns {IConfigParser<Output, number>}
  * @category Parsers
+ * @since v0.3.0
  */
 export function floatParser<Output extends number = number>(postValidate?: PostValidate<Output, number>): IConfigParser<Output, number> {
 	return {
 		name: 'floatParser',
-		parse: async (key: string, value: string): Promise<number> => {
+		parse: (key: string, value: string) => {
 			return getFloat(value).unwrap(() => new TypeError(`value for key ${key} is not a float string`));
 		},
 		postValidate,
-		preValidate: async (key: string, value: string): Promise<void> => {
+		preValidate: (key: string, value: string) => {
 			if (typeof value !== 'string') {
 				throw new TypeError(`value for key ${key} is not a string`);
 			}

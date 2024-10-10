@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+/* eslint-disable @typescript-eslint/unbound-method */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable sonarjs/no-duplicate-string */
 import 'cross-fetch/polyfill';
 import 'mocha';
@@ -13,24 +19,24 @@ import {
 	createRequestNotReady,
 	env,
 	FetchConfigLoader,
-	FetchConfigLoaderOptions,
+	type FetchConfigLoaderOptions,
 	floatParser,
 	getConfigVariable,
-	IConfigLoader,
+	type IConfigLoader,
 	integerParser,
-	IRequestCache,
+	type IRequestCache,
 	JsonConfigParser,
 	MemoryConfigLoader,
 	reactEnv,
-	RequestNotReady,
+	type RequestNotReady,
 	SemicolonConfigParser,
 	setLogger,
 	stringParser,
 	UrlParser,
-	ValidateCallback,
+	type ValidateCallback,
 	validLiteral,
 } from '../src/';
-import {ILoggerLike} from '@avanio/logger-like';
+import {type ILoggerLike} from '@avanio/logger-like';
 import {testObjectParser} from './testObjectParse';
 import {URL} from 'url';
 
@@ -54,7 +60,7 @@ const fetchResponsePayload = {
 	TEST_OBJECT: 'First=false;Second=false;Third=true',
 };
 
-function mockFetch(input: globalThis.URL | RequestInfo, init?: RequestInit | undefined): Promise<Response> {
+function mockFetch(input: globalThis.URL | RequestInfo, init?: RequestInit): Promise<Response> {
 	const req = new Request(input, init);
 	const bodyData = JSON.stringify(fetchResponsePayload);
 	const etagValue = etag(bodyData);
@@ -104,7 +110,7 @@ const fetchValidate: ValidateCallback<Record<string, string | undefined>, Record
 	return stringRecordSchema.parseAsync(data);
 };
 
-let fetchEnv: (params?: string | undefined) => IConfigLoader;
+let fetchEnv: (params?: string) => IConfigLoader;
 const urlDefault = new URL('http://localhost/api');
 let fetchRequestData: Request | undefined;
 let isFetchDisabled = false;

@@ -1,6 +1,6 @@
-import {ShowValueType, buildHiddenValue} from '../lib/formatUtils';
-import {IConfigParser} from '../interfaces/IConfigParser';
-import {ValidateCallback} from '../interfaces/IValidate';
+import {buildHiddenValue, type ShowValueType} from '../lib/formatUtils';
+import {type IConfigParser} from '../interfaces/IConfigParser';
+import {type ValidateCallback} from '../interfaces/IValidate';
 
 /**
  * The base type of the parsed JSON object
@@ -11,6 +11,7 @@ export type JsonParseType = Record<string, unknown>;
  * A parser for JSON sting as config
  * @implements {IConfigParser<Out, JsonParseType>}
  * @category Parsers
+ * @since v0.9.0
  */
 export class JsonConfigParser<Out extends JsonParseType> implements IConfigParser<Out, JsonParseType> {
 	public name = 'jsonConfigParser';
@@ -28,8 +29,8 @@ export class JsonConfigParser<Out extends JsonParseType> implements IConfigParse
 		this.showValue = showValue;
 	}
 
-	public parse(key: string, value: string): Promise<JsonParseType> {
-		return Promise.resolve(JSON.parse(value));
+	public parse(key: string, value: string) {
+		return JSON.parse(value) as JsonParseType;
 	}
 
 	public async postValidate(key: string, value: JsonParseType): Promise<Out | undefined> {
@@ -40,7 +41,7 @@ export class JsonConfigParser<Out extends JsonParseType> implements IConfigParse
 		return JSON.stringify(
 			Object.entries(value).reduce<Record<string, unknown>>((last, [key, value]) => {
 				if (value) {
-					last[`${key}`] = value;
+					last[key] = value;
 				}
 				return last;
 			}, {}),
@@ -52,9 +53,9 @@ export class JsonConfigParser<Out extends JsonParseType> implements IConfigParse
 			Object.entries(value).reduce<Record<string, unknown>>((last, [key, value]) => {
 				if (value) {
 					if (!this.keysToHide.includes(key)) {
-						last[`${key}`] = value;
+						last[key] = value;
 					} else {
-						last[`${key}`] = buildHiddenValue(`${value}`, this.showValue);
+						last[key] = buildHiddenValue(String(value), this.showValue);
 					}
 				}
 				return last;

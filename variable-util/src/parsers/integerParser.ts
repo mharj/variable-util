@@ -1,4 +1,4 @@
-import {IConfigParser, PostValidate} from '../interfaces/IConfigParser';
+import {type IConfigParser, type PostValidate} from '../interfaces/IConfigParser';
 import {getInteger} from '../lib/primitiveUtils';
 
 /**
@@ -7,16 +7,17 @@ import {getInteger} from '../lib/primitiveUtils';
  * @param {PostValidate<Output, number>} [postValidate] - optional post validation
  * @returns {IConfigParser<Output, number>}
  * @category Parsers
+ * @since v0.3.0
  */
 export function integerParser<Output extends number = number>(postValidate?: PostValidate<Output, number>): IConfigParser<Output, number> {
 	return {
 		name: 'integerParser',
-		parse: async (key: string, value: string): Promise<number> => {
+		parse: (key: string, value: string) => {
 			return getInteger(value).unwrap(() => new TypeError(`value for key ${key} is not an integer string`));
 		},
 		postValidate,
 		toString: (value: number): string => {
-			return `${value}`;
+			return String(value);
 		},
 	};
 }

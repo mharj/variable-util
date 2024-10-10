@@ -25,6 +25,8 @@
         "strictNullChecks": true,
         "noUnusedLocals": true,
         "strict": true,
+        "skipLibCheck": true,
+        "noUncheckedIndexedAccess": true
     },
     "typedocOptions": {
 		"entryPoints": ["src/index.ts"],

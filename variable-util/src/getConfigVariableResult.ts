@@ -1,9 +1,9 @@
-import {Err, Ok, Result} from '@luolapeikko/result-option';
-import {IConfigLoader, IConfigParser} from './interfaces';
-import {ConfigOptions} from './ConfigOptions';
-import {FormatParameters} from './lib/formatUtils';
+import {Err, type IResult, Ok} from '@luolapeikko/result-option';
+import {type IConfigLoader, type IConfigParser} from './interfaces';
+import {type ConfigOptions} from './ConfigOptions';
+import {type FormatParameters} from './lib/formatUtils';
 import {getConfigVariable} from './getConfigVariable';
-import {Loadable} from './types/Loadable';
+import {type Loadable} from './types/Loadable';
 
 /**
  * @example
@@ -20,23 +20,23 @@ export async function getConfigVariableResult<Output>(
 	defaultValueLoadable: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
-): Promise<Result<Output>>;
+): Promise<IResult<Output>>;
 export async function getConfigVariableResult<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
-	defaultValueLoadable?: Loadable<Output> | undefined,
+	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
-): Promise<Result<Output | undefined>>;
+): Promise<IResult<Output | undefined>>;
 export async function getConfigVariableResult<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
-	defaultValueLoadable?: Loadable<Output> | undefined,
+	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
-): Promise<Result<Output | undefined>> {
+): Promise<IResult<Output | undefined>> {
 	try {
 		return Ok(await getConfigVariable(rootKey, loaders, parser, defaultValueLoadable, params, options));
 	} catch (err) {

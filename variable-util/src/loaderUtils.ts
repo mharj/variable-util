@@ -1,7 +1,7 @@
-import {FormatParameters, printValue} from './lib/formatUtils';
-import {IConfigLoader, IConfigParser} from './interfaces';
-import {LoaderTypeValue} from './types/TypeValue';
-import {SolvedConfigOptions} from './ConfigOptions';
+import {type FormatParameters, printValue} from './lib/formatUtils';
+import {type IConfigLoader, type IConfigParser} from './interfaces';
+import {type LoaderTypeValue} from './types/TypeValue';
+import {type SolvedConfigOptions} from './ConfigOptions';
 import {VariableError} from './VariableError';
 
 /**

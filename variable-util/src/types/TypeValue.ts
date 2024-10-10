@@ -1,3 +1,7 @@
+/**
+ * Loader type value
+ * @since 0.2.18
+ */
 export type LoaderTypeValue<T> = {
 	/** type of loader output (default, env,...) */
 	type: string | undefined;
@@ -9,6 +13,10 @@ export type LoaderTypeValue<T> = {
 	namespace: string | undefined;
 };
 
+/**
+ * Loader type strict value
+ * @since 0.2.18
+ */
 export type LoaderTypeValueStrict<T> = {
 	/** type of loader output (default, env,...) */
 	type: string | undefined;

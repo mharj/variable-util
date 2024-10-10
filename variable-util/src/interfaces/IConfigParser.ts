@@ -1,9 +1,14 @@
+/**
+ * PreValidate function
+ * @since v0.3.0
+ */
 export type PostValidate<Output, RawOutput> = (key: string, value: RawOutput) => Promise<Output | undefined>;
 
 /**
  * Interface for config parsers
  * @template Output - Type of output
  * @template RawOutput - Type of raw output
+ * @since v0.3.1
  */
 export interface IConfigParser<Output, RawOutput> {
 	/**
@@ -15,19 +20,19 @@ export interface IConfigParser<Output, RawOutput> {
 	 * Config parser function
 	 * @throws Error if parsing fails
 	 */
-	parse(key: string, value: string): Promise<RawOutput>;
+	parse(key: string, value: string): RawOutput | Promise<RawOutput>;
 
 	/**
 	 * Optional raw string value validation before parsing.
 	 * @throws Error if validation fails
 	 */
-	preValidate?(key: string, value: unknown): Promise<void>;
+	preValidate?(key: string, value: unknown): void | Promise<void>;
 
 	/**
 	 * Optional value validation after parsing
 	 * @throws Error if validation fails
 	 */
-	postValidate?(key: string, value: RawOutput): Promise<Output | undefined>;
+	postValidate?(key: string, value: RawOutput): Output | undefined | Promise<Output | undefined>;
 
 	/**
 	 * Build readable string from value

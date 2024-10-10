@@ -5,6 +5,7 @@ import {VariableError} from './VariableError';
  * @class VariableLookupError
  * @extends VariableError
  * @category Errors
+ * @since v0.2.2
  */
 export class VariableLookupError extends VariableError {
 	public readonly variableKey: string;

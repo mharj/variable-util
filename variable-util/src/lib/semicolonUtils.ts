@@ -1,4 +1,4 @@
-import {buildHiddenValue, ShowValueType} from './formatUtils';
+import {buildHiddenValue, type ShowValueType} from './formatUtils';
 
 /**
  * Make the first character of a string lowercase
@@ -24,9 +24,11 @@ function lcFirst(data: string): string {
 export function parseSemicolonConfig(config: string, keepCase = true): Record<string, string> {
 	return config.split(';').reduce<Record<string, string>>((last, c) => {
 		const [k, v] = c.split('=', 2);
-		const key = keepCase ? k.trim() : lcFirst(k.trim());
-		if (key) {
-			last[key] = decodeURIComponent(v?.trim());
+		if (k && v) {
+			const key = keepCase ? k.trim() : lcFirst(k.trim());
+			if (key) {
+				last[key] = decodeURIComponent(v.trim());
+			}
 		}
 		return last;
 	}, {});
@@ -44,7 +46,7 @@ export function stringifySemicolonConfig(config: Record<string, unknown>): strin
 	return Object.entries(config)
 		.reduce<string[]>((last, [key, value]) => {
 			if (value !== undefined) {
-				const encodedValue = encodeURIComponent(`${value}`);
+				const encodedValue = encodeURIComponent(String(value));
 				last.push(`${key}=${encodedValue}`);
 			}
 			return last;
@@ -70,9 +72,9 @@ export function logStringifySemicolonConfig<Out extends Record<string, unknown>>
 		.reduce<string[]>((last, [key, value]) => {
 			if (value !== undefined) {
 				if (!keysToHide.includes(key as keyof Out)) {
-					last.push(`${key}=${value}`);
+					last.push(`${key}=${String(value)}`);
 				} else {
-					const hiddenValue = buildHiddenValue(`${value}`, show);
+					const hiddenValue = buildHiddenValue(String(value), show);
 					last.push(`${key}=${hiddenValue}`);
 				}
 			}

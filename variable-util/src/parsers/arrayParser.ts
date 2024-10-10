@@ -1,4 +1,4 @@
-import {IConfigParser, PostValidate} from '../interfaces';
+import {type IConfigParser, type PostValidate} from '../interfaces';
 
 /**
  * Build parser for array of values
@@ -7,6 +7,7 @@ import {IConfigParser, PostValidate} from '../interfaces';
  * @param postValidate optional post validation
  * @returns {IConfigParser<Output[], RawOutput[]>} Parser for array of values
  * @category Parsers
+ * @since v0.9.1
  */
 export function arrayParser<Output, RawOutput>(
 	parse: IConfigParser<Output, RawOutput>,

@@ -50,6 +50,7 @@ export type FetchConfigRequest = ConfigRequest | Promise<ConfigRequest> | (() =>
  * FetchConfigLoader is used to load config from a fetch request
  * @category Loaders
  * @implements {IConfigLoader}
+ * @since v0.8.0
  */
 export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Partial<FetchConfigLoaderOptions>, FetchConfigLoaderOptions> {
 	public type = 'fetch';
@@ -79,12 +80,12 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Pa
 
 	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
 		// check if we have JSON data loaded, if not load it
-		if (!this.dataPromise || this._isLoaded === false) {
+		if (!this.dataPromise || !this._isLoaded) {
 			this.dataPromise = this.handleData();
 		}
 		const data = await this.dataPromise;
 		const targetKey = overrideKey || lookupKey; // optional override key, else use actual lookupKey
-		const value = data?.[targetKey] || undefined;
+		const value = data[targetKey] || undefined;
 		return {type: this.type, result: {value, path: this.path, seen: this.handleSeen(targetKey, value)}};
 	}
 
@@ -114,10 +115,10 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Pa
 			// if we still have an error, throw it
 			if (res.status >= 400) {
 				if (isSilent) {
-					logger?.info(`http error ${res.status} from FetchEnvConfig`);
+					logger?.info(`http error ${res.status.toString()} from FetchEnvConfig`);
 					return Promise.resolve({}); // set as empty so we prevent fetch spamming
 				}
-				throw new VariableError(`http error ${res.status} from FetchEnvConfig`);
+				throw new VariableError(`http error ${res.status.toString()} from FetchEnvConfig`);
 			}
 		}
 		// if we have a cached response and we get a cache hit code (default 304), use the cached response instead
@@ -125,6 +126,7 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Pa
 			res = await this.handleNotModifiedCache(req, res);
 		}
 		const contentType = res.headers.get('content-type');
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (contentType?.startsWith('application/json') && payload === 'json') {
 			const data = await this.handleJson(res);
 			logger?.debug('successfully loaded config from FetchEnvConfig');
@@ -132,10 +134,10 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Pa
 			return data;
 		}
 		if (isSilent) {
-			logger?.info(`unsupported content-type ${contentType} from FetchEnvConfig`);
+			logger?.info(`unsupported content-type ${String(contentType)} from FetchEnvConfig`);
 			return Promise.resolve({}); // set as empty so we prevent fetch spamming
 		}
-		throw new VariableError(`unsupported content-type ${contentType} from FetchEnvConfig`);
+		throw new VariableError(`unsupported content-type ${String(contentType)} from FetchEnvConfig`);
 	}
 
 	/**
@@ -146,7 +148,7 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Pa
 		if (cache) {
 			const cacheRes = await cache.fetchRequest(req);
 			// if we have a cache and we are offline, use the cache else return undefined
-			if (cache.isOnline() === false) {
+			if (!cache.isOnline()) {
 				if (cacheRes) {
 					logger?.debug(`client is offline, returned cached response for FetchEnvConfig`);
 					return cacheRes;
@@ -189,7 +191,7 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Pa
 				logger?.debug(`returned cached response for FetchEnvConfig`);
 				return cacheRes;
 			}
-			throw new VariableError(`http error ${res.status} from FetchEnvConfig (using cached version)`); // we have a cache but no cached response
+			throw new VariableError(`http error ${res.status.toString()} from FetchEnvConfig (using cached version)`); // we have a cache but no cached response
 		}
 		return res;
 	}
@@ -199,7 +201,7 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Pa
 		try {
 			const contentType = res.headers.get('content-type');
 			if (!contentType?.startsWith('application/json')) {
-				throw new Error(`unsupported content-type ${contentType}`);
+				throw new Error(`unsupported content-type ${String(contentType)}`);
 			}
 			const rawData: unknown = await res.json();
 			if (!isValidObject(rawData)) {

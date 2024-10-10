@@ -1,8 +1,8 @@
-import {ConfigLoader, IConfigLoaderProps} from './ConfigLoader';
+import {ConfigLoader, type IConfigLoaderProps} from './ConfigLoader';
 import {handleSeen} from '../lib/seenUtils';
-import {ILoggerLike} from '@avanio/logger-like';
+import {type ILoggerLike} from '@avanio/logger-like';
 import type {Loadable} from '../types';
-import {LoaderValue} from '../interfaces';
+import {type LoaderValue} from '../interfaces';
 
 export interface IMemoryConfigLoaderProps extends IConfigLoaderProps {
 	logger?: ILoggerLike;
@@ -11,6 +11,7 @@ export interface IMemoryConfigLoaderProps extends IConfigLoaderProps {
 /**
  * Config loader with in-memory data which can be set and retrieved variables on the fly.
  * - Useful for temporary controlled overrides or testing
+ * @since v0.9.2
  */
 export class MemoryConfigLoader<MemoryMap extends Record<string, string | undefined>> extends ConfigLoader<
 	string,
@@ -30,7 +31,7 @@ export class MemoryConfigLoader<MemoryMap extends Record<string, string | undefi
 
 	public async set(key: keyof MemoryMap, value: string | undefined): Promise<void> {
 		const options = await this.getOptions();
-		options.logger?.debug(this.buildErrorStr(`setting key ${String(key)} to '${value}'`));
+		options.logger?.debug(this.buildErrorStr(`setting key ${String(key)} to '${String(value)}'`));
 		if (this.data.get(key) !== value) {
 			this.seen.delete(String(key));
 		}

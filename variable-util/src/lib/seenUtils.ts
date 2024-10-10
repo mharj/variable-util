@@ -11,7 +11,7 @@ export function handleSeen(seenMap: Map<string, string>, key: string, value: str
 		return false;
 	}
 	const lastValue = seenMap.get(key);
-	const seen = value !== undefined && value === lastValue;
+	const seen = value === lastValue;
 	if (!seen) {
 		seenMap.set(key, value);
 	}

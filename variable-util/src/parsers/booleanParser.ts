@@ -1,4 +1,4 @@
-import {IConfigParser, PostValidate} from '../interfaces/IConfigParser';
+import {type IConfigParser, type PostValidate} from '../interfaces/IConfigParser';
 import {getBoolean} from '../lib/primitiveUtils';
 
 /**
@@ -15,15 +15,16 @@ import {getBoolean} from '../lib/primitiveUtils';
  * @param {PostValidate<Output, number>} [postValidate] - optional post validation
  * @returns {IConfigParser<Output, number>}
  * @category Parsers
+ * @since v0.3.0
  */
 export function booleanParser<Output extends boolean = boolean>(postValidate?: PostValidate<Output, boolean>): IConfigParser<Output, boolean> {
 	return {
 		name: 'booleanParser',
-		parse: async (key: string, value: string): Promise<boolean> => {
+		parse: (key: string, value: string) => {
 			return getBoolean(value).unwrap(() => new TypeError(`value for key ${key} is not a boolean string`));
 		},
 		postValidate,
-		preValidate: async (key: string, value: string): Promise<void> => {
+		preValidate: (key: string, value: string) => {
 			// allow boolean values to be passed in as getBoolean can handle them
 			if (typeof value === 'boolean') {
 				return;

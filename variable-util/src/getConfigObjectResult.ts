@@ -1,9 +1,9 @@
-import {Err, Ok, Result} from '@luolapeikko/result-option';
-import {IConfigLoader, IConfigParser} from './interfaces';
-import {ConfigOptions} from './ConfigOptions';
-import {FormatParameters} from './lib/formatUtils';
+import {Err, type IResult, Ok} from '@luolapeikko/result-option';
+import {type IConfigLoader, type IConfigParser} from './interfaces';
+import {type ConfigOptions} from './ConfigOptions';
+import {type FormatParameters} from './lib/formatUtils';
 import {getConfigObject} from './getConfigObject';
-import {Loadable} from './types/Loadable';
+import {type Loadable} from './types/Loadable';
 
 /**
  * Wrapper around getConfigObject that returns a Result
@@ -29,23 +29,23 @@ export async function getConfigObjectResult<Output>(
 	defaultValueLoadable: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
-): Promise<Result<{type: string | undefined; value: Output}>>;
+): Promise<IResult<{type: string | undefined; value: Output}>>;
 export async function getConfigObjectResult<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
-	defaultValueLoadable?: Loadable<Output> | undefined,
+	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
-): Promise<Result<{type: string | undefined; value: Output | undefined}>>;
+): Promise<IResult<{type: string | undefined; value: Output | undefined}>>;
 export async function getConfigObjectResult<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
-	defaultValueLoadable?: Loadable<Output> | undefined,
+	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
-): Promise<Result<{type: string | undefined; value: Output | undefined}>> {
+): Promise<IResult<{type: string | undefined; value: Output | undefined}>> {
 	try {
 		return Ok(await getConfigObject(rootKey, loaders, parser, defaultValueLoadable, params, options));
 	} catch (err) {

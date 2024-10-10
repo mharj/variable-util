@@ -1,7 +1,7 @@
 import {logStringifySemicolonConfig, parseSemicolonConfig, stringifySemicolonConfig} from '../lib/semicolonUtils';
-import {IConfigParser} from '../interfaces/IConfigParser';
-import {ShowValueType} from '../lib';
-import {ValidateCallback} from '../interfaces/IValidate';
+import {type IConfigParser} from '../interfaces/IConfigParser';
+import {type ShowValueType} from '../lib';
+import {type ValidateCallback} from '../interfaces/IValidate';
 
 /**
  * The base type of the parsed JSON object
@@ -27,6 +27,7 @@ export interface SemicolonConfigParserOptions<
  * A parser for semicolon separated string as config
  * @implements {IConfigParser<Out, RawType>}
  * @category Parsers
+ * @since v0.9.0
  */
 export class SemicolonConfigParser<Out extends OutConfigParseType = OutConfigParseType, RawType extends RawConfigParseType = RawConfigParseType>
 	implements IConfigParser<Out, RawType>

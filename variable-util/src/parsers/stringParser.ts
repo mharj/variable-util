@@ -1,4 +1,4 @@
-import {IConfigParser, PostValidate} from '../interfaces/IConfigParser';
+import {type IConfigParser, type PostValidate} from '../interfaces/IConfigParser';
 import {getString} from '../lib/primitiveUtils';
 
 /**
@@ -7,15 +7,16 @@ import {getString} from '../lib/primitiveUtils';
  * @param {PostValidate<Output, string>} [postValidate] - optional post validation
  * @returns {IConfigParser<Output, string>}
  * @category Parsers
+ * @since v0.3.0
  */
 export function stringParser<Output extends string = string>(postValidate?: PostValidate<Output, string>): IConfigParser<Output, string> {
 	return {
 		name: 'stringParser',
-		parse: async (key: string, value: string): Promise<string> => {
+		parse: (key: string, value: string) => {
 			return getString(value).unwrap(() => new TypeError(`value for key ${key} is not a string`));
 		},
 		postValidate,
-		preValidate: async (key: string, value: string): Promise<void> => {
+		preValidate: (key: string, value: string) => {
 			if (typeof value !== 'string') {
 				throw new TypeError(`value for key ${key} is not a string`);
 			}

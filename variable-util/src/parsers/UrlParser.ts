@@ -1,5 +1,5 @@
 import 'url-polyfill';
-import {IConfigParser} from '../interfaces/IConfigParser';
+import {type IConfigParser} from '../interfaces/IConfigParser';
 
 /**
  * Properties for the UrlParser
@@ -13,6 +13,7 @@ export interface UrlParserProps {
  * @class UrlParser
  * @implements {IConfigParser<URL, URL>}
  * @category Parsers
+ * @since v0.2.5
  */
 export class UrlParser implements IConfigParser<URL, URL> {
 	public name = 'urlParser';
@@ -29,9 +30,9 @@ export class UrlParser implements IConfigParser<URL, URL> {
 		this.urlSanitize = urlSanitize || false;
 	}
 
-	public parse(key: string, value: string): Promise<URL> {
+	public parse(key: string, value: string): URL {
 		try {
-			return Promise.resolve(new URL(value));
+			return new URL(value);
 		} catch (err) {
 			throw err instanceof Error ? err : new Error('unknown error');
 		}

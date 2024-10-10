@@ -1,8 +1,8 @@
-import {IConfigLoader, IConfigParser} from './interfaces/';
-import {ConfigOptions} from './ConfigOptions';
-import {FormatParameters} from './lib/formatUtils';
+import {type IConfigLoader, type IConfigParser} from './interfaces/';
+import {type ConfigOptions} from './ConfigOptions';
+import {type FormatParameters} from './lib/formatUtils';
 import {getConfigObject} from './getConfigObject';
-import {Loadable} from './types/Loadable';
+import {type Loadable} from './types/Loadable';
 
 /**
  * get config variable from loaders
@@ -26,7 +26,7 @@ export async function getConfigVariable<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
-	defaultValueLoadable?: Loadable<Output> | undefined,
+	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
 ): Promise<Output | undefined>;
@@ -34,9 +34,9 @@ export async function getConfigVariable<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
-	defaultValueLoadable?: Loadable<Output> | undefined,
+	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
 ): Promise<Output | undefined> {
-	return (await getConfigObject(rootKey, loaders, parser, defaultValueLoadable, params, options))?.value;
+	return (await getConfigObject(rootKey, loaders, parser, defaultValueLoadable, params, options)).value;
 }

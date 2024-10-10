@@ -1,9 +1,9 @@
-import {buildOptions, ConfigOptions} from './ConfigOptions';
-import {Err, Ok, Result} from '@luolapeikko/result-option';
+import {buildOptions, type ConfigOptions} from './ConfigOptions';
+import {Err, type IResult, Ok} from '@luolapeikko/result-option';
 import type {ILoggerLike, ISetOptionalLogger} from '@avanio/logger-like';
-import {EnvMapSchema} from './types/EnvMapSchema';
+import {type EnvMapSchema} from './types/EnvMapSchema';
 import {getConfigObject} from './getConfigObject';
-import {LoaderTypeValueStrict} from './types/TypeValue';
+import {type LoaderTypeValueStrict} from './types/TypeValue';
 import {VariableError} from './VariableError';
 
 /**
@@ -27,6 +27,7 @@ export type TypeValueRecords<T> = Record<keyof T, LoaderTypeValueStrict<T[keyof 
  * 	 URL: {loaders: [env()], parser: new UrlParser({urlSanitize: true}), defaultValue: new URL('http://localhost:3000')},
  * });
  * console.log('port', await config.get('PORT'));
+ * @since v0.6.0
  */
 export class ConfigMap<Data extends Record<string, unknown>> implements ISetOptionalLogger {
 	private schema: EnvMapSchema<Data>;
@@ -58,6 +59,7 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 */
 	public async getObject<Key extends keyof Data = keyof Data>(key: Key): Promise<LoaderTypeValueStrict<Data[Key]>> {
 		const entry = this.schema[key];
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (!entry) {
 			throw new VariableError(`ConfigMap key ${String(key)} not found in config map`);
 		}
@@ -83,7 +85,7 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * 	 console.log(type, value); // 'env', 3000
 	 * }
 	 */
-	public async getObjectResult<Key extends keyof Data = keyof Data>(key: Key): Promise<Result<LoaderTypeValueStrict<Data[Key]>>> {
+	public async getObjectResult<Key extends keyof Data = keyof Data>(key: Key): Promise<IResult<LoaderTypeValueStrict<Data[Key]>>> {
 		try {
 			return Ok(await this.getObject(key));
 		} catch (err) {
@@ -120,7 +122,7 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * 	 console.log('port', port.ok());
 	 * }
 	 */
-	public async getResult<Key extends keyof Data = keyof Data>(key: Key): Promise<Result<Data[Key]>> {
+	public async getResult<Key extends keyof Data = keyof Data>(key: Key): Promise<IResult<Data[Key]>> {
 		try {
 			return Ok(await this.get(key));
 		} catch (err) {
@@ -137,7 +139,7 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * 	 console.log('port', port.ok());
 	 * }
 	 */
-	public async getStringResult<Key extends keyof Data = keyof Data>(key: Key): Promise<Result<undefined extends Data[Key] ? string | undefined : string>> {
+	public async getStringResult<Key extends keyof Data = keyof Data>(key: Key): Promise<IResult<undefined extends Data[Key] ? string | undefined : string>> {
 		try {
 			return Ok(await this.getString(key));
 		} catch (err) {
@@ -154,7 +156,7 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 */
 	public async getAllObjects(): Promise<TypeValueRecords<Data>> {
 		const values = await this.getAllPromises();
-		return values.reduce((result, [key, value]) => {
+		return values.reduce<TypeValueRecords<Data>>((result, [key, value]) => {
 			result[key] = value;
 			return result;
 		}, {} as TypeValueRecords<Data>);
@@ -169,7 +171,7 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 */
 	public async getAllValues(): Promise<Data> {
 		const values = await this.getAllPromises();
-		return values.reduce((result, [key, value]) => {
+		return values.reduce<Data>((result, [key, value]) => {
 			result[key] = value.value;
 			return result;
 		}, {} as Data);
@@ -209,7 +211,7 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	private getAllPromises(): Promise<[keyof Data, LoaderTypeValueStrict<Data[keyof Data]>][]> {
 		return Promise.all(
 			(Object.keys(this.schema) as (keyof Data)[]).map<Promise<[keyof Data, LoaderTypeValueStrict<Data[keyof Data]>]>>(async (key) => {
-				return [key, await this.getObject(key as keyof Data)];
+				return [key, await this.getObject(key)];
 			}),
 		);
 	}

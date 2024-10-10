@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 /**
  * Argument can be a value, a promise or a function that returns a value or a promise.
  */

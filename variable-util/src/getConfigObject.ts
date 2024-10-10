@@ -1,10 +1,10 @@
-import {buildOptions, ConfigOptions} from './ConfigOptions';
+import {buildOptions, type ConfigOptions} from './ConfigOptions';
 import {handleLoader, printLog} from './loaderUtils';
-import {IConfigLoader, IConfigParser} from './interfaces/';
-import {LoaderTypeValue, LoaderTypeValueStrict} from './types/TypeValue';
-import {FormatParameters} from './lib/formatUtils';
+import {type IConfigLoader, type IConfigParser} from './interfaces/';
+import {type LoaderTypeValue, type LoaderTypeValueStrict} from './types/TypeValue';
+import {type FormatParameters} from './lib/formatUtils';
 import {handleSeen} from './lib/seenUtils';
-import {Loadable} from './types/Loadable';
+import {type Loadable} from './types/Loadable';
 import {VariableError} from './VariableError';
 
 /**
@@ -45,7 +45,7 @@ export async function getConfigObject<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
-	defaultValueLoadable?: Loadable<Output> | undefined,
+	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
 ): Promise<LoaderTypeValue<Output>>;
@@ -53,7 +53,7 @@ export async function getConfigObject<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
 	parser: IConfigParser<Output, unknown>,
-	defaultValueLoadable?: Loadable<Output> | undefined,
+	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
 ): Promise<LoaderTypeValue<Output>> {
@@ -65,10 +65,12 @@ export async function getConfigObject<Output>(
 	 */
 	if (defaultValueLoadable !== undefined) {
 		try {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 			const value = await (typeof defaultValueLoadable === 'function' ? defaultValueLoadable() : defaultValueLoadable);
 			if (value === undefined) {
 				throw new VariableError('default value is empty');
 			}
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			defaultValue = value;
 			type = 'default';
 		} catch (err) {

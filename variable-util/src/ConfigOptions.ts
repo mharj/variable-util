@@ -1,4 +1,4 @@
-import {ILoggerLike} from '@avanio/logger-like';
+import {type ILoggerLike} from '@avanio/logger-like';
 import {resolveLogger} from './logger';
 
 export type ConfigOptions = {

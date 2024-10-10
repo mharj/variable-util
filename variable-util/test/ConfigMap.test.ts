@@ -9,8 +9,8 @@ import * as dotenv from 'dotenv';
 import * as sinon from 'sinon';
 import * as z from 'zod';
 import {arrayParser, booleanParser, ConfigMap, env, integerParser, setLogger, stringParser, UrlParser, validLiteral} from '../src/';
-import {testObjectFinalSchema, testObjectParser, TestObjectType} from './testObjectParse';
-import {Result} from '@luolapeikko/result-option';
+import {testObjectFinalSchema, testObjectParser, type TestObjectType} from './testObjectParse';
+import {type IResult} from '@luolapeikko/result-option';
 import {URL} from 'url';
 
 dotenv.config();
@@ -133,7 +133,7 @@ describe('ConfigMap', () => {
 		it('should return CONSTANT env value', async function () {
 			const call: Promise<string[]> = config.get('ARRAY');
 			await expect(call).to.be.eventually.eql(['a', 'b', 'c']);
-			expect(infoSpy.args[0][0]).to.be.eq('ConfigVariables:Demo[default]: ARRAY [a;b;c] from default');
+			expect(infoSpy.args[0]?.[0]).to.be.eq('ConfigVariables:Demo[default]: ARRAY [a;b;c] from default');
 		});
 	});
 	describe('getString', () => {
@@ -162,53 +162,53 @@ describe('ConfigMap', () => {
 			await expect(call).to.be.eventually.eq('https://www.google.com/');
 		});
 	});
-	describe('getStringResult', () => {
+	describe('getStringIResult', () => {
 		it('should return PORT env value', async function () {
 			process.env.PORT = '6000';
-			const call: Result<string, unknown> = await config.getStringResult('PORT');
+			const call: IResult<string> = await config.getStringResult('PORT');
 			expect(call.ok()).to.be.eq('6000');
 		});
 		it('should return HOST env value', async function () {
 			process.env.HOST = 'minecraft';
-			const call: Result<string, unknown> = await config.getStringResult('HOST');
+			const call: IResult<string> = await config.getStringResult('HOST');
 			expect(call.ok()).to.be.eq('minecraft');
 		});
 		it('should return DEBUG env value', async function () {
 			process.env.DEBUG = 'true';
-			const call: Result<string | undefined, unknown> = await config.getStringResult('DEBUG');
+			const call: IResult<string | undefined> = await config.getStringResult('DEBUG');
 			expect(call.ok()).to.be.eq('true');
 		});
 		it('should return DEMO env value', async function () {
-			const call: Result<string | undefined, unknown> = await config.getStringResult('DEMO');
+			const call: IResult<string | undefined> = await config.getStringResult('DEMO');
 			expect(call.ok()).to.be.eq(undefined);
 		});
 		it('should return URL env value', async function () {
 			process.env.URL = 'https://www.google.com/';
-			const call: Result<string | undefined, unknown> = await config.getStringResult('URL');
+			const call: IResult<string | undefined> = await config.getStringResult('URL');
 			expect(call.ok()).to.be.eq('https://www.google.com/');
 		});
 	});
-	describe('getResult', () => {
+	describe('getIResult', () => {
 		it('should return PORT env value', async function () {
 			process.env.PORT = '6000';
-			const call: Result<number> = await config.getResult('PORT');
+			const call: IResult<number> = await config.getResult('PORT');
 			expect(call.ok()).to.be.eq(6000);
 		});
 		it('should return HOST env value', async function () {
 			process.env.HOST = 'minecraft';
-			const call: Result<string> = await config.getResult('HOST');
+			const call: IResult<string> = await config.getResult('HOST');
 			expect(call.ok()).to.be.eq('minecraft');
 		});
 		it('should return DEBUG env value', async function () {
 			process.env.DEBUG = 'true';
-			const call: Result<boolean> = await config.getResult('DEBUG');
+			const call: IResult<boolean> = await config.getResult('DEBUG');
 			expect(call.ok()).to.be.eq(true);
 		});
 		it('should return URL env value', async function () {
 			process.env.URL = 'https://asd:qwe@www.google.com';
-			const call: Result<URL> = await config.getResult('URL');
+			const call: IResult<URL> = await config.getResult('URL');
 			expect(call.ok()?.href).to.be.eql(new URL('https://asd:qwe@www.google.com').href);
-			expect(infoSpy.args[0][0]).to.be.eq('ConfigVariables:Demo[env]: URL [https://***:***@www.google.com/] from process.env.URL');
+			expect(infoSpy.args[0]?.[0]).to.be.eq('ConfigVariables:Demo[env]: URL [https://***:***@www.google.com/] from process.env.URL');
 		});
 	});
 	describe('getAll', () => {
