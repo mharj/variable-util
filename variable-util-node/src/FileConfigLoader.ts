@@ -1,5 +1,9 @@
 import {AbstractFileRecordLoader, type AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
 
+/**
+ * A file-based configuration loader that reads a JSON file.
+ * @since v0.9.1
+ */
 export class FileConfigLoader extends AbstractFileRecordLoader<AbstractFileRecordLoaderOptions<'json'>> {
 	public readonly type = 'file';
 	protected defaultOptions: AbstractFileRecordLoaderOptions<'json'> = {

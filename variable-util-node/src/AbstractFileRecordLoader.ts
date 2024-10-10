@@ -4,6 +4,10 @@ import {getError} from './errorUtil';
 import type {ILoggerLike} from '@avanio/logger-like';
 import {readFile} from 'fs/promises';
 
+/**
+ * Options for the AbstractFileRecordLoader.
+ * @since v0.8.0
+ */
 export interface AbstractFileRecordLoaderOptions<FileType extends string> extends IConfigLoaderProps {
 	fileType: FileType;
 	/** file name to load */
@@ -33,6 +37,10 @@ export interface AbstractFileRecordLoaderOptions<FileType extends string> extend
 	validate: ValidateCallback<Record<string, string | undefined>, Record<string, string | undefined>> | undefined;
 }
 
+/**
+ * Abstract class for loading records from a file.
+ * @since v0.8.0
+ */
 export abstract class AbstractFileRecordLoader<
 	Options extends AbstractFileRecordLoaderOptions<string> = AbstractFileRecordLoaderOptions<string>,
 > extends RecordConfigLoader<string | undefined, Partial<Options>, Options> {
@@ -95,7 +103,7 @@ export abstract class AbstractFileRecordLoader<
 			}
 			this.handleFileWatch(options); // add watch after successful load
 			return data;
-		} catch (err) {
+		} catch (_err) {
 			const msg = this.buildErrorStr(`file ${options.fileName} is not a valid ${options.fileType}`);
 			if (options.isSilent) {
 				options.logger?.info(msg);

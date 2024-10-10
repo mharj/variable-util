@@ -82,7 +82,7 @@ describe('config variable', () => {
 		it('should return error when isSilent = false and file not exists', async function () {
 			const fileEnv = new FileConfigLoader({fileName: './test/testSettings99.json', isSilent: false}).getLoader;
 			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq(undefined);
-			expect(errorSpy.calledOnce).to.be.true;
+			expect(errorSpy.calledOnce).to.be.eq(true);
 		});
 
 		it('should fail to load not existing file', async function () {
@@ -122,7 +122,7 @@ describe('config variable', () => {
 		it('should return error when isSilent = false and file not exists', async function () {
 			const dockerEnv = new DockerSecretsConfigLoader({path: './test', fileLowerCase: true, isSilent: false}).getLoader;
 			expect(await getConfigVariable('DOCKERSECRET99', [dockerEnv()], stringParser(), undefined, {showValue: true})).to.be.eq(undefined);
-			expect(errorSpy.calledOnce).to.be.true;
+			expect(errorSpy.calledOnce).to.be.eq(true);
 		});
 	});
 	describe('DotEnv loader', () => {

@@ -3,6 +3,7 @@ import {parse} from 'dotenv';
 
 /**
  * Loader for dotenv files, using the `dotenv` packages parser.
+ * @since v0.6.1
  */
 export class DotEnvLoader extends AbstractFileRecordLoader {
 	public readonly type = 'dotenv';

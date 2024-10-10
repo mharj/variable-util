@@ -17,6 +17,10 @@ export interface DockerSecretsConfigLoaderOptions {
 	disabled: boolean;
 }
 
+/**
+ * Loader for docker secrets, reads secrets from the `/run/secrets` directory.
+ * @since v0.8.0
+ */
 export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined, Partial<DockerSecretsConfigLoaderOptions>, DockerSecretsConfigLoaderOptions> {
 	public readonly type = 'docker-secrets';
 	private valuePromises: Record<string, Promise<string | undefined> | undefined> = {};
