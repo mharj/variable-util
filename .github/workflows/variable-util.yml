@@ -4,10 +4,12 @@ on:
     branches: [main]
     paths:
       - "variable-util/**"
+      - ".github/workflows/variable-util.yml"
   pull_request:
     branches: [main]
     paths:
       - "variable-util/**"
+      - ".github/workflows/variable-util.yml"
 
 env:
   # Setting an environment variable with the value of a configuration variable
