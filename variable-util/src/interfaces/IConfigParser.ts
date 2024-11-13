@@ -5,6 +5,16 @@
 export type PostValidate<Output, RawOutput> = (key: string, value: RawOutput) => Promise<Output | undefined>;
 
 /**
+ * String encoder options for parsers
+ */
+export type EncodeOptions = {
+	/**
+	 * use URI encoding for string outputs (used by semicolon parser)
+	 */
+	uriEncode?: boolean;
+};
+
+/**
  * Interface for config parsers
  * @template Output - Type of output
  * @template RawOutput - Type of raw output
@@ -37,7 +47,7 @@ export interface IConfigParser<Output, RawOutput> {
 	/**
 	 * Build readable string from value
 	 */
-	toString(value: Output): string;
+	toString(value: Output, options?: EncodeOptions): string;
 
 	/**
 	 * Optional build readable string from value for log (can hide sensitive part from logs) else toString is used

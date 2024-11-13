@@ -1,5 +1,5 @@
+import {type EncodeOptions, type IConfigParser} from '../interfaces/IConfigParser';
 import {logStringifySemicolonConfig, parseSemicolonConfig, stringifySemicolonConfig} from '../lib/semicolonUtils';
-import {type IConfigParser} from '../interfaces/IConfigParser';
 import {type ShowValueType} from '../lib';
 import {type ValidateCallback} from '../interfaces/IValidate';
 
@@ -53,8 +53,8 @@ export class SemicolonConfigParser<Out extends OutConfigParseType = OutConfigPar
 		return await this.validate?.(value);
 	}
 
-	public toString(value: Out): string {
-		return stringifySemicolonConfig(value);
+	public toString(value: Out, options?: EncodeOptions): string {
+		return stringifySemicolonConfig(value, options?.uriEncode);
 	}
 
 	public toLogString(value: Out): string {

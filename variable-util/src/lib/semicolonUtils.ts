@@ -42,11 +42,14 @@ export function parseSemicolonConfig(config: string, keepCase = true): Record<st
  * @example
  * stringifySemicolonConfig({a: 'b', c: 'd'}) // 'a=b;c=d'
  */
-export function stringifySemicolonConfig(config: Record<string, unknown>): string {
+export function stringifySemicolonConfig(config: Record<string, unknown>, uriEncode = true): string {
 	return Object.entries(config)
 		.reduce<string[]>((last, [key, value]) => {
 			if (value !== undefined) {
-				const encodedValue = encodeURIComponent(String(value));
+				const encodedValue = uriEncode ? encodeURIComponent(String(value)) : String(value);
+				if (!uriEncode) {
+					console.log('encodedValue', encodedValue);
+				}
 				last.push(`${key}=${encodedValue}`);
 			}
 			return last;

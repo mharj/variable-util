@@ -1,6 +1,6 @@
 import {buildOptions, type ConfigOptions} from './ConfigOptions';
+import {type EncodeOptions, type IConfigLoader, type IConfigParser} from './interfaces/';
 import {handleLoader, printLog} from './loaderUtils';
-import {type IConfigLoader, type IConfigParser} from './interfaces/';
 import {type LoaderTypeValue, type LoaderTypeValueStrict} from './types/TypeValue';
 import {type FormatParameters} from './lib/formatUtils';
 import {handleSeen} from './lib/seenUtils';
@@ -40,6 +40,7 @@ export async function getConfigObject<Output>(
 	defaultValueLoadable: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
+	encodeOptions?: EncodeOptions,
 ): Promise<LoaderTypeValueStrict<Output>>;
 export async function getConfigObject<Output>(
 	rootKey: string,
@@ -48,6 +49,7 @@ export async function getConfigObject<Output>(
 	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
+	encodeOptions?: EncodeOptions,
 ): Promise<LoaderTypeValue<Output>>;
 export async function getConfigObject<Output>(
 	rootKey: string,
@@ -56,6 +58,7 @@ export async function getConfigObject<Output>(
 	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
+	encodeOptions?: EncodeOptions,
 ): Promise<LoaderTypeValue<Output>> {
 	const currentOptions = buildOptions(options);
 	let defaultValue: Output | undefined;
@@ -81,7 +84,7 @@ export async function getConfigObject<Output>(
 	for (const loader of loaders) {
 		let output: LoaderTypeValue<Output> | undefined;
 		try {
-			output = await handleLoader(rootKey, loader, parser, params, currentOptions);
+			output = await handleLoader(rootKey, loader, parser, params, currentOptions, encodeOptions);
 		} catch (err) {
 			currentOptions.logger?.error(err);
 		}
@@ -91,7 +94,7 @@ export async function getConfigObject<Output>(
 	}
 	let stringValue: string | undefined;
 	if (defaultValue !== undefined) {
-		stringValue = parser.toString(defaultValue);
+		stringValue = parser.toString(defaultValue, encodeOptions);
 		if (!handleSeen(defaultValueSeenMap, rootKey, stringValue)) {
 			printLog(currentOptions, 'default', rootKey, stringValue, 'default', params);
 		}

@@ -8,7 +8,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 import * as sinon from 'sinon';
 import * as z from 'zod';
-import {arrayParser, booleanParser, ConfigMap, env, integerParser, setLogger, stringParser, UrlParser, validLiteral} from '../src/';
+import {arrayParser, booleanParser, ConfigMap, env, integerParser, MemoryConfigLoader, setLogger, stringParser, UrlParser, validLiteral} from '../src/';
 import {testObjectFinalSchema, testObjectParser, type TestObjectType} from './testObjectParse';
 import {type IResult} from '@luolapeikko/result-option';
 import {URL} from 'url';
@@ -55,22 +55,33 @@ const testEnvSchema = z.object({
 	ARRAY: z.array(z.string()),
 });
 
+const memoryEnv = new MemoryConfigLoader<{PORT?: string}>(
+	{
+		PORT: undefined,
+	},
+	{logger: spyLogger},
+);
+// eslint-disable-next-line @typescript-eslint/unbound-method
+const memEnv = memoryEnv.getLoader;
+
+const loaders = [memEnv(), env()];
+
 const config = new ConfigMap<TestEnv>(
 	{
-		DEBUG: {loaders: [env()], parser: booleanParser(), defaultValue: false},
-		DEMO: {loaders: [env()], parser: stringParser()},
-		HOST: {loaders: [env()], parser: stringParser(), defaultValue: 'localhost'},
-		PORT: {loaders: [env()], parser: integerParser(), defaultValue: 3000},
+		DEBUG: {loaders, parser: booleanParser(), defaultValue: false},
+		DEMO: {loaders, parser: stringParser()},
+		HOST: {loaders, parser: stringParser(), defaultValue: 'localhost'},
+		PORT: {loaders, parser: integerParser(), defaultValue: 3000},
 		URL: {
-			loaders: [env()],
+			loaders,
 			parser: new UrlParser({urlSanitize: true}),
 			defaultValue: new URL('http://localhost:3000'),
 			params: {showValue: true},
 		},
-		CONSTANT: {loaders: [env()], parser: stringParser(validLiteral(['constant'] as const)), defaultValue: 'constant'},
-		TEST_OBJECT: {loaders: [env()], parser: testObjectParser, defaultValue: {First: false, Second: false, Third: true}},
-		NOT_EXISTS: {loaders: [env()], parser: stringParser(), undefinedThrowsError: true, undefinedErrorMessage: 'add NOT_EXISTS to env'},
-		ARRAY: {loaders: [env()], parser: arrayParser(stringParser()), defaultValue: ['a', 'b', 'c'], params: {showValue: true}},
+		CONSTANT: {loaders, parser: stringParser(validLiteral(['constant'] as const)), defaultValue: 'constant'},
+		TEST_OBJECT: {loaders, parser: testObjectParser, defaultValue: {First: false, Second: false, Third: true}},
+		NOT_EXISTS: {loaders, parser: stringParser(), undefinedThrowsError: true, undefinedErrorMessage: 'add NOT_EXISTS to env'},
+		ARRAY: {loaders, parser: arrayParser(stringParser()), defaultValue: ['a', 'b', 'c'], params: {showValue: true}},
 	},
 	{namespace: 'Demo'},
 );
@@ -134,6 +145,15 @@ describe('ConfigMap', () => {
 			const call: Promise<string[]> = config.get('ARRAY');
 			await expect(call).to.be.eventually.eql(['a', 'b', 'c']);
 			expect(infoSpy.args[0]?.[0]).to.be.eq('ConfigVariables:Demo[default]: ARRAY [a;b;c] from default');
+		});
+		it('should return PORT env value', async function () {
+			process.env.PORT = '6000';
+			await expect(config.get('PORT')).to.be.eventually.eq(6000);
+			await memoryEnv.set('PORT', '7000');
+			await expect(config.get('PORT')).to.be.eventually.eq(7000);
+			await memoryEnv.set('PORT', undefined);
+			await expect(config.get('PORT')).to.be.eventually.eq(6000);
+			process.env.PORT = undefined;
 		});
 	});
 	describe('getString', () => {

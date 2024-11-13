@@ -1,6 +1,7 @@
 import {buildOptions, type ConfigOptions} from './ConfigOptions';
 import {Err, type IResult, Ok} from '@luolapeikko/result-option';
 import type {ILoggerLike, ISetOptionalLogger} from '@avanio/logger-like';
+import {type EncodeOptions} from './interfaces/IConfigParser';
 import {type EnvMapSchema} from './types/EnvMapSchema';
 import {getConfigObject} from './getConfigObject';
 import {type LoaderTypeValueStrict} from './types/TypeValue';
@@ -57,7 +58,7 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * const valueObject: LoaderTypeValue<number> = await config.getObject('PORT');
 	 * console.log(valueObject.type, valueObject.value); // 'env', 3000
 	 */
-	public async getObject<Key extends keyof Data = keyof Data>(key: Key): Promise<LoaderTypeValueStrict<Data[Key]>> {
+	public async getObject<Key extends keyof Data = keyof Data>(key: Key, encodeOptions?: EncodeOptions): Promise<LoaderTypeValueStrict<Data[Key]>> {
 		const entry = this.schema[key];
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (!entry) {
@@ -67,7 +68,9 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 			throw new VariableError(`ConfigMap key ${String(key)} is not a string`);
 		}
 		const {loaders, parser, defaultValue, params, undefinedThrowsError, undefinedErrorMessage} = entry;
-		const configObject = (await getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params, this.options)) as LoaderTypeValueStrict<Data[Key]>;
+		const configObject = (await getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params, this.options, encodeOptions)) as LoaderTypeValueStrict<
+			Data[Key]
+		>;
 		if (undefinedThrowsError && configObject.value === undefined) {
 			buildOptions(this.options).logger?.info(`ConfigMap key ${String(key)} is undefined (expect to throw error)`);
 			throw new VariableError(undefinedErrorMessage || `ConfigMap key ${String(key)} is undefined`);
@@ -85,9 +88,12 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * 	 console.log(type, value); // 'env', 3000
 	 * }
 	 */
-	public async getObjectResult<Key extends keyof Data = keyof Data>(key: Key): Promise<IResult<LoaderTypeValueStrict<Data[Key]>>> {
+	public async getObjectResult<Key extends keyof Data = keyof Data>(
+		key: Key,
+		encodeOptions?: EncodeOptions,
+	): Promise<IResult<LoaderTypeValueStrict<Data[Key]>>> {
 		try {
-			return Ok(await this.getObject(key));
+			return Ok(await this.getObject(key, encodeOptions));
 		} catch (err) {
 			return Err(err);
 		}
@@ -109,8 +115,11 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * @example
 	 * const port: string = await config.getString('PORT');
 	 */
-	public async getString<Key extends keyof Data = keyof Data>(key: Key): Promise<undefined extends Data[Key] ? string | undefined : string> {
-		return (await this.getObject(key)).stringValue;
+	public async getString<Key extends keyof Data = keyof Data>(
+		key: Key,
+		encodeOptions?: EncodeOptions,
+	): Promise<undefined extends Data[Key] ? string | undefined : string> {
+		return (await this.getObject(key, encodeOptions)).stringValue;
 	}
 
 	/**
@@ -139,9 +148,12 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * 	 console.log('port', port.ok());
 	 * }
 	 */
-	public async getStringResult<Key extends keyof Data = keyof Data>(key: Key): Promise<IResult<undefined extends Data[Key] ? string | undefined : string>> {
+	public async getStringResult<Key extends keyof Data = keyof Data>(
+		key: Key,
+		encodeOptions?: EncodeOptions,
+	): Promise<IResult<undefined extends Data[Key] ? string | undefined : string>> {
 		try {
-			return Ok(await this.getString(key));
+			return Ok(await this.getString(key, encodeOptions));
 		} catch (err) {
 			return Err(err);
 		}
@@ -184,8 +196,8 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * const values: Record<keyof Data, string> = await config.getAllStringValues();
 	 * console.log('PORT', values.PORT); // '3000' (string)
 	 */
-	public async getAllStringValues(): Promise<Record<keyof Data, string>> {
-		const values = await this.getAllPromises();
+	public async getAllStringValues(encodeOptions?: EncodeOptions): Promise<Record<keyof Data, string>> {
+		const values = await this.getAllPromises(encodeOptions);
 		return values.reduce<Record<keyof Data, string>>(
 			(result, [key, value]) => {
 				result[key] = value.stringValue;
@@ -208,10 +220,10 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	/**
 	 * run lookup to all keys and return all promises
 	 */
-	private getAllPromises(): Promise<[keyof Data, LoaderTypeValueStrict<Data[keyof Data]>][]> {
+	private getAllPromises(encodeOptions?: EncodeOptions): Promise<[keyof Data, LoaderTypeValueStrict<Data[keyof Data]>][]> {
 		return Promise.all(
 			(Object.keys(this.schema) as (keyof Data)[]).map<Promise<[keyof Data, LoaderTypeValueStrict<Data[keyof Data]>]>>(async (key) => {
-				return [key, await this.getObject(key)];
+				return [key, await this.getObject(key, encodeOptions)];
 			}),
 		);
 	}

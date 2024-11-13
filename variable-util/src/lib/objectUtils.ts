@@ -17,6 +17,7 @@ export function buildStringObject(obj: Record<string, unknown>): Record<string, 
 		if (value === undefined || value === null) {
 			last[key] = undefined;
 		} else {
+			// eslint-disable-next-line @typescript-eslint/no-base-to-string
 			last[key] = String(value);
 		}
 		return last;

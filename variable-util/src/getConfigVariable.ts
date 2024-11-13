@@ -1,4 +1,4 @@
-import {type IConfigLoader, type IConfigParser} from './interfaces/';
+import {type EncodeOptions, type IConfigLoader, type IConfigParser} from './interfaces/';
 import {type ConfigOptions} from './ConfigOptions';
 import {type FormatParameters} from './lib/formatUtils';
 import {getConfigObject} from './getConfigObject';
@@ -21,6 +21,7 @@ export async function getConfigVariable<Output>(
 	defaultValueLoadable: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
+	encodeOptions?: EncodeOptions,
 ): Promise<Output>;
 export async function getConfigVariable<Output>(
 	rootKey: string,
@@ -29,6 +30,7 @@ export async function getConfigVariable<Output>(
 	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
+	encodeOptions?: EncodeOptions,
 ): Promise<Output | undefined>;
 export async function getConfigVariable<Output>(
 	rootKey: string,
@@ -37,6 +39,7 @@ export async function getConfigVariable<Output>(
 	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
+	encodeOptions?: EncodeOptions,
 ): Promise<Output | undefined> {
-	return (await getConfigObject(rootKey, loaders, parser, defaultValueLoadable, params, options)).value;
+	return (await getConfigObject(rootKey, loaders, parser, defaultValueLoadable, params, options, encodeOptions)).value;
 }

@@ -55,6 +55,7 @@ export class JsonConfigParser<Out extends JsonParseType> implements IConfigParse
 					if (!this.keysToHide.includes(key)) {
 						last[key] = value;
 					} else {
+						// eslint-disable-next-line @typescript-eslint/no-base-to-string
 						last[key] = buildHiddenValue(String(value), this.showValue);
 					}
 				}

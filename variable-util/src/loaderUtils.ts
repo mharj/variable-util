@@ -1,5 +1,5 @@
+import {type EncodeOptions, type IConfigLoader, type IConfigParser} from './interfaces';
 import {type FormatParameters, printValue} from './lib/formatUtils';
-import {type IConfigLoader, type IConfigParser} from './interfaces';
 import {type LoaderTypeValue} from './types/TypeValue';
 import {type SolvedConfigOptions} from './ConfigOptions';
 import {VariableError} from './VariableError';
@@ -122,6 +122,7 @@ export async function handleLoader<Output, RawOutput = unknown>(
 	parser: IConfigParser<Output, RawOutput>,
 	params: FormatParameters | undefined,
 	options: SolvedConfigOptions,
+	encodeOptions: EncodeOptions | undefined,
 ): Promise<LoaderTypeValue<Output> | undefined> {
 	try {
 		const {type, result} = await loader.callback(rootKey);
@@ -163,7 +164,7 @@ export async function handleLoader<Output, RawOutput = unknown>(
 			/**
 			 * print log
 			 */
-			const stringValue = parser.toString(output);
+			const stringValue = parser.toString(output, encodeOptions);
 			if (!seen) {
 				const logValue = parser.toLogString?.(output) ?? stringValue;
 				printLog(options, loader.type, rootKey, logValue, path, params);
