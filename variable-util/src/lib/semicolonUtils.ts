@@ -47,9 +47,6 @@ export function stringifySemicolonConfig(config: Record<string, unknown>, uriEnc
 		.reduce<string[]>((last, [key, value]) => {
 			if (value !== undefined) {
 				const encodedValue = uriEncode ? encodeURIComponent(String(value)) : String(value);
-				if (!uriEncode) {
-					console.log('encodedValue', encodedValue);
-				}
 				last.push(`${key}=${encodedValue}`);
 			}
 			return last;
