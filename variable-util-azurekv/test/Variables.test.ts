@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import 'mocha';
 import * as dotenv from 'dotenv';
 import * as sinon from 'sinon';
+import {beforeAll, beforeEach, describe, expect, it} from 'vitest';
 import {getConfigVariable, setLogger, UrlParser, urlSanitize} from '@avanio/variable-util';
 import {AzureSecretsConfigLoader} from '../src/';
 import {DefaultAzureCredential} from '@azure/identity';
-import {expect} from 'chai';
 import {type ILoggerLike} from '@avanio/logger-like';
 
 dotenv.config();
@@ -29,10 +28,10 @@ setLogger(debugLogger);
 let mongoUrl: URL;
 let mongoString: string;
 
-describe('az key vault config variable', () => {
-	before(function () {
+describe('az key vault config variable', {skip: !process.env.KV_URI || !process.env.KV_MONGO_KEY || !process.env.MONGO_URL}, () => {
+	beforeAll(function () {
 		if (!process.env.KV_URI || !process.env.KV_MONGO_KEY || !process.env.MONGO_URL) {
-			this.skip();
+			return;
 		}
 		mongoUrl = new URL(process.env.MONGO_URL);
 		mongoString = urlSanitize(mongoUrl.href);
@@ -43,7 +42,6 @@ describe('az key vault config variable', () => {
 		}
 	});
 	it('should return fetch value', async function () {
-		this.timeout(600000);
 		const urlParser = new UrlParser({urlSanitize: true});
 		const fetchKvInstance = new AzureSecretsConfigLoader(() => ({
 			credentials: new DefaultAzureCredential(),

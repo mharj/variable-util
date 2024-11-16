@@ -16,15 +16,16 @@ export interface AzureSecretsConfigLoaderOptions extends IConfigLoaderProps {
 }
 
 export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined, AzureSecretsConfigLoaderOptions, AzureSecretsConfigLoaderOptions> {
-	public readonly type = 'azure-secrets';
+	public readonly type: Lowercase<string>;
 	private client: SecretClient | undefined;
 	private readonly valuePromises = new ExpireCache<Promise<{value: string | undefined; path: string}>>();
 
 	protected defaultOptions: undefined;
 
-	constructor(options: Loadable<AzureSecretsConfigLoaderOptions>) {
+	constructor(options: Loadable<AzureSecretsConfigLoaderOptions>, type: Lowercase<string> = 'azure-secrets') {
 		super(options);
 		this.options = options;
+		this.type = type;
 		void this.init();
 	}
 
