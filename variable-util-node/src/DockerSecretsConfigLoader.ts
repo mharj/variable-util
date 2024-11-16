@@ -22,7 +22,7 @@ export interface DockerSecretsConfigLoaderOptions {
  * @since v0.8.0
  */
 export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined, Partial<DockerSecretsConfigLoaderOptions>, DockerSecretsConfigLoaderOptions> {
-	public readonly type = 'docker-secrets';
+	public readonly type: Lowercase<string>;
 	private valuePromises: Record<string, Promise<string | undefined> | undefined> = {};
 	protected defaultOptions: DockerSecretsConfigLoaderOptions = {
 		disabled: false,
@@ -32,9 +32,10 @@ export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined, 
 		path: '/run/secrets',
 	};
 
-	public constructor(options: Loadable<Partial<DockerSecretsConfigLoaderOptions>>) {
+	public constructor(options: Loadable<Partial<DockerSecretsConfigLoaderOptions>>, type: Lowercase<string> = 'docker-secrets') {
 		super(options);
 		this.getLoader = this.getLoader.bind(this);
+		this.type = type;
 	}
 
 	protected async handleLoader(lookupKey: string, overrideKey?: string): Promise<LoaderValue> {

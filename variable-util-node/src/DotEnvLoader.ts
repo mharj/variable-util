@@ -1,4 +1,5 @@
 import {AbstractFileRecordLoader, type AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
+import {type Loadable} from '@avanio/variable-util';
 import {parse} from 'dotenv';
 
 /**
@@ -6,7 +7,13 @@ import {parse} from 'dotenv';
  * @since v0.6.1
  */
 export class DotEnvLoader extends AbstractFileRecordLoader {
-	public readonly type = 'dotenv';
+	public readonly type: Lowercase<string>;
+
+	public constructor(options: Loadable<Partial<AbstractFileRecordLoaderOptions<'env'>>>, type: Lowercase<string> = 'dotenv') {
+		super(options);
+		this.type = type;
+	}
+
 	protected defaultOptions: AbstractFileRecordLoaderOptions<'env'> = {
 		disabled: false,
 		fileName: '.env',

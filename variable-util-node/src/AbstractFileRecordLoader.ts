@@ -44,7 +44,7 @@ export interface AbstractFileRecordLoaderOptions<FileType extends string> extend
 export abstract class AbstractFileRecordLoader<
 	Options extends AbstractFileRecordLoaderOptions<string> = AbstractFileRecordLoaderOptions<string>,
 > extends RecordConfigLoader<string | undefined, Partial<Options>, Options> {
-	abstract readonly type: string;
+	abstract readonly type: Lowercase<string>;
 	private watcher: FSWatcher | undefined;
 	private timeout: ReturnType<typeof setTimeout> | undefined;
 

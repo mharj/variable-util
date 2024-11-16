@@ -1,11 +1,18 @@
 import {AbstractFileRecordLoader, type AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
+import {type Loadable} from '@avanio/variable-util';
 
 /**
  * A file-based configuration loader that reads a JSON file.
  * @since v0.9.1
  */
 export class FileConfigLoader extends AbstractFileRecordLoader<AbstractFileRecordLoaderOptions<'json'>> {
-	public readonly type = 'file';
+	public readonly type: Lowercase<string>;
+
+	public constructor(options: Loadable<Partial<AbstractFileRecordLoaderOptions<'json'>>>, type: Lowercase<string> = 'file') {
+		super(options);
+		this.type = type;
+	}
+
 	protected defaultOptions: AbstractFileRecordLoaderOptions<'json'> = {
 		disabled: false,
 		fileName: 'config.json',
