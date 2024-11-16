@@ -1,4 +1,4 @@
-import {type IConfigParser, type PostValidate} from '../interfaces/IConfigParser';
+import {type IConfigParser, type ParserProps, type PostValidate, type PreValidateProps} from '../interfaces/IConfigParser';
 import {getBoolean} from '../lib/primitiveUtils';
 
 /**
@@ -20,11 +20,11 @@ import {getBoolean} from '../lib/primitiveUtils';
 export function booleanParser<Output extends boolean = boolean>(postValidate?: PostValidate<Output, boolean>): IConfigParser<Output, boolean> {
 	return {
 		name: 'booleanParser',
-		parse: (key: string, value: string) => {
+		parse: ({key, value}: ParserProps) => {
 			return getBoolean(value).unwrap(() => new TypeError(`value for key ${key} is not a boolean string`));
 		},
 		postValidate,
-		preValidate: (key: string, value: string) => {
+		preValidate: ({key, value}: PreValidateProps) => {
 			// allow boolean values to be passed in as getBoolean can handle them
 			if (typeof value === 'boolean') {
 				return;

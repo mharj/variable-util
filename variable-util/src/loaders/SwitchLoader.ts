@@ -37,15 +37,16 @@ export type SwitchConfigMap<Map extends Record<string, unknown>, Key extends str
  * @since v0.10.1
  */
 export class SwitchLoader<Config extends Record<string, unknown>, Key extends string> extends ConfigLoader<string, ISwitchLoaderProps> {
-	public readonly type = 'switch';
+	public readonly type: Lowercase<string>;
 	protected override defaultOptions: ISwitchLoaderProps | undefined;
 	private readonly config: Readonly<SwitchConfigMap<Config, Key>>;
 	private readonly keys = new Set<Key>();
 	private readonly seen = new Map<string, string>();
 
-	constructor(configs: SwitchConfigMap<Config, Key>, props: Loadable<ISwitchLoaderProps> = {}) {
+	constructor(configs: SwitchConfigMap<Config, Key>, props: Loadable<ISwitchLoaderProps> = {}, type: Lowercase<string> = 'switch') {
 		super(props);
 		this.config = configs;
+		this.type = type;
 	}
 
 	public async activateSwitch(key: Key) {

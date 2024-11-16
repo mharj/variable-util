@@ -1,5 +1,5 @@
 import {buildHiddenValue, type ShowValueType} from '../lib/formatUtils';
-import {type IConfigParser} from '../interfaces/IConfigParser';
+import {type IConfigParser, type ParserProps, type PostValidateProps} from '../interfaces/IConfigParser';
 import {type ValidateCallback} from '../interfaces/IValidate';
 
 /**
@@ -29,11 +29,11 @@ export class JsonConfigParser<Out extends JsonParseType> implements IConfigParse
 		this.showValue = showValue;
 	}
 
-	public parse(key: string, value: string) {
+	public parse({value}: ParserProps) {
 		return JSON.parse(value) as JsonParseType;
 	}
 
-	public async postValidate(key: string, value: JsonParseType): Promise<Out | undefined> {
+	public async postValidate({value}: PostValidateProps<JsonParseType>): Promise<Out | undefined> {
 		return await this.validate?.(value);
 	}
 

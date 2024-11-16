@@ -1,4 +1,4 @@
-import {type IConfigParser, type PostValidate} from '../interfaces';
+import {type IConfigParser, type ParserProps, type PostValidate} from '../interfaces';
 
 /**
  * Build parser for array of values
@@ -16,8 +16,8 @@ export function arrayParser<Output, RawOutput>(
 ): IConfigParser<Output[], RawOutput[]> {
 	return {
 		name: 'semicolonArrayParser',
-		parse: (key: string, value: string): Promise<RawOutput[]> => {
-			return Promise.all(value.split(separator).map((v) => parse.parse(key, v)));
+		parse: (props: ParserProps): Promise<RawOutput[]> => {
+			return Promise.all(props.value.split(separator).map((v) => parse.parse({...props, value: v})));
 		},
 		postValidate,
 		toString: (value: Output[]): string => {

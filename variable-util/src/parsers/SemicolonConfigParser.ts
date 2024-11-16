@@ -1,4 +1,4 @@
-import {type EncodeOptions, type IConfigParser} from '../interfaces/IConfigParser';
+import {type EncodeOptions, type IConfigParser, type ParserProps, type PostValidateProps} from '../interfaces/IConfigParser';
 import {logStringifySemicolonConfig, parseSemicolonConfig, stringifySemicolonConfig} from '../lib/semicolonUtils';
 import {type ShowValueType} from '../lib';
 import {type ValidateCallback} from '../interfaces/IValidate';
@@ -45,11 +45,11 @@ export class SemicolonConfigParser<Out extends OutConfigParseType = OutConfigPar
 		this.showValue = showValue;
 	}
 
-	public parse(key: string, value: string): Promise<RawType> {
+	public parse({value}: ParserProps): Promise<RawType> {
 		return Promise.resolve(parseSemicolonConfig(value, this.keepCase) as RawType);
 	}
 
-	public async postValidate(key: string, value: RawType): Promise<Out | undefined> {
+	public async postValidate({value}: PostValidateProps<RawType>): Promise<Out | undefined> {
 		return await this.validate?.(value);
 	}
 

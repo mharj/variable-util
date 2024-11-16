@@ -50,6 +50,7 @@
             }
         ],
         "deprecation/deprecation": "warn",
+        "no-void": "off",
 		"lines-between-class-members": "off",
 		"@stylistic/ts/lines-between-class-members": [
 			"warn",

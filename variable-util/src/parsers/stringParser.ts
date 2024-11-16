@@ -1,4 +1,4 @@
-import {type IConfigParser, type PostValidate} from '../interfaces/IConfigParser';
+import {type IConfigParser, type ParserProps, type PostValidate, type PreValidateProps} from '../interfaces/IConfigParser';
 import {getString} from '../lib/primitiveUtils';
 
 /**
@@ -12,11 +12,11 @@ import {getString} from '../lib/primitiveUtils';
 export function stringParser<Output extends string = string>(postValidate?: PostValidate<Output, string>): IConfigParser<Output, string> {
 	return {
 		name: 'stringParser',
-		parse: (key: string, value: string) => {
+		parse: ({value, key}: ParserProps) => {
 			return getString(value).unwrap(() => new TypeError(`value for key ${key} is not a string`));
 		},
 		postValidate,
-		preValidate: (key: string, value: string) => {
+		preValidate: ({key, value}: PreValidateProps) => {
 			if (typeof value !== 'string') {
 				throw new TypeError(`value for key ${key} is not a string`);
 			}

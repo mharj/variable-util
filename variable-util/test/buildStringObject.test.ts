@@ -1,8 +1,5 @@
-import 'mocha';
-import * as chai from 'chai';
+import {describe, expect, it} from 'vitest';
 import {buildStringObject} from '../src';
-
-const expect = chai.expect;
 
 describe('buildStringObject', function () {
 	it('should build valid object', function () {

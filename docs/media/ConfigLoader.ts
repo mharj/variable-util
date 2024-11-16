@@ -12,7 +12,7 @@ export interface IConfigLoaderProps {
  * @since v0.8.0
  */
 export abstract class ConfigLoader<HandlerParams, Props extends IConfigLoaderProps, DefaultProps extends Props = Props> {
-	public abstract type: string;
+	public abstract type: Lowercase<string>;
 	protected options: Loadable<Props>;
 	protected abstract defaultOptions: DefaultProps | undefined;
 

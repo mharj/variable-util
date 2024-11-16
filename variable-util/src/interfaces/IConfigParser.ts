@@ -1,11 +1,44 @@
+import {type IConfigLoader} from './IConfigLoader';
+
+/**
+ * Parser method props
+ * @since v0.11.0
+ */
+export type ParserProps = {
+	loader: IConfigLoader;
+	key: string;
+	value: string;
+};
+
+/**
+ * PreValidate method props
+ * @since v0.11.0
+ */
+export type PreValidateProps = {
+	loader: IConfigLoader;
+	key: string;
+	value: unknown;
+};
+
+/**
+ * PostValidate method props
+ * @since v0.11.0
+ */
+export type PostValidateProps<T> = {
+	loader: IConfigLoader;
+	key: string;
+	value: T;
+};
+
 /**
  * PreValidate function
- * @since v0.3.0
+ * @since v0.11.0
  */
-export type PostValidate<Output, RawOutput> = (key: string, value: RawOutput) => Promise<Output | undefined>;
+export type PostValidate<Output, RawOutput> = (postValidateProps: PostValidateProps<RawOutput>) => Promise<Output | undefined>;
 
 /**
  * String encoder options for parsers
+ * @since v0.11.0
  */
 export type EncodeOptions = {
 	/**
@@ -18,7 +51,7 @@ export type EncodeOptions = {
  * Interface for config parsers
  * @template Output - Type of output
  * @template RawOutput - Type of raw output
- * @since v0.3.1
+ * @since v0.11.0
  */
 export interface IConfigParser<Output, RawOutput> {
 	/**
@@ -30,19 +63,19 @@ export interface IConfigParser<Output, RawOutput> {
 	 * Config parser function
 	 * @throws Error if parsing fails
 	 */
-	parse(key: string, value: string): RawOutput | Promise<RawOutput>;
+	parse(parserProps: ParserProps): RawOutput | Promise<RawOutput>;
 
 	/**
 	 * Optional raw string value validation before parsing.
 	 * @throws Error if validation fails
 	 */
-	preValidate?(key: string, value: unknown): void | Promise<void>;
+	preValidate?(preValidateProps: PreValidateProps): void | Promise<void>;
 
 	/**
 	 * Optional value validation after parsing
 	 * @throws Error if validation fails
 	 */
-	postValidate?(key: string, value: RawOutput): Output | undefined | Promise<Output | undefined>;
+	postValidate?(postValidateProps: PostValidateProps<RawOutput>): Output | undefined | Promise<Output | undefined>;
 
 	/**
 	 * Build readable string from value

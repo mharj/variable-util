@@ -5,7 +5,7 @@ function isLiteral<RawType, Type extends RawType>(value: RawType, values: readon
 }
 
 export function validLiteral<RawType, Type extends RawType>(values: readonly Type[]): PostValidate<Type, RawType> {
-	return (key: string, value: RawType): Promise<Type | undefined> => {
+	return ({key, value}): Promise<Type | undefined> => {
 		if (isLiteral<RawType, Type>(value, values)) {
 			return Promise.resolve(value);
 		}

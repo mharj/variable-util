@@ -1,4 +1,4 @@
-import {type IConfigParser, type PostValidate} from '../interfaces/IConfigParser';
+import {type IConfigParser, type ParserProps, type PostValidate, type PreValidateProps} from '../interfaces/IConfigParser';
 import {getFloat} from '../lib/primitiveUtils';
 
 /**
@@ -12,11 +12,11 @@ import {getFloat} from '../lib/primitiveUtils';
 export function floatParser<Output extends number = number>(postValidate?: PostValidate<Output, number>): IConfigParser<Output, number> {
 	return {
 		name: 'floatParser',
-		parse: (key: string, value: string) => {
+		parse: ({key, value}: ParserProps) => {
 			return getFloat(value).unwrap(() => new TypeError(`value for key ${key} is not a float string`));
 		},
 		postValidate,
-		preValidate: (key: string, value: string) => {
+		preValidate: ({key, value}: PreValidateProps) => {
 			if (typeof value !== 'string') {
 				throw new TypeError(`value for key ${key} is not a string`);
 			}

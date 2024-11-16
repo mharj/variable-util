@@ -1,8 +1,6 @@
-import 'mocha';
-import * as chai from 'chai';
+import {describe, expect, it} from 'vitest';
 import {buildPartialHiddenValueString} from '../src/';
 
-const expect = chai.expect;
 const uuidValue = '326ef604-7570-443a-bbea-fe68f21f84be';
 const shortKey = 'someSecretKey';
 

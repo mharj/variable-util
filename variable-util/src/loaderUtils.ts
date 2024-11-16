@@ -31,13 +31,14 @@ export function printLog({logger, namespace}: SolvedConfigOptions, type: string,
 export function rebuildAsVariableError<Output, RawOutput = unknown>(
 	value: string,
 	error: Error,
+	loader: IConfigLoader,
 	parser: IConfigParser<Output, RawOutput>,
 	params?: FormatParameters,
 ): VariableError {
 	if (error instanceof VariableError) {
 		return error;
 	} else {
-		const varError = new VariableError(`variables[${parser.name}]:${printValue(value, params)} ${error.message}`);
+		const varError = new VariableError(`variables[${loader.type}](${parser.name}):${printValue(value, params)} ${error.message}`);
 		varError.stack = error.stack;
 		return varError;
 	}
@@ -54,13 +55,14 @@ export function rebuildAsVariableError<Output, RawOutput = unknown>(
 function buildPreValidateErrorMessage<Output, RawOutput = unknown>(
 	value: string,
 	err: unknown,
+	loader: IConfigLoader,
 	parser: IConfigParser<Output, RawOutput>,
 	params?: FormatParameters,
 ): VariableError {
 	if (err instanceof Error) {
-		return rebuildAsVariableError(value, err, parser, params);
+		return rebuildAsVariableError(value, err, loader, parser, params);
 	} else {
-		return new VariableError(`variables[${parser.name}]:${printValue(value, params)} unknown preValidate error`);
+		return new VariableError(`variables[${loader.type}](${parser.name}):${printValue(value, params)} unknown preValidate error`);
 	}
 }
 
@@ -76,13 +78,14 @@ function buildPreValidateErrorMessage<Output, RawOutput = unknown>(
 function buildParserErrorMessage<Output, RawOutput = unknown>(
 	value: string,
 	err: unknown,
+	loader: IConfigLoader,
 	parser: IConfigParser<Output, RawOutput>,
 	params?: FormatParameters,
 ): VariableError {
 	if (err instanceof Error) {
-		return rebuildAsVariableError(value, err, parser, params);
+		return rebuildAsVariableError(value, err, loader, parser, params);
 	} else {
-		return new VariableError(`variables[${parser.name}]:${printValue(value, params)} unknown parse error`);
+		return new VariableError(`variables[${loader.type}](${parser.name}):${printValue(value, params)} unknown parse error`);
 	}
 }
 
@@ -98,13 +101,14 @@ function buildParserErrorMessage<Output, RawOutput = unknown>(
 function buildPostValidateErrorMessage<Output, RawOutput = unknown>(
 	value: string,
 	err: unknown,
+	loader: IConfigLoader,
 	parser: IConfigParser<Output, RawOutput>,
 	params?: FormatParameters,
 ): VariableError {
 	if (err instanceof Error) {
-		return rebuildAsVariableError(value, err, parser, params);
+		return rebuildAsVariableError(value, err, loader, parser, params);
 	} else {
-		return new VariableError(`variables[${parser.name}]:${printValue(value, params)} unknown postValidate error`);
+		return new VariableError(`variables[${loader.type}](${parser.name}):${printValue(value, params)} unknown postValidate error`);
 	}
 }
 
@@ -136,30 +140,30 @@ export async function handleLoader<Output, RawOutput = unknown>(
 			 * parser pre-validate
 			 */
 			try {
-				await parser.preValidate?.(rootKey, value);
+				await parser.preValidate?.({key: rootKey, value, loader});
 			} catch (err) {
-				throw buildPreValidateErrorMessage(value, err, parser, params);
+				throw buildPreValidateErrorMessage(value, err, loader, parser, params);
 			}
 			/**
 			 * parse value
 			 */
 			let rawOutput: RawOutput;
 			try {
-				rawOutput = await parser.parse(rootKey, value);
+				rawOutput = await parser.parse({key: rootKey, value, loader});
 			} catch (err) {
-				throw buildParserErrorMessage(value, err, parser, params);
+				throw buildParserErrorMessage(value, err, loader, parser, params);
 			}
 			/**
 			 * parser post-validate
 			 */
 			let output: Output = rawOutput as unknown as Output; // TODO: if validator on parser is not defined we should return RawOutput type
 			try {
-				const validateData = await parser.postValidate?.(rootKey, rawOutput);
+				const validateData = await parser.postValidate?.({key: rootKey, value: rawOutput, loader});
 				if (validateData) {
 					output = validateData;
 				}
 			} catch (err) {
-				throw buildPostValidateErrorMessage(value, err, parser, params);
+				throw buildPostValidateErrorMessage(value, err, loader, parser, params);
 			}
 			/**
 			 * print log

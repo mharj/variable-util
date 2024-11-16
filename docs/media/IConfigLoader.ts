@@ -13,11 +13,11 @@ export interface LoaderValueResult {
 
 /**
  * Interface for the LoaderValue output payload
- * @since v0.5.0
+ * @since v0.11.0
  */
 export interface LoaderValue {
 	/** this is shown on logs `ConfigVariables[___type___]: ___KEY___ [VALUE] from {path}` */
-	type: string;
+	readonly type: Lowercase<string>;
 	/** callback result or undefined if disabled */
 	result: LoaderValueResult | undefined;
 }

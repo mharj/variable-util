@@ -1,6 +1,6 @@
 {
     "name": "@avanio/variable-util",
-    "version": "0.10.3",
+    "version": "0.11.0",
     "description": "Utility to get variables from multiple resources",
     "main": "./dist/index.js",
     "module": "./dist/index.mjs",
@@ -17,29 +17,14 @@
         "doc": "typedoc",
         "build": "tsup src/index.ts --sourcemap --format cjs,esm --dts --clean",
         "prepublishOnly": "npm run build",
-        "test": "mocha",
+        "test": "vitest test --run --no-isolate --coverage",
+        "coverage": "vitest test --run --no-isolate --reporter=dot --coverage --coverage.reporter=lcov",
         "lint": "eslint src",
         "validate": "tsc --noEmit --project tsconfig.test.json"
     },
     "files": [
         "dist"
     ],
-    "mocha": {
-        "exit": true,
-        "extension": [
-            "ts",
-            "js"
-        ],
-        "recursive": true,
-        "require": [
-            "ts-node/register",
-            "source-map-support/register"
-        ],
-        "reporters": [
-            "spec",
-            "mocha-junit-reporter"
-        ]
-    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/mharj/variable-util.git"
@@ -57,16 +42,13 @@
     "devDependencies": {
         "@stylistic/eslint-plugin": "^2.10.1",
         "@stylistic/eslint-plugin-ts": "^2.10.1",
-        "@types/chai": "^4.3.20",
-        "@types/chai-as-promised": "^7.1.8",
         "@types/etag": "^1.8.3",
-        "@types/mocha": "^10.0.9",
         "@types/node": "^18.19.64",
         "@types/sinon": "^17.0.3",
         "@typescript-eslint/eslint-plugin": "^8.14.0",
         "@typescript-eslint/parser": "^8.14.0",
-        "chai": "^4.5.0",
-        "chai-as-promised": "^7.1.2",
+        "@vitest/coverage-v8": "^2.1.4",
+        "c8": "^10.1.2",
         "cross-fetch": "^4.0.0",
         "dotenv": "^16.4.5",
         "eslint": "^8.57.1",
@@ -76,19 +58,20 @@
         "eslint-plugin-prettier": "^5.2.1",
         "eslint-plugin-sonarjs": "^0.25.1",
         "etag": "^1.8.1",
-        "mocha": "^10.8.2",
         "prettier": "^3.3.3",
         "sinon": "^19.0.2",
         "source-map-support": "^0.5.21",
-        "ts-node": "^10.9.2",
         "tsup": "^8.3.5",
         "typedoc": "^0.26.11",
         "typescript": "^5.6.3",
+        "vite": "^5.4.10",
+        "vitest": "^2.1.4",
         "zod": "^3.23.8"
     },
     "dependencies": {
         "@avanio/logger-like": "^0.2.7",
         "@luolapeikko/result-option": "^1.0.3",
         "url-polyfill": "^1.1.12"
-    }
+    },
+    "packageManager": "pnpm@9.13.2+sha256.ccce81bf7498c5f0f80e31749c1f8f03baba99d168f64590fc7e13fad3ea1938"
 }

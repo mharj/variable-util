@@ -1,4 +1,4 @@
-import {type IConfigParser, type PostValidate} from '../interfaces/IConfigParser';
+import {type IConfigParser, type ParserProps, type PostValidate} from '../interfaces/IConfigParser';
 import {getInteger} from '../lib/primitiveUtils';
 
 /**
@@ -12,7 +12,7 @@ import {getInteger} from '../lib/primitiveUtils';
 export function integerParser<Output extends number = number>(postValidate?: PostValidate<Output, number>): IConfigParser<Output, number> {
 	return {
 		name: 'integerParser',
-		parse: (key: string, value: string) => {
+		parse: ({key, value}: ParserProps) => {
 			return getInteger(value).unwrap(() => new TypeError(`value for key ${key} is not an integer string`));
 		},
 		postValidate,

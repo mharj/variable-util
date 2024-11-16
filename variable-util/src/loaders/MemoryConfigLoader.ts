@@ -18,15 +18,16 @@ export class MemoryConfigLoader<MemoryMap extends Record<string, string | undefi
 	IMemoryConfigLoaderProps,
 	IMemoryConfigLoaderProps
 > {
-	public readonly type = 'memory';
+	public readonly type: Lowercase<string>;
 	protected defaultOptions: IMemoryConfigLoaderProps | undefined;
 	private data: Map<keyof MemoryMap, string | undefined>;
 	private seen = new Map<string, string>();
 
-	public constructor(initialData: MemoryMap, options: Loadable<IMemoryConfigLoaderProps> = {}) {
+	public constructor(initialData: MemoryMap, options: Loadable<IMemoryConfigLoaderProps> = {}, type: Lowercase<string> = 'memory') {
 		super(options);
 		this.getLoader = this.getLoader.bind(this);
 		this.data = new Map(Object.entries(initialData));
+		this.type = type;
 	}
 
 	public async set(key: keyof MemoryMap, value: string | undefined): Promise<void> {

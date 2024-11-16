@@ -2,20 +2,28 @@
 /* eslint-disable sort-keys */
 /* eslint-disable sonarjs/no-duplicate-string */
 import 'cross-fetch/polyfill';
-import 'mocha';
-import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 import * as sinon from 'sinon';
 import * as z from 'zod';
-import {arrayParser, booleanParser, ConfigMap, env, integerParser, MemoryConfigLoader, setLogger, stringParser, UrlParser, validLiteral} from '../src/';
+import {
+	arrayParser,
+	booleanParser,
+	ConfigMap,
+	env,
+	integerParser,
+	MemoryConfigLoader,
+	setLogger,
+	stringParser,
+	UrlParser,
+	validLiteral,
+	VariableError,
+} from '../src/';
+import {beforeAll, beforeEach, describe, expect, it} from 'vitest';
 import {testObjectFinalSchema, testObjectParser, type TestObjectType} from './testObjectParse';
 import {type IResult} from '@luolapeikko/result-option';
 import {URL} from 'url';
 
 dotenv.config();
-chai.use(chaiAsPromised);
-const expect = chai.expect;
 
 const debugSpy = sinon.spy();
 const infoSpy = sinon.spy();
@@ -87,7 +95,7 @@ const config = new ConfigMap<TestEnv>(
 );
 
 describe('ConfigMap', () => {
-	before(() => {
+	beforeAll(() => {
 		setLogger(spyLogger);
 	});
 	beforeEach(() => {
@@ -101,58 +109,59 @@ describe('ConfigMap', () => {
 		it('should return PORT env value', async function () {
 			process.env.PORT = '6000';
 			const call: Promise<number> = config.get('PORT');
-			await expect(call).to.be.eventually.eq(6000);
+			await expect(call).resolves.toEqual(6000);
 			expect(infoSpy.callCount).to.be.eq(1);
 		});
 		it('should return HOST env value', async function () {
 			process.env.HOST = 'minecraft';
 			const call: Promise<string> = config.get('HOST');
-			await expect(call).to.be.eventually.eq('minecraft');
+			await expect(call).resolves.toEqual('minecraft');
 		});
 		it('should return DEBUG env value', async function () {
 			process.env.DEBUG = 'true';
 			const call: Promise<boolean> = config.get('DEBUG');
-			await expect(call).to.be.eventually.eq(true);
+			await expect(call).resolves.toEqual(true);
 			expect(infoSpy.callCount).to.be.eq(1);
 		});
 		it('should return DEBUG env value (already seen)', async function () {
 			process.env.DEBUG = 'true';
 			const call: Promise<boolean> = config.get('DEBUG');
-			await expect(call).to.be.eventually.eq(true);
+			await expect(call).resolves.toEqual(true);
 			expect(infoSpy.callCount).to.be.eq(0);
 		});
 		it('should return DEBUG env value (change)', async function () {
 			process.env.DEBUG = 'false';
 			const call: Promise<boolean> = config.get('DEBUG');
-			await expect(call).to.be.eventually.eq(false);
+			await expect(call).resolves.toEqual(false);
 			expect(infoSpy.callCount).to.be.eq(1);
 		});
 		it('should return URL env value', async function () {
 			process.env.URL = 'https://www.google.com';
 			const call: Promise<URL> = config.get('URL');
-			await expect(call).to.be.eventually.eql(new URL('https://www.google.com'));
+			await expect(call).resolves.toEqual(new URL('https://www.google.com'));
 		});
 		it('should return CONSTANT env value', async function () {
 			process.env.CONSTANT = 'constant';
 			const call: Promise<'constant'> = config.get('CONSTANT');
-			await expect(call).to.be.eventually.eq('constant');
+			await expect(call).resolves.toEqual('constant');
 		});
 		it('should return CONSTANT env value', async function () {
 			const call: Promise<string> = config.get('NOT_EXISTS');
-			await expect(call).to.be.eventually.rejectedWith('add NOT_EXISTS to env');
+			// vitest promise rejection
+			await expect(call).rejects.toEqual(new VariableError('add NOT_EXISTS to env'));
 		});
 		it('should return CONSTANT env value', async function () {
 			const call: Promise<string[]> = config.get('ARRAY');
-			await expect(call).to.be.eventually.eql(['a', 'b', 'c']);
+			await expect(call).resolves.toEqual(['a', 'b', 'c']);
 			expect(infoSpy.args[0]?.[0]).to.be.eq('ConfigVariables:Demo[default]: ARRAY [a;b;c] from default');
 		});
 		it('should return PORT env value', async function () {
 			process.env.PORT = '6000';
-			await expect(config.get('PORT')).to.be.eventually.eq(6000);
+			await expect(config.get('PORT')).resolves.toEqual(6000);
 			await memoryEnv.set('PORT', '7000');
-			await expect(config.get('PORT')).to.be.eventually.eq(7000);
+			await expect(config.get('PORT')).resolves.toEqual(7000);
 			await memoryEnv.set('PORT', undefined);
-			await expect(config.get('PORT')).to.be.eventually.eq(6000);
+			await expect(config.get('PORT')).resolves.toEqual(6000);
 			process.env.PORT = undefined;
 		});
 	});
@@ -160,26 +169,26 @@ describe('ConfigMap', () => {
 		it('should return PORT env value', async function () {
 			process.env.PORT = '6000';
 			const call: Promise<string> = config.getString('PORT');
-			await expect(call).to.be.eventually.eq('6000');
+			await expect(call).resolves.toEqual('6000');
 		});
 		it('should return HOST env value', async function () {
 			process.env.HOST = 'minecraft';
 			const call: Promise<string> = config.getString('HOST');
-			await expect(call).to.be.eventually.eq('minecraft');
+			await expect(call).resolves.toEqual('minecraft');
 		});
 		it('should return DEBUG env value', async function () {
 			process.env.DEBUG = 'true';
 			const call: Promise<string> = config.getString('DEBUG');
-			await expect(call).to.be.eventually.eq('true');
+			await expect(call).resolves.toEqual('true');
 		});
 		it('should return DEMO env value', async function () {
 			const call: Promise<string | undefined> = config.getString('DEMO');
-			await expect(call).to.be.eventually.eq(undefined);
+			await expect(call).resolves.toEqual(undefined);
 		});
 		it('should return URL env value', async function () {
 			process.env.URL = 'https://www.google.com/';
 			const call: Promise<string> = config.getString('URL');
-			await expect(call).to.be.eventually.eq('https://www.google.com/');
+			await expect(call).resolves.toEqual('https://www.google.com/');
 		});
 	});
 	describe('getStringIResult', () => {
@@ -236,7 +245,7 @@ describe('ConfigMap', () => {
 			process.env.NOT_EXISTS = 'not_exists'; // else it will throw error
 			const call = config.getAllObjects();
 			const result = await call;
-			await expect(call).to.be.eventually.eql({
+			await expect(call).resolves.toEqual({
 				DEBUG: {type: 'env', value: true, stringValue: 'true', namespace: 'Demo'},
 				DEMO: {type: undefined, value: undefined, stringValue: undefined, namespace: 'Demo'},
 				HOST: {type: 'env', value: 'minecraft', stringValue: 'minecraft', namespace: 'Demo'},

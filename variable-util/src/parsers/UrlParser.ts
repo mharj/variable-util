@@ -1,5 +1,5 @@
 import 'url-polyfill';
-import {type IConfigParser} from '../interfaces/IConfigParser';
+import {type IConfigParser, type ParserProps} from '../interfaces/IConfigParser';
 
 /**
  * Properties for the UrlParser
@@ -30,7 +30,7 @@ export class UrlParser implements IConfigParser<URL, URL> {
 		this.urlSanitize = urlSanitize || false;
 	}
 
-	public parse(key: string, value: string): URL {
+	public parse({value}: ParserProps): URL {
 		try {
 			return new URL(value);
 		} catch (err) {

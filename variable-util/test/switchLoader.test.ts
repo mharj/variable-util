@@ -1,22 +1,23 @@
-import 'mocha';
-import * as chai from 'chai';
 import {ConfigMap, stringParser, SwitchLoader} from '../src';
-
-const expect = chai.expect;
+import {describe, expect, it} from 'vitest';
 
 type TestEnv = {
 	DEMO?: string;
 	ANOTHER?: string;
 };
 
-const switchLoader = new SwitchLoader<TestEnv, 'switch1' | 'switch2'>({
-	switch1: {
-		DEMO: 'value',
+const switchLoader = new SwitchLoader<TestEnv, 'switch1' | 'switch2'>(
+	{
+		switch1: {
+			DEMO: 'value',
+		},
+		switch2: {
+			DEMO: 'value2',
+		},
 	},
-	switch2: {
-		DEMO: 'value2',
-	},
-});
+	undefined,
+	'unit-test',
+);
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const switcher = switchLoader.getLoader;

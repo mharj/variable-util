@@ -1,12 +1,17 @@
-import 'mocha';
-import * as chai from 'chai';
-import {booleanParser} from '../src';
+import {booleanParser, type IConfigLoader} from '../src';
+import {describe, expect, it} from 'vitest';
 
-const expect = chai.expect;
+const testLoader: IConfigLoader = {
+	type: 'unit',
+	callback: () => ({
+		type: 'unit',
+		result: undefined,
+	}),
+};
 
 describe('Test boolean parser', function () {
 	it('should parse values', async function () {
-		expect(await booleanParser().parse('key', 'true')).to.equal(true);
-		expect(await booleanParser().parse('key', true as unknown as string)).to.equal(true);
+		expect(await booleanParser().parse({loader: testLoader, key: 'key', value: 'true'})).to.equal(true);
+		expect(await booleanParser().parse({loader: testLoader, key: 'key', value: true as unknown as string})).to.equal(true);
 	});
 });

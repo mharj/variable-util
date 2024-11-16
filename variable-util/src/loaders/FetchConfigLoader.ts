@@ -53,7 +53,7 @@ export type FetchConfigRequest = ConfigRequest | Promise<ConfigRequest> | (() =>
  * @since v0.8.0
  */
 export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Partial<FetchConfigLoaderOptions>, FetchConfigLoaderOptions> {
-	public type = 'fetch';
+	public readonly type: Lowercase<string>;
 	private request: FetchConfigRequest;
 	private path = 'undefined';
 
@@ -72,10 +72,12 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Pa
 	 * Constructor for FetchConfigLoader
 	 * @param request - callback that returns a fetch request or a message object that the request is not ready
 	 * @param options - optional options for FetchConfigLoader
+	 * @param type - optional name type for FetchConfigLoader (default: 'fetch')
 	 */
-	constructor(request: FetchConfigRequest, options: Loadable<Partial<FetchConfigLoaderOptions>> = {}) {
+	constructor(request: FetchConfigRequest, options: Loadable<Partial<FetchConfigLoaderOptions>> = {}, type: Lowercase<string> = 'fetch') {
 		super(options);
 		this.request = request;
+		this.type = type;
 	}
 
 	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
