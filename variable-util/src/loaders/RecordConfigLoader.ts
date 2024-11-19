@@ -21,6 +21,7 @@ export abstract class RecordConfigLoader<HandlerParams, Props extends IConfigLoa
 		this.dataPromise = this.handleData();
 		this.valueSeen.clear();
 		await this.dataPromise;
+		this.emit('updated');
 	}
 
 	/**

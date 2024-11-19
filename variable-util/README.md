@@ -5,10 +5,16 @@
 getConfigVariable is a utility function that extracts configuration values from different sources like environment variables and even fetches remote configuration values.
 Also have ability to parse (and verify) string, URL and JSON stringified or semicolon separated object values.
 
-## Installation
+## NodeJS Installation
 
 ```bash
 npm i @avanio/variable-util
+```
+
+## Browser Installation (use browserify events for compatibility)
+
+```bash
+npm i @avanio/variable-util events
 ```
 
 ## [Documentation](https://mharj.github.io/variable-util/)
@@ -63,7 +69,7 @@ const callbackToBuildRequest = async (): Promise<Request> => {
 	return new Request('https://example.com/config.json');
 };
 const fetchEnv = new FetchConfigLoader(callbackToBuildRequest).getLoader;
-// note: fetchEnv can overrider key we are looking for fetchEnv('SOME_OTHER_KEY');
+// note: fetchEnv can override key we are looking for fetchEnv('SOME_OTHER_KEY');
 
 // usually all variables are loaded same way, so you can define the loaders array just once.
 const loaders = [reactEnv(), fetchEnv()];
@@ -124,7 +130,7 @@ A IConfigLoader instance that loads configuration values from the process.env.
 
 ### `reactEnv(): IConfigLoader`
 
-A IConfigLoader instance that loads configuration values from the process.env. with ```REACT_APP_*``` prefix.
+A IConfigLoader instance that loads configuration values from the process.env. with `REACT_APP_*` prefix.
 
 ### `new FetchConfigLoader(() => Promise<Response | RequestNotReadyMessage>, options?: FetchConfigLoaderOptions).getLoader: IConfigLoader`
 

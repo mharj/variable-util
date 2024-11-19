@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable sort-keys */
 /* eslint-disable sonarjs/no-duplicate-string */
@@ -22,6 +23,8 @@ import {beforeAll, beforeEach, describe, expect, it} from 'vitest';
 import {testObjectFinalSchema, testObjectParser, type TestObjectType} from './testObjectParse';
 import {type IResult} from '@luolapeikko/result-option';
 import {URL} from 'url';
+
+const updateSpy = sinon.spy();
 
 dotenv.config();
 
@@ -69,6 +72,7 @@ const memoryEnv = new MemoryConfigLoader<{PORT?: string}>(
 	},
 	{logger: spyLogger},
 );
+memoryEnv.on('updated', updateSpy);
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const memEnv = memoryEnv.getLoader;
 
@@ -93,6 +97,7 @@ const config = new ConfigMap<TestEnv>(
 	},
 	{namespace: 'Demo'},
 );
+config.setLogger(spyLogger);
 
 describe('ConfigMap', () => {
 	beforeAll(() => {
@@ -104,6 +109,7 @@ describe('ConfigMap', () => {
 		errorSpy.resetHistory();
 		warnSpy.resetHistory();
 		traceSpy.resetHistory();
+		updateSpy.resetHistory();
 	});
 	describe('get', () => {
 		it('should return PORT env value', async function () {
@@ -163,6 +169,7 @@ describe('ConfigMap', () => {
 			await memoryEnv.set('PORT', undefined);
 			await expect(config.get('PORT')).resolves.toEqual(6000);
 			process.env.PORT = undefined;
+			expect(updateSpy.callCount).to.be.eq(2);
 		});
 	});
 	describe('getString', () => {
@@ -238,6 +245,16 @@ describe('ConfigMap', () => {
 			const call: IResult<URL> = await config.getResult('URL');
 			expect(call.ok()?.href).to.be.eql(new URL('https://asd:qwe@www.google.com').href);
 			expect(infoSpy.args[0]?.[0]).to.be.eq('ConfigVariables:Demo[env]: URL [https://***:***@www.google.com/] from process.env.URL');
+		});
+	});
+	describe('getObjectResult', () => {
+		it('should not return value if non-existing key', async function () {
+			const call: IResult<any> = await config.getObjectResult('ASD' as any);
+			expect(call.ok()).to.be.eql(undefined);
+		});
+		it('should not return value not valid key', async function () {
+			const call: IResult<any> = await config.getObjectResult(null as any);
+			expect(call.ok()).to.be.eql(undefined);
 		});
 	});
 	describe('getAll', () => {

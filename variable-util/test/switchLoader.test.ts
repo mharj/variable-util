@@ -1,5 +1,8 @@
+import * as sinon from 'sinon';
+import {beforeEach, describe, expect, it} from 'vitest';
 import {ConfigMap, stringParser, SwitchLoader} from '../src';
-import {describe, expect, it} from 'vitest';
+
+const updateSpy = sinon.spy();
 
 type TestEnv = {
 	DEMO?: string;
@@ -18,6 +21,7 @@ const switchLoader = new SwitchLoader<TestEnv, 'switch1' | 'switch2'>(
 	undefined,
 	'unit-test',
 );
+switchLoader.on('updated', updateSpy);
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const switcher = switchLoader.getLoader;
@@ -31,6 +35,9 @@ const config = new ConfigMap<TestEnv>(
 );
 
 describe('Test Switch loader', function () {
+	beforeEach(function () {
+		updateSpy.resetHistory();
+	});
 	it('should parse values', async function () {
 		expect(await config.get('DEMO')).to.equal(undefined);
 		await switchLoader.activateSwitch('switch1');
@@ -40,6 +47,7 @@ describe('Test Switch loader', function () {
 		expect(await config.get('DEMO')).to.equal('value2');
 		await switchLoader.deactivateSwitch('switch2');
 		expect(await config.get('DEMO')).to.equal(undefined);
+		expect(updateSpy.callCount).to.equal(4);
 	});
 	it('should get last selected keys value', async function () {
 		expect(await config.get('DEMO')).to.equal(undefined);
@@ -49,5 +57,6 @@ describe('Test Switch loader', function () {
 		await switchLoader.deactivateSwitch('switch2');
 		await switchLoader.deactivateSwitch('switch1');
 		expect(await config.get('DEMO')).to.equal(undefined);
+		expect(updateSpy.callCount).to.equal(4);
 	});
 });

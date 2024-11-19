@@ -15,7 +15,7 @@ export interface ISwitchLoaderProps extends IConfigLoaderProps {
  * @since v0.10.1
  * @example
  * type TestConfigMapEnv = { DEMO: string; ANOTHER: string; };
- * const swithConfigMap: SwitchConfigMap<TestConfigMapEnv, 'switch1' | 'switch2'> = {
+ * const switchConfigMap: SwitchConfigMap<TestConfigMapEnv, 'switch1' | 'switch2'> = {
  *   switch1: { DEMO: 'value' },
  *   switch2: { DEMO: 'value2' },
  * };
@@ -53,12 +53,14 @@ export class SwitchLoader<Config extends Record<string, unknown>, Key extends st
 		const options = await this.getOptions();
 		options.logger?.debug(this.buildErrorStr(`activating key '${String(key)}' => [${this.getConfigKeys(key).join(', ')}]`));
 		this.keys.add(key);
+		this.emit('updated');
 	}
 
 	public async deactivateSwitch(key: Key) {
 		const options = await this.getOptions();
 		options.logger?.debug(this.buildErrorStr(`deactivating key '${String(key)}' => [${this.getConfigKeys(key).join(', ')}]`));
 		this.keys.delete(key);
+		this.emit('updated');
 	}
 
 	public getCurrentKeys(): Readonly<Set<Key>> {

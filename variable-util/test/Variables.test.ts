@@ -104,6 +104,7 @@ const fetchValidate: ValidateCallback<Record<string, string | undefined>, Record
 	return stringRecordSchema.parseAsync(data);
 };
 
+let fetchLoader: FetchConfigLoader;
 let fetchEnv: (params?: string) => IConfigLoader;
 const urlDefault = new URL('http://localhost/api');
 let fetchRequestData: Request | undefined;
@@ -212,10 +213,12 @@ describe('config variable', () => {
 		describe('FetchConfigLoader', () => {
 			beforeEach(function () {
 				clearDefaultValueSeenMap();
-				fetchEnv = new FetchConfigLoader(handleFetchRequest, fetchLoaderOptions).getLoader;
+				fetchLoader = new FetchConfigLoader(handleFetchRequest, fetchLoaderOptions);
+				fetchEnv = fetchLoader.getLoader;
 				isFetchDisabled = false;
 			});
 			it('should return default if fetch request not ready yet', async function () {
+				expect(fetchLoader.isLoaded()).to.be.eq(false);
 				expect(await getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true})).to.be.eql(urlDefault);
 				expect(infoSpy.callCount).to.be.eq(1);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: API_SERVER [${urlDefault}] from default`);
@@ -290,6 +293,9 @@ describe('config variable', () => {
 				expect(infoSpy.callCount).to.be.eq(1);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: API_SERVER [http://localhost/api] from default`);
 				expect(output).to.be.eql(urlDefault);
+			});
+			it('should reload fetch value when online', async function () {
+				await fetchLoader.reload();
 			});
 		});
 		describe('MemoryConfigLoader', () => {

@@ -6,6 +6,7 @@ import {type EnvMapSchema} from './types/EnvMapSchema';
 import {getConfigObject} from './getConfigObject';
 import {type LoaderTypeValueStrict} from './types/TypeValue';
 import {VariableError} from './VariableError';
+import {VariableLookupError} from './VariableLookupError';
 
 /**
  * TypeValueRecords
@@ -59,13 +60,13 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * console.log(valueObject.type, valueObject.value); // 'env', 3000
 	 */
 	public async getObject<Key extends keyof Data = keyof Data>(key: Key, encodeOptions?: EncodeOptions): Promise<LoaderTypeValueStrict<Data[Key]>> {
+		if (typeof key !== 'string') {
+			throw new VariableError(`ConfigMap key ${String(key)} is not a string`);
+		}
 		const entry = this.schema[key];
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (!entry) {
-			throw new VariableError(`ConfigMap key ${String(key)} not found in config map`);
-		}
-		if (typeof key !== 'string') {
-			throw new VariableError(`ConfigMap key ${String(key)} is not a string`);
+			throw new VariableLookupError(key, `ConfigMap key ${String(key)} not found in config map`);
 		}
 		const {loaders, parser, defaultValue, params, undefinedThrowsError, undefinedErrorMessage} = entry;
 		const configObject = (await getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params, this.options, encodeOptions)) as LoaderTypeValueStrict<

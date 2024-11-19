@@ -37,6 +37,7 @@ export class MemoryConfigLoader<MemoryMap extends Record<string, string | undefi
 			this.seen.delete(String(key));
 		}
 		this.data.set(key, value);
+		this.emit('updated');
 	}
 
 	public async get(key: keyof MemoryMap): Promise<string | undefined> {

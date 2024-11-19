@@ -1,6 +1,22 @@
 import {type IConfigLoader, type LoaderValue} from '../interfaces/';
+import {EventEmitter} from 'events';
 import {type Loadable} from '../types/Loadable';
 
+/**
+ * ConfigLoaderEventMap is the event map for the ConfigLoader
+ * @category Loaders
+ * @since v0.11.1
+ */
+export type ConfigLoaderEventMap = {
+	/** notify when loader data is updated */
+	updated: [];
+};
+
+/**
+ * IConfigLoaderProps is the interface for ConfigLoader props
+ * @category Loaders
+ * @since v0.8.0
+ */
 export interface IConfigLoaderProps {
 	disabled?: boolean | Promise<boolean> | (() => boolean | Promise<boolean>);
 }
@@ -11,12 +27,17 @@ export interface IConfigLoaderProps {
  * @abstract
  * @since v0.8.0
  */
-export abstract class ConfigLoader<HandlerParams, Props extends IConfigLoaderProps, DefaultProps extends Props = Props> {
+export abstract class ConfigLoader<
+	HandlerParams,
+	Props extends IConfigLoaderProps,
+	DefaultProps extends Props = Props,
+> extends EventEmitter<ConfigLoaderEventMap> {
 	public abstract type: Lowercase<string>;
 	protected options: Loadable<Props>;
 	protected abstract defaultOptions: DefaultProps | undefined;
 
 	constructor(props: Loadable<Props>) {
+		super();
 		this.getLoader = this.getLoader.bind(this); // bind this to getLoader
 		this.options = props;
 	}
