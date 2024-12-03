@@ -3,7 +3,7 @@ import {type IConfigLoader, type IConfigParser} from './interfaces';
 import {type ConfigOptions} from './ConfigOptions';
 import {type FormatParameters} from './lib/formatUtils';
 import {getConfigVariable} from './getConfigVariable';
-import {type Loadable} from './types/Loadable';
+import {type Loadable} from '@luolapeikko/ts-common';
 
 /**
  * @example

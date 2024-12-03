@@ -1,6 +1,6 @@
 import {type IConfigLoader, type LoaderValue} from '../interfaces/';
 import {EventEmitter} from 'events';
-import {type Loadable} from '../types/Loadable';
+import type {Loadable} from '@luolapeikko/ts-common';
 
 /**
  * ConfigLoaderEventMap is the event map for the ConfigLoader

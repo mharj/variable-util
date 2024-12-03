@@ -20,6 +20,23 @@ export function printLog({logger, namespace}: SolvedConfigOptions, type: string,
 }
 
 /**
+ * Rebuild Error as raw VariableError
+ * @category Utils
+ * @since v0.12.0
+ */
+export function handleAsVariableError(err: unknown): VariableError {
+	if (err instanceof VariableError) {
+		return err;
+	}
+	if (err instanceof Error) {
+		const varError = new VariableError(err.message);
+		varError.stack = err.stack;
+		return varError;
+	}
+	return new VariableError(`Unknown error ${JSON.stringify(err)}`);
+}
+
+/**
  * Rebuild Error as VariableError
  * @param {string} value - value of variable
  * @param {Error} error - error to rebuild
@@ -169,7 +186,7 @@ export async function handleLoader<Output, RawOutput = unknown>(
 			 * print log
 			 */
 			const stringValue = parser.toString(output, encodeOptions);
-			if (!seen) {
+			if (!seen && !encodeOptions?.silent) {
 				const logValue = parser.toLogString?.(output) ?? stringValue;
 				printLog(options, loader.type, rootKey, logValue, path, params);
 			}

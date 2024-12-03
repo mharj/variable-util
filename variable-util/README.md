@@ -9,7 +9,9 @@ Also have ability to parse (and verify) string, URL and JSON stringified or semi
 
 ```bash
 npm i @avanio/variable-util
+npm i url-polyfill # import this to code if you need to support URL in older nodejs versions
 ```
+
 
 ## Browser Installation (use browserify events for compatibility)
 

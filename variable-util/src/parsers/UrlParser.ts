@@ -1,4 +1,3 @@
-import 'url-polyfill';
 import {type IConfigParser, type ParserProps} from '../interfaces/IConfigParser';
 
 /**

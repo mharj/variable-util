@@ -1,7 +1,7 @@
 import {type FormatParameters} from '../lib/formatUtils';
 import {type IConfigLoader} from '../interfaces/IConfigLoader';
 import {type IConfigParser} from '../interfaces/IConfigParser';
-import {type Loadable} from './Loadable';
+import {type Loadable} from '@luolapeikko/ts-common';
 
 /**
  * Optional environment entry

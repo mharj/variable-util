@@ -45,6 +45,10 @@ export type EncodeOptions = {
 	 * use URI encoding for string outputs (used by semicolon parser)
 	 */
 	uriEncode?: boolean;
+	/**
+	 * not logging the value
+	 */
+	silent?: boolean;
 };
 
 /**

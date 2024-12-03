@@ -1,11 +1,11 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 import {buildOptions, type ConfigOptions} from './ConfigOptions';
 import {type EncodeOptions, type IConfigLoader, type IConfigParser} from './interfaces/';
-import {handleLoader, printLog} from './loaderUtils';
+import {handleAsVariableError, handleLoader, printLog} from './loaderUtils';
+import {type Loadable, resolveLoadable} from '@luolapeikko/ts-common';
 import {type LoaderTypeValue, type LoaderTypeValueStrict} from './types/TypeValue';
 import {type FormatParameters} from './lib/formatUtils';
 import {handleSeen} from './lib/seenUtils';
-import {type Loadable} from './types/Loadable';
-import {VariableError} from './VariableError';
 
 /**
  * Map of seen default values
@@ -68,17 +68,11 @@ export async function getConfigObject<Output>(
 	 */
 	if (defaultValueLoadable !== undefined) {
 		try {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-			const value = await (typeof defaultValueLoadable === 'function' ? defaultValueLoadable() : defaultValueLoadable);
-			if (value === undefined) {
-				throw new VariableError('default value is empty');
-			}
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			defaultValue = value;
+			defaultValue = (await resolveLoadable(defaultValueLoadable)) as Output;
 			type = 'default';
 		} catch (err) {
 			currentOptions.logger?.error(err);
-			throw err;
+			throw handleAsVariableError(err);
 		}
 	}
 	for (const loader of loaders) {
@@ -95,7 +89,7 @@ export async function getConfigObject<Output>(
 	let stringValue: string | undefined;
 	if (defaultValue !== undefined) {
 		stringValue = parser.toString(defaultValue, encodeOptions);
-		if (!handleSeen(defaultValueSeenMap, rootKey, stringValue)) {
+		if (!handleSeen(defaultValueSeenMap, rootKey, stringValue) && !encodeOptions?.silent) {
 			printLog(currentOptions, 'default', rootKey, stringValue, 'default', params);
 		}
 		return {namespace: currentOptions.namespace, stringValue, type: 'default', value: defaultValue};

@@ -2,7 +2,7 @@ import {type EncodeOptions, type IConfigLoader, type IConfigParser} from './inte
 import {type ConfigOptions} from './ConfigOptions';
 import {type FormatParameters} from './lib/formatUtils';
 import {getConfigObject} from './getConfigObject';
-import {type Loadable} from './types/Loadable';
+import {type Loadable} from '@luolapeikko/ts-common';
 
 /**
  * get config variable from loaders

@@ -3,7 +3,7 @@ import {isRequestNotReadMessage, type RequestNotReady} from '../types/RequestNot
 import type {IConfigLoaderProps} from './ConfigLoader';
 import type {ILoggerLike} from '@avanio/logger-like';
 import type {IRequestCache} from '../interfaces/IRequestCache';
-import type {Loadable} from '../types/Loadable';
+import type {Loadable} from '@luolapeikko/ts-common';
 import type {LoaderValue} from '../interfaces/IConfigLoader';
 import {RecordConfigLoader} from './RecordConfigLoader';
 import {urlSanitize} from '../lib/formatUtils';

@@ -3,7 +3,7 @@ import {type IConfigLoader, type IConfigParser} from './interfaces';
 import {type ConfigOptions} from './ConfigOptions';
 import {type FormatParameters} from './lib/formatUtils';
 import {getConfigObject} from './getConfigObject';
-import {type Loadable} from './types/Loadable';
+import {type Loadable} from '@luolapeikko/ts-common';
 
 /**
  * Wrapper around getConfigObject that returns a Result

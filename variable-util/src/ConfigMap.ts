@@ -106,8 +106,8 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * @example
 	 * const port: number = await config.get('PORT');
 	 */
-	public async get<Key extends keyof Data = keyof Data>(key: Key): Promise<Data[Key]> {
-		return (await this.getObject(key)).value;
+	public async get<Key extends keyof Data = keyof Data>(key: Key, encodeOptions?: EncodeOptions): Promise<Data[Key]> {
+		return (await this.getObject(key, encodeOptions)).value;
 	}
 
 	/**
@@ -132,9 +132,9 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * 	 console.log('port', port.ok());
 	 * }
 	 */
-	public async getResult<Key extends keyof Data = keyof Data>(key: Key): Promise<IResult<Data[Key]>> {
+	public async getResult<Key extends keyof Data = keyof Data>(key: Key, encodeOptions?: EncodeOptions): Promise<IResult<Data[Key]>> {
 		try {
-			return Ok(await this.get(key));
+			return Ok(await this.get(key, encodeOptions));
 		} catch (err) {
 			return Err(err);
 		}

@@ -5,7 +5,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable sonarjs/no-duplicate-string */
-import 'cross-fetch/polyfill';
 import * as dotenv from 'dotenv';
 import * as sinon from 'sinon';
 import * as z from 'zod';

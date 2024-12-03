@@ -2,7 +2,6 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable sort-keys */
 /* eslint-disable sonarjs/no-duplicate-string */
-import 'cross-fetch/polyfill';
 import * as dotenv from 'dotenv';
 import * as sinon from 'sinon';
 import * as z from 'zod';
@@ -52,6 +51,7 @@ type TestEnv = {
 	TEST_OBJECT: TestObjectType;
 	NOT_EXISTS: string;
 	ARRAY: string[];
+	SILENT_VALUE: number;
 };
 
 const testEnvSchema = z.object({
@@ -64,6 +64,7 @@ const testEnvSchema = z.object({
 	TEST_OBJECT: testObjectFinalSchema,
 	NOT_EXISTS: z.string(),
 	ARRAY: z.array(z.string()),
+	SILENT_VALUE: z.number(),
 });
 
 const memoryEnv = new MemoryConfigLoader<{PORT?: string}>(
@@ -94,6 +95,7 @@ const config = new ConfigMap<TestEnv>(
 		TEST_OBJECT: {loaders, parser: testObjectParser, defaultValue: {First: false, Second: false, Third: true}},
 		NOT_EXISTS: {loaders, parser: stringParser(), undefinedThrowsError: true, undefinedErrorMessage: 'add NOT_EXISTS to env'},
 		ARRAY: {loaders, parser: arrayParser(stringParser()), defaultValue: ['a', 'b', 'c'], params: {showValue: true}},
+		SILENT_VALUE: {loaders, parser: integerParser(), defaultValue: 3000, params: {showValue: true}},
 	},
 	{namespace: 'Demo'},
 );
@@ -117,6 +119,11 @@ describe('ConfigMap', () => {
 			const call: Promise<number> = config.get('PORT');
 			await expect(call).resolves.toEqual(6000);
 			expect(infoSpy.callCount).to.be.eq(1);
+		});
+		it('should return PORT env value', async function () {
+			const call: Promise<number> = config.get('SILENT_VALUE', {silent: true});
+			await expect(call).resolves.toEqual(3000);
+			expect(infoSpy.callCount).to.be.eq(0);
 		});
 		it('should return HOST env value', async function () {
 			process.env.HOST = 'minecraft';
@@ -281,6 +288,7 @@ describe('ConfigMap', () => {
 					namespace: 'Demo',
 				},
 				ARRAY: {type: 'default', value: ['a', 'b', 'c'], stringValue: 'a;b;c', namespace: 'Demo'},
+				SILENT_VALUE: {type: 'default', value: 3000, stringValue: '3000', namespace: 'Demo'},
 			});
 		});
 	});
