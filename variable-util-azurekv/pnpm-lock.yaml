@@ -24,6 +24,9 @@ importers:
       '@azure/keyvault-secrets':
         specifier: ^4.9.0
         version: 4.9.0
+      '@luolapeikko/ts-common':
+        specifier: ^0.2.4
+        version: 0.2.4
       '@stylistic/eslint-plugin':
         specifier: ^2.11.0
         version: 2.11.0(eslint@8.57.1)(typescript@5.7.2)

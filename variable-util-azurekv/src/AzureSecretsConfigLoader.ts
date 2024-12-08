@@ -1,4 +1,5 @@
-import {ConfigLoader, type IConfigLoaderProps, type Loadable, type LoaderValue} from '@avanio/variable-util';
+import {ConfigLoader, type IConfigLoaderProps, type LoaderValue} from '@avanio/variable-util';
+import {type Loadable} from '@luolapeikko/ts-common';
 import {ExpireCache} from '@avanio/expire-cache';
 import {type ILoggerLike} from '@avanio/logger-like';
 import {SecretClient} from '@azure/keyvault-secrets';

@@ -50,6 +50,7 @@
     "@avanio/variable-util": "^0.12.0",
     "@azure/identity": "^4.5.0",
     "@azure/keyvault-secrets": "^4.9.0",
+    "@luolapeikko/ts-common": "^0.2.4",
     "@stylistic/eslint-plugin": "^2.11.0",
     "@stylistic/eslint-plugin-ts": "^2.11.0",
     "@tsconfig/node18": "^18.2.4",
@@ -77,7 +78,8 @@
     "@avanio/logger-like": "^0.0 || ^0.1 || ^0.2",
     "@avanio/variable-util": "^0.12",
     "@azure/identity": "3 - 4",
-    "@azure/keyvault-secrets": "4.6 - 4.9"
+    "@azure/keyvault-secrets": "4.6 - 4.9",
+    "@luolapeikko/ts-common": "^0.1 || ^0.2"
   },
   "dependencies": {
     "@avanio/expire-cache": "^0.6.3"
