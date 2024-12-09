@@ -1,6 +1,6 @@
 {
   "name": "@avanio/variable-util-tachyon",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "tachyon store for variables",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -35,38 +35,39 @@
   ],
   "devDependencies": {
     "@avanio/logger-like": "^0.2.7",
-    "@avanio/variable-util": "^0.11.0",
-    "@stylistic/eslint-plugin": "^2.10.1",
-    "@stylistic/eslint-plugin-ts": "^2.10.1",
+    "@avanio/variable-util": "^0.12.0",
+    "@stylistic/eslint-plugin": "^2.12.0",
+    "@stylistic/eslint-plugin-ts": "^2.12.0",
     "@tsconfig/node18": "^18.2.4",
-    "@types/node": "^18.19.64",
+    "@types/node": "^18.19.67",
     "@types/sinon": "^17.0.3",
-    "@typescript-eslint/eslint-plugin": "^8.14.0",
-    "@typescript-eslint/parser": "^8.14.0",
-    "@vitest/coverage-v8": "^2.1.5",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "@vitest/coverage-v8": "^2.1.8",
     "c8": "^10.1.2",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.7",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-deprecation": "^3.0.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-sonarjs": "^0.25.1",
-    "prettier": "^3.3.3",
+    "prettier": "^3.4.2",
+    "quantum-sequence": "^0.10.1",
     "sinon": "^19.0.2",
     "source-map-support": "^0.5.21",
+    "tachyon-drive": "^0.10.2",
     "tsup": "^8.3.5",
-    "typescript": "^5.6.3",
-    "vite": "^5.4.11",
-    "vitest": "^2.1.4"
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3",
+    "vitest": "^2.1.8",
+    "zod": "^3.23.8"
   },
   "peerDependencies": {
     "@avanio/logger-like": "^0.1 || ^0.2",
-    "@avanio/variable-util": "^0.11"
-  },
-  "dependencies": {
-    "quantum-sequence": "^0.10.1",
-    "tachyon-drive": "^0.10.2",
-    "zod": "^3.23.8"
+    "@avanio/variable-util": "^0.12",
+    "quantum-sequence": "^0.10",
+    "tachyon-drive": "^0.10",
+    "zod": "^3.23"
   }
 }
