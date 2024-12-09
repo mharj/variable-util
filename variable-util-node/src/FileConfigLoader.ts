@@ -1,5 +1,5 @@
 import {AbstractFileRecordLoader, type AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
-import {type Loadable} from '@avanio/variable-util';
+import {type Loadable} from '@luolapeikko/ts-common';
 
 /**
  * A file-based configuration loader that reads a JSON file.

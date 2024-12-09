@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
-import {beforeEach, describe, expect, it} from 'vitest';
 import * as path from 'path';
 import * as sinon from 'sinon';
+import {beforeEach, describe, expect, it} from 'vitest';
 import {booleanParser, ConfigMap, getConfigVariable, integerParser, setLogger, stringParser} from '@avanio/variable-util';
 import {DockerSecretsConfigLoader, DotEnvLoader, FileConfigLoader} from '../src/';
 import type {ILoggerLike} from '@avanio/logger-like';

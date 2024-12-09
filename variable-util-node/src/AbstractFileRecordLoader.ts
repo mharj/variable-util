@@ -1,6 +1,6 @@
 import {existsSync, type FSWatcher, watch} from 'fs';
-import {type IConfigLoaderProps, type Loadable, type LoaderValue, RecordConfigLoader, type ValidateCallback, VariableError} from '@avanio/variable-util';
-import {getError} from './errorUtil';
+import {type IConfigLoaderProps, type LoaderValue, RecordConfigLoader, type ValidateCallback, VariableError} from '@avanio/variable-util';
+import {type Loadable, toError} from '@luolapeikko/ts-common';
 import type {ILoggerLike} from '@avanio/logger-like';
 import {readFile} from 'fs/promises';
 
@@ -138,7 +138,7 @@ export abstract class AbstractFileRecordLoader<
 			options.logger?.debug(this.buildErrorStr(`file ${options.fileName} changed`));
 			await this.reload();
 		} catch (err) {
-			options.logger?.error(this.buildErrorStr(`error reloading file ${options.fileName}: ${getError(err).message}`));
+			options.logger?.error(this.buildErrorStr(`error reloading file ${options.fileName}: ${toError(err).message}`));
 		}
 	}
 }
