@@ -173,6 +173,8 @@ describe('ConfigMap', () => {
 			await expect(config.get('PORT')).resolves.toEqual(6000);
 			await memoryEnv.set('PORT', '7000');
 			await expect(config.get('PORT')).resolves.toEqual(7000);
+			await memoryEnv.setDisabled(() => Promise.resolve(true));
+			await expect(config.get('PORT')).resolves.toEqual(6000);
 			await memoryEnv.set('PORT', undefined);
 			await expect(config.get('PORT')).resolves.toEqual(6000);
 			process.env.PORT = undefined;

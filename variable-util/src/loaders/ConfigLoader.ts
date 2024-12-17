@@ -1,6 +1,6 @@
 import {type IConfigLoader, type LoaderValue} from '../interfaces/';
 import {EventEmitter} from 'events';
-import type {Loadable} from '@luolapeikko/ts-common';
+import {type Loadable} from '@luolapeikko/ts-common';
 
 /**
  * ConfigLoaderEventMap is the event map for the ConfigLoader
@@ -83,6 +83,16 @@ export abstract class ConfigLoader<
 	protected async getOptions(): Promise<DefaultProps & Props> {
 		const resolvedOptions = await (typeof this.options === 'function' ? this.options() : this.options);
 		return Object.assign({}, this.defaultOptions, resolvedOptions);
+	}
+
+	/**
+	 * Set options to loader
+	 * @param options - options
+	 * @returns Promise of void
+	 */
+	protected async setOptions(options: Partial<DefaultProps & Props>) {
+		const resolvedOptions = await (typeof this.options === 'function' ? this.options() : this.options);
+		this.options = Object.assign({}, resolvedOptions, options);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 import {ConfigLoader, type IConfigLoaderProps} from './ConfigLoader';
+import {type Loadable, resolveLoadable} from '@luolapeikko/ts-common';
 import {handleSeen} from '../lib/seenUtils';
 import {type ILoggerLike} from '@avanio/logger-like';
-import type {Loadable} from '@luolapeikko/ts-common';
 import {type LoaderValue} from '../interfaces';
 
 export interface IMemoryConfigLoaderProps extends IConfigLoaderProps {
@@ -44,6 +44,10 @@ export class MemoryConfigLoader<MemoryMap extends Record<string, string | undefi
 		const options = await this.getOptions();
 		options.logger?.debug(this.buildErrorStr(`getting key ${String(key)}`));
 		return this.data.get(key);
+	}
+
+	public async setDisabled(disabled: Loadable<boolean>): Promise<void> {
+		await this.setOptions({disabled: await resolveLoadable(disabled)});
 	}
 
 	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
