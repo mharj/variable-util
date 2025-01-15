@@ -1,10 +1,9 @@
-/* eslint-disable no-unused-expressions */
 import * as path from 'path';
+import type {ILoggerLike} from '@avanio/logger-like';
+import {booleanParser, ConfigMap, getConfigVariable, integerParser, setLogger, stringParser} from '@avanio/variable-util';
 import * as sinon from 'sinon';
 import {beforeEach, describe, expect, it} from 'vitest';
-import {booleanParser, ConfigMap, getConfigVariable, integerParser, setLogger, stringParser} from '@avanio/variable-util';
-import {DockerSecretsConfigLoader, DotEnvLoader, FileConfigLoader} from '../src/';
-import type {ILoggerLike} from '@avanio/logger-like';
+import {DockerSecretsConfigLoader, DotEnvLoader, FileConfigLoader} from '../src';
 
 const debugSpy = sinon.spy();
 const infoSpy = sinon.spy();
@@ -61,6 +60,11 @@ describe('config variable', () => {
 		it('should return file variable value, filename from promise', async function () {
 			const fileEnv = new FileConfigLoader(Promise.resolve({fileName: jsonFilename})).getLoader;
 			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
+			expect(await getConfigVariable('SETTINGS_VARIABLE2', [fileEnv()], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
+			expect(await getConfigVariable('SETTINGS_VARIABLE3', [fileEnv()], booleanParser(), undefined, {showValue: true})).to.be.eq(true);
+			expect(await getConfigVariable('SETTINGS_VARIABLE4', [fileEnv()], booleanParser(), undefined, {showValue: true})).to.be.eq(true);
+			expect(await getConfigVariable('SETTINGS_VARIABLE5', [fileEnv()], integerParser(), undefined, {showValue: true})).to.be.eq(1);
+			expect(await getConfigVariable('SETTINGS_VARIABLE6', [fileEnv()], integerParser(), undefined, {showValue: true})).to.be.eq(1);
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);
 		});
 		it('should return file variable value, filename from callback', async function () {
@@ -101,6 +105,11 @@ describe('config variable', () => {
 			const res = await mapper.getResult('demo');
 			expect(() => res.unwrap()).to.throw('ConfigMap key demo is undefined');
 			expect((errorSpy.getCall(0).args[0] as Error).message).to.be.eq(`ConfigLoader[file]: file ./test/test.txt is not a valid json`);
+		});
+		it('should get empty value if disabled', async function () {
+			const fileEnv = new FileConfigLoader({disabled: true, fileName: jsonFilename, isSilent: false, logger: testLogger}).getLoader;
+			const data = await fileEnv().callback('SETTINGS_VARIABLE1');
+			expect(data).to.be.eql({type: data.type, result: undefined});
 		});
 	});
 	describe('Docker Secrets loader', () => {

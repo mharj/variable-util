@@ -1,6 +1,6 @@
-import {AbstractFileRecordLoader, type AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
 import {type Loadable} from '@luolapeikko/ts-common';
 import {parse} from 'dotenv';
+import {AbstractFileRecordLoader, type AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
 
 /**
  * Loader for dotenv files, using the `dotenv` packages parser.
@@ -8,11 +8,6 @@ import {parse} from 'dotenv';
  */
 export class DotEnvLoader extends AbstractFileRecordLoader {
 	public readonly type: Lowercase<string>;
-
-	public constructor(options: Loadable<Partial<AbstractFileRecordLoaderOptions<'env'>>>, type: Lowercase<string> = 'dotenv') {
-		super(options);
-		this.type = type;
-	}
 
 	protected defaultOptions: AbstractFileRecordLoaderOptions<'env'> = {
 		disabled: false,
@@ -23,6 +18,11 @@ export class DotEnvLoader extends AbstractFileRecordLoader {
 		validate: undefined,
 		watch: false,
 	};
+
+	public constructor(options: Loadable<Partial<AbstractFileRecordLoaderOptions<'env'>>>, type: Lowercase<string> = 'dotenv') {
+		super(options);
+		this.type = type;
+	}
 
 	protected handleParse(rawData: Buffer): Record<string, string | undefined> {
 		return parse(rawData);

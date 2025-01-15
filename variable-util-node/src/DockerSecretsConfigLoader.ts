@@ -1,9 +1,9 @@
-import * as path from 'path';
-import {ConfigLoader, type LoaderValue, VariableLookupError} from '@avanio/variable-util';
 import {existsSync} from 'fs';
-import type {ILoggerLike} from '@avanio/logger-like';
-import {type Loadable} from '@luolapeikko/ts-common';
 import {readFile} from 'fs/promises';
+import * as path from 'path';
+import type {ILoggerLike} from '@avanio/logger-like';
+import {ConfigLoader, type LoaderValue, VariableLookupError} from '@avanio/variable-util';
+import {type Loadable} from '@luolapeikko/ts-common';
 
 export interface DockerSecretsConfigLoaderOptions {
 	/** force file name to lower case */

@@ -1,8 +1,8 @@
 import {existsSync, type FSWatcher, watch} from 'fs';
+import {readFile} from 'fs/promises';
+import type {ILoggerLike} from '@avanio/logger-like';
 import {type IConfigLoaderProps, type LoaderValue, RecordConfigLoader, type ValidateCallback, VariableError} from '@avanio/variable-util';
 import {type Loadable, toError} from '@luolapeikko/ts-common';
-import type {ILoggerLike} from '@avanio/logger-like';
-import {readFile} from 'fs/promises';
 
 /**
  * Options for the AbstractFileRecordLoader.
