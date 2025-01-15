@@ -11,16 +11,16 @@ import {type IConfigParser, type ParserProps, type PostValidate} from '../interf
  */
 export function arrayParser<Output, RawOutput>(
 	parse: IConfigParser<Output, RawOutput>,
-	separator: ';' = ';',
+	separator: string = ';',
 	postValidate?: PostValidate<Output[], RawOutput[]>,
 ): IConfigParser<Output[], RawOutput[]> {
 	return {
-		name: 'semicolonArrayParser',
-		parse: (props: ParserProps): Promise<RawOutput[]> => {
+		name: 'arraySeparatorParser',
+		parse: (props: ParserProps) => {
 			return Promise.all(props.value.split(separator).map((v) => parse.parse({...props, value: v})));
 		},
 		postValidate,
-		toString: (value: Output[]): string => {
+		toString: (value: Output[]) => {
 			return value.map((v) => parse.toString(v)).join(separator);
 		},
 	};

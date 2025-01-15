@@ -1,14 +1,14 @@
-import {buildStringObject, isValidObject} from '../lib';
-import {isRequestNotReadMessage, type RequestNotReady} from '../types/RequestNotReady';
-import type {IConfigLoaderProps} from './ConfigLoader';
 import type {ILoggerLike} from '@avanio/logger-like';
-import type {IRequestCache} from '../interfaces/IRequestCache';
 import type {Loadable} from '@luolapeikko/ts-common';
 import type {LoaderValue} from '../interfaces/IConfigLoader';
-import {RecordConfigLoader} from './RecordConfigLoader';
-import {urlSanitize} from '../lib/formatUtils';
+import type {IRequestCache} from '../interfaces/IRequestCache';
 import type {ValidateCallback} from '../interfaces/IValidate';
+import {buildStringObject, isValidObject} from '../lib';
+import {urlSanitize} from '../lib/formatUtils';
+import {isRequestNotReadMessage, type RequestNotReady} from '../types/RequestNotReady';
 import {VariableError} from '../VariableError';
+import type {IConfigLoaderProps} from './ConfigLoader';
+import {RecordConfigLoader} from './RecordConfigLoader';
 
 /**
  * Options for the FetchConfigLoader

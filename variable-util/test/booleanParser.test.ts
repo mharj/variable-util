@@ -1,5 +1,5 @@
-import {booleanParser, type IConfigLoader} from '../src';
 import {describe, expect, it} from 'vitest';
+import {booleanParser, type IConfigLoader} from '../src';
 
 const testLoader: IConfigLoader = {
 	type: 'unit',

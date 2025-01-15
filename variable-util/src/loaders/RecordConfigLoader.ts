@@ -1,5 +1,5 @@
-import {ConfigLoader, type IConfigLoaderProps} from './ConfigLoader';
 import {handleSeen} from '../lib/seenUtils';
+import {ConfigLoader, type IConfigLoaderProps} from './ConfigLoader';
 
 /**
  * RecordConfigLoader is a class that extends ConfigLoader and adds the ability to reload the data.
@@ -25,6 +25,13 @@ export abstract class RecordConfigLoader<HandlerParams, Props extends IConfigLoa
 	}
 
 	/**
+	 * is the data loaded
+	 */
+	public isLoaded(): boolean {
+		return this._isLoaded;
+	}
+
+	/**
 	 * Set seen value and return last "seen" value
 	 * @param targetKey
 	 * @param currentValue
@@ -32,13 +39,6 @@ export abstract class RecordConfigLoader<HandlerParams, Props extends IConfigLoa
 	 */
 	protected handleSeen(targetKey: string, currentValue: string | undefined): boolean {
 		return handleSeen(this.valueSeen, targetKey, currentValue);
-	}
-
-	/**
-	 * is the data loaded
-	 */
-	public isLoaded(): boolean {
-		return this._isLoaded;
 	}
 
 	protected abstract handleData(): Promise<Record<string, HandlerParams>>;

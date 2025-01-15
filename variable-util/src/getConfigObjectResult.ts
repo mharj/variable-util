@@ -1,9 +1,9 @@
 import {Err, type IResult, Ok} from '@luolapeikko/result-option';
-import {type IConfigLoader, type IConfigParser} from './interfaces';
-import {type ConfigOptions} from './ConfigOptions';
-import {type FormatParameters} from './lib/formatUtils';
-import {getConfigObject} from './getConfigObject';
 import {type Loadable} from '@luolapeikko/ts-common';
+import {type ConfigOptions} from './ConfigOptions';
+import {getConfigObject} from './getConfigObject';
+import {type IConfigLoader, type IConfigParser} from './interfaces';
+import {type FormatParameters} from './lib/formatUtils';
 
 /**
  * Wrapper around getConfigObject that returns a Result

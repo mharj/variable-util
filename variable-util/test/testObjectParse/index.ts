@@ -1,5 +1,5 @@
-import {SemicolonConfigParser} from '../../src/parsers/SemicolonConfigParser';
 import {z} from 'zod';
+import {SemicolonConfigParser} from '../../src/parsers/SemicolonConfigParser';
 
 /**
  * transform string 'true' | 'false' as boolean

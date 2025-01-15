@@ -1,8 +1,8 @@
-import {ConfigLoader, type IConfigLoaderProps} from './ConfigLoader';
-import {handleSeen} from '../lib/seenUtils';
 import {type ILoggerLike} from '@avanio/logger-like';
 import type {Loadable} from '@luolapeikko/ts-common';
 import {type LoaderValue} from '../interfaces/IConfigLoader';
+import {handleSeen} from '../lib/seenUtils';
+import {ConfigLoader, type IConfigLoaderProps} from './ConfigLoader';
 
 export interface ISwitchLoaderProps extends IConfigLoaderProps {
 	logger?: ILoggerLike;

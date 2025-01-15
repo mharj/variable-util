@@ -1,9 +1,9 @@
-import {buildOptions, type ConfigOptions} from './ConfigOptions';
-import {Err, type IResult, Ok} from '@luolapeikko/result-option';
 import type {ILoggerLike, ISetOptionalLogger} from '@avanio/logger-like';
+import {Err, type IResult, Ok} from '@luolapeikko/result-option';
+import {buildOptions, type ConfigOptions} from './ConfigOptions';
+import {getConfigObject} from './getConfigObject';
 import {type EncodeOptions} from './interfaces/IConfigParser';
 import {type EnvMapSchema} from './types/EnvMapSchema';
-import {getConfigObject} from './getConfigObject';
 import {type LoaderTypeValueStrict} from './types/TypeValue';
 import {VariableError} from './VariableError';
 import {VariableLookupError} from './VariableLookupError';

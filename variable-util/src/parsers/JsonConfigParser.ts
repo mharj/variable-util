@@ -1,6 +1,6 @@
-import {buildHiddenValue, type ShowValueType} from '../lib/formatUtils';
 import {type IConfigParser, type ParserProps, type PostValidateProps} from '../interfaces/IConfigParser';
 import {type ValidateCallback} from '../interfaces/IValidate';
+import {buildHiddenValue, type ShowValueType} from '../lib/formatUtils';
 
 /**
  * The base type of the parsed JSON object

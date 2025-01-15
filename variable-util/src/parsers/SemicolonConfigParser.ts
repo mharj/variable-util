@@ -1,7 +1,7 @@
 import {type EncodeOptions, type IConfigParser, type ParserProps, type PostValidateProps} from '../interfaces/IConfigParser';
-import {logStringifySemicolonConfig, parseSemicolonConfig, stringifySemicolonConfig} from '../lib/semicolonUtils';
-import {type ShowValueType} from '../lib';
 import {type ValidateCallback} from '../interfaces/IValidate';
+import {type ShowValueType} from '../lib';
+import {logStringifySemicolonConfig, parseSemicolonConfig, stringifySemicolonConfig} from '../lib/semicolonUtils';
 
 /**
  * The base type of the parsed JSON object

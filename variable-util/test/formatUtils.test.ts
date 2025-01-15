@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {buildPartialHiddenValueString} from '../src/';
+import {buildPartialHiddenValueString} from '../src';
 
 const uuidValue = '326ef604-7570-443a-bbea-fe68f21f84be';
 const shortKey = 'someSecretKey';

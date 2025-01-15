@@ -1,7 +1,6 @@
-/* eslint-disable sonarjs/no-duplicate-string */
-import * as z from 'zod';
 import {describe, expect, it} from 'vitest';
-import {env, getConfigObject, getConfigVariable, SemicolonConfigParser} from '../src/';
+import * as z from 'zod';
+import {env, getConfigObject, getConfigVariable, SemicolonConfigParser} from '../src';
 
 const booleanParamSchema = z.enum(['true', 'false']).transform((value) => value === 'true');
 

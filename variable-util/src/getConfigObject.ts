@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import {buildOptions, type ConfigOptions} from './ConfigOptions';
-import {type EncodeOptions, type IConfigLoader, type IConfigParser} from './interfaces/';
-import {handleAsVariableError, handleLoader, printLog} from './loaderUtils';
 import {type Loadable, resolveLoadable} from '@luolapeikko/ts-common';
-import {type LoaderTypeValue, type LoaderTypeValueStrict} from './types/TypeValue';
+import {buildOptions, type ConfigOptions} from './ConfigOptions';
+import {type EncodeOptions, type IConfigLoader, type IConfigParser} from './interfaces';
 import {type FormatParameters} from './lib/formatUtils';
 import {handleSeen} from './lib/seenUtils';
+import {handleAsVariableError, handleLoader, printLog} from './loaderUtils';
+import {type LoaderTypeValue, type LoaderTypeValueStrict} from './types/TypeValue';
 
 /**
  * Map of seen default values

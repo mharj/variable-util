@@ -1,14 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/unbound-method */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable sonarjs/no-duplicate-string */
+import {URL} from 'url';
+import {type ILoggerLike} from '@avanio/logger-like';
 import * as dotenv from 'dotenv';
+import etag from 'etag';
 import * as sinon from 'sinon';
-import * as z from 'zod';
 import {beforeAll, beforeEach, describe, expect, it} from 'vitest';
+import * as z from 'zod';
 import {
 	booleanParser,
 	clearDefaultValueSeenMap,
@@ -31,11 +27,8 @@ import {
 	UrlParser,
 	type ValidateCallback,
 	validLiteral,
-} from '../src/';
-import etag from 'etag';
-import {type ILoggerLike} from '@avanio/logger-like';
+} from '../src';
 import {testObjectParser} from './testObjectParse';
-import {URL} from 'url';
 
 dotenv.config();
 const debugSpy = sinon.spy();
@@ -271,7 +264,7 @@ describe('config variable', () => {
 				fetchRequestData = req;
 				const call = getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
 				const output = await call;
-				expect(errorSpy.callCount, errorSpy.getCall(0)?.args.join(' ')).to.be.eq(0);
+				expect(errorSpy.callCount).to.be.eq(0);
 				expect(infoSpy.callCount).to.be.eq(1);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[fetch]: API_SERVER [${value}] from ${configRequestUrl}`);
 				expect(debugSpy.callCount).to.be.eq(4);
@@ -288,7 +281,7 @@ describe('config variable', () => {
 				fetchRequestData = req;
 				const call = getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
 				const output = await call;
-				expect(errorSpy.callCount, errorSpy.getCall(0)?.args.join(' ')).to.be.eq(0);
+				expect(errorSpy.callCount).to.be.eq(0);
 				expect(infoSpy.callCount).to.be.eq(1);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: API_SERVER [http://localhost/api] from default`);
 				expect(output).to.be.eql(urlDefault);

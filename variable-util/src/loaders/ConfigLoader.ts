@@ -1,6 +1,6 @@
-import {type IConfigLoader, type LoaderValue} from '../interfaces/';
 import {EventEmitter} from 'events';
 import {type Loadable} from '@luolapeikko/ts-common';
+import {type IConfigLoader, type LoaderValue} from '../interfaces';
 
 /**
  * ConfigLoaderEventMap is the event map for the ConfigLoader
@@ -55,19 +55,6 @@ export abstract class ConfigLoader<
 	}
 
 	/**
-	 * Call the loader function if not disabled
-	 * @param lookupKey - key to lookup in config
-	 * @param params - optional passing params for handleLoader (i.e. lookup key override, settings etc.)
-	 * @returns {Promise<LoaderValue>} - Promise of LoaderValue
-	 */
-	private async callLoader(lookupKey: string, params?: HandlerParams): Promise<LoaderValue> {
-		if (await this.isDisabled()) {
-			return {type: this.type, result: undefined};
-		}
-		return this.handleLoader(lookupKey, params);
-	}
-
-	/**
 	 * Check if loader is disabled
 	 * @returns {Promise<boolean | undefined>} - Promise of boolean or undefined
 	 */
@@ -110,5 +97,18 @@ export abstract class ConfigLoader<
 	 */
 	protected buildErrorStr(message: string): string {
 		return `ConfigLoader[${this.type}]: ${message}`;
+	}
+
+	/**
+	 * Call the loader function if not disabled
+	 * @param lookupKey - key to lookup in config
+	 * @param params - optional passing params for handleLoader (i.e. lookup key override, settings etc.)
+	 * @returns {Promise<LoaderValue>} - Promise of LoaderValue
+	 */
+	private async callLoader(lookupKey: string, params?: HandlerParams): Promise<LoaderValue> {
+		if (await this.isDisabled()) {
+			return {type: this.type, result: undefined};
+		}
+		return this.handleLoader(lookupKey, params);
 	}
 }

@@ -1,7 +1,7 @@
+import {type SolvedConfigOptions} from './ConfigOptions';
 import {type EncodeOptions, type IConfigLoader, type IConfigParser} from './interfaces';
 import {type FormatParameters, printValue} from './lib/formatUtils';
 import {type LoaderTypeValue} from './types/TypeValue';
-import {type SolvedConfigOptions} from './ConfigOptions';
 import {VariableError} from './VariableError';
 
 /**
