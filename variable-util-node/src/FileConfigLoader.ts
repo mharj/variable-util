@@ -36,10 +36,11 @@ export class FileConfigLoader extends AbstractFileRecordLoader<AbstractFileRecor
 	 * Converts an object to a record of strings as env values are always strings.
 	 */
 	private convertObjectToStringRecord(data: object): Record<string, string> {
-		const result: Record<string, string> = {};
-		for (const [key, value] of Object.entries(data)) {
-			result[key] = String(value);
-		}
-		return result;
+		return Object.entries(data).reduce<Record<string, string>>((acc, [key, value]) => {
+			if (value) {
+				acc[key] = String(value);
+			}
+			return acc;
+		}, {});
 	}
 }
