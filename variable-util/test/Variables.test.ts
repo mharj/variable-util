@@ -2,9 +2,9 @@ import {URL} from 'url';
 import {type ILoggerLike} from '@avanio/logger-like';
 import * as dotenv from 'dotenv';
 import etag from 'etag';
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import {beforeAll, beforeEach, describe, expect, it} from 'vitest';
-import * as z from 'zod';
+import {z} from 'zod';
 import {
 	booleanParser,
 	clearDefaultValueSeenMap,
@@ -44,6 +44,7 @@ const API_SERVER = 'http://localhost:123/api';
 const fetchResponsePayload = {
 	API_SERVER,
 	TEST_OBJECT: 'First=false;Second=false;Third=true',
+	NULL_VALUE: null,
 };
 
 function mockFetch(input: globalThis.URL | RequestInfo, init?: RequestInit): Promise<Response> {
@@ -242,6 +243,12 @@ describe('config variable', () => {
 				expect(debugSpy.getCall(0).args[0]).to.be.an('string').and.eq(`fetching config from ${configRequestUrl}`);
 				expect(debugSpy.getCall(1).args[0]).to.be.an('string').and.eq(`returned cached response for FetchEnvConfig`);
 				expect(debugSpy.getCall(2).args[0]).to.be.an('string').and.eq(`successfully loaded config from FetchEnvConfig`);
+			});
+			it('should not get null value', async function () {
+				const req = new Request(configRequestUrl, {headers: {'If-None-Match': '123'}});
+				fetchRequestData = req;
+				expect(await getConfigVariable('NULL_VALUE', [fetchEnv()], testObjectParser, undefined, {showValue: true})).to.be.eq(undefined);
+				expect(infoSpy.callCount).to.be.eq(0);
 			});
 			it('should get cache hit', async function () {
 				const value = new URL(API_SERVER);

@@ -1,4 +1,4 @@
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import {beforeEach, describe, expect, it} from 'vitest';
 import {ConfigMap, stringParser, SwitchLoader} from '../src';
 

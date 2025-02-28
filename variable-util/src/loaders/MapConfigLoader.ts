@@ -2,22 +2,23 @@ import {handleSeen} from '../lib/seenUtils';
 import {ConfigLoader, type IConfigLoaderProps} from './ConfigLoader';
 
 /**
- * RecordConfigLoader is a class that extends ConfigLoader and adds the ability to reload the data.
- * @since v0.8.0
+ * MapConfigLoader is a class that extends ConfigLoader and adds the ability to reload the data.
+ * @since v0.13.0
  */
-export abstract class RecordConfigLoader<HandlerParams, Props extends IConfigLoaderProps, DefaultProps extends Props = Props> extends ConfigLoader<
+export abstract class MapConfigLoader<HandlerParams, Props extends IConfigLoaderProps, DefaultProps extends Props = Props> extends ConfigLoader<
 	HandlerParams,
 	Props,
 	DefaultProps
 > {
 	protected _isLoaded = false;
-	protected dataPromise: Promise<Record<string, HandlerParams>> | undefined;
+	protected data = new Map<string, HandlerParams>();
 	protected valueSeen = new Map<string, string>();
 	protected abstract defaultOptions: DefaultProps | undefined;
 	/**
-	 * reloads the data
+	 * clear maps and reloads the data
 	 */
 	public async reload(): Promise<void> {
+		this.data.clear();
 		this.valueSeen.clear();
 		await this.loadData();
 	}
@@ -35,9 +36,9 @@ export abstract class RecordConfigLoader<HandlerParams, Props extends IConfigLoa
 	 * @returns {Promise<void>}
 	 */
 	protected async loadData(): Promise<void> {
-		this.dataPromise = this.handleData();
-		await this.dataPromise;
-		this.emit('updated');
+		if (await this.handleLoadData()) {
+			this.emit('updated');
+		}
 	}
 
 	/**
@@ -50,5 +51,5 @@ export abstract class RecordConfigLoader<HandlerParams, Props extends IConfigLoa
 		return handleSeen(this.valueSeen, targetKey, currentValue);
 	}
 
-	protected abstract handleData(): Promise<Record<string, HandlerParams>>;
+	protected abstract handleLoadData(): Promise<boolean>;
 }

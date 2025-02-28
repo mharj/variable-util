@@ -1,9 +1,9 @@
 import {URL} from 'url';
 import {type IResult} from '@luolapeikko/result-option';
 import * as dotenv from 'dotenv';
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import {beforeAll, beforeEach, describe, expect, it} from 'vitest';
-import * as z from 'zod';
+import {z} from 'zod';
 import {
 	arrayParser,
 	booleanParser,

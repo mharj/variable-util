@@ -3,12 +3,12 @@ import type {Loadable} from '@luolapeikko/ts-common';
 import type {LoaderValue} from '../interfaces/IConfigLoader';
 import type {IRequestCache} from '../interfaces/IRequestCache';
 import type {ValidateCallback} from '../interfaces/IValidate';
-import {buildStringObject, isValidObject} from '../lib';
+import {applyStringMap, buildStringObject, isValidObject} from '../lib';
 import {urlSanitize} from '../lib/formatUtils';
 import {isRequestNotReadMessage, type RequestNotReady} from '../types/RequestNotReady';
 import {VariableError} from '../VariableError';
 import type {IConfigLoaderProps} from './ConfigLoader';
-import {RecordConfigLoader} from './RecordConfigLoader';
+import {MapConfigLoader} from './MapConfigLoader';
 
 /**
  * Options for the FetchConfigLoader
@@ -52,7 +52,7 @@ export type FetchConfigRequest = ConfigRequest | Promise<ConfigRequest> | (() =>
  * @implements {IConfigLoader}
  * @since v0.8.0
  */
-export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Partial<FetchConfigLoaderOptions>, FetchConfigLoaderOptions> {
+export class FetchConfigLoader extends MapConfigLoader<string, Partial<FetchConfigLoaderOptions>, FetchConfigLoaderOptions> {
 	public readonly type: Lowercase<string>;
 	private request: FetchConfigRequest;
 	private path = 'undefined';
@@ -82,29 +82,28 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Pa
 
 	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
 		// check if we have JSON data loaded, if not load it
-		if (!this.dataPromise || !this._isLoaded) {
-			this.dataPromise = this.handleData();
+		if (!this._isLoaded) {
+			await this.loadData();
+			this._isLoaded = true; // only load data once to prevent spamming fetch requests (use reload method to manually update data)
 		}
-		const data = await this.dataPromise;
 		const targetKey = overrideKey || lookupKey; // optional override key, else use actual lookupKey
-		const value = data[targetKey] || undefined;
+		const value = this.data.get(targetKey);
 		return {type: this.type, result: {value, path: this.path, seen: this.handleSeen(targetKey, value)}};
 	}
 
-	protected async handleData(): Promise<Record<string, string | undefined>> {
+	protected async handleLoadData(): Promise<boolean> {
 		const {logger, cache, isSilent, cacheHitHttpCode, payload} = await this.getOptions();
-		this._isLoaded = false;
 		const req = await this.getRequest();
 		if (isRequestNotReadMessage(req)) {
 			logger?.debug(`FetchEnvConfig: ${req.message}`);
-			return Promise.resolve({});
+			return false;
 		}
 		this.path = urlSanitize(req.url); // hide username/passwords from URL in logs
 		logger?.debug(`fetching config from ${this.path}`);
 		let res = await this.fetchRequestOrCacheResponse(req);
 		if (!res) {
 			logger?.info(`client is offline and not have cached response for FetchEnvConfig`);
-			return Promise.resolve({});
+			return false;
 		}
 		// if we have a cache and valid response, store to cache
 		if (res.ok && cache) {
@@ -118,7 +117,7 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Pa
 			if (res.status >= 400) {
 				if (isSilent) {
 					logger?.info(`http error ${res.status.toString()} from FetchEnvConfig`);
-					return Promise.resolve({}); // set as empty so we prevent fetch spamming
+					return false;
 				}
 				throw new VariableError(`http error ${res.status.toString()} from FetchEnvConfig`);
 			}
@@ -130,14 +129,13 @@ export class FetchConfigLoader extends RecordConfigLoader<string | undefined, Pa
 		const contentType = res.headers.get('content-type');
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (contentType?.startsWith('application/json') && payload === 'json') {
-			const data = await this.handleJson(res);
+			applyStringMap(await this.handleJson(res), this.data);
 			logger?.debug('successfully loaded config from FetchEnvConfig');
-			this._isLoaded = true;
-			return data;
+			return true;
 		}
 		if (isSilent) {
 			logger?.info(`unsupported content-type ${String(contentType)} from FetchEnvConfig`);
-			return Promise.resolve({}); // set as empty so we prevent fetch spamming
+			return false;
 		}
 		throw new VariableError(`unsupported content-type ${String(contentType)} from FetchEnvConfig`);
 	}
