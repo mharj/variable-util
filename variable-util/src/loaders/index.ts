@@ -5,3 +5,4 @@ export * from './ReactEnvConfigLoader';
 export * from './FetchConfigLoader';
 export * from './MemoryConfigLoader';
 export * from './SwitchLoader';
+export * from './MapConfigLoader';
