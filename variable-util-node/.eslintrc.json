@@ -5,7 +5,7 @@
         "sourceType": "module",
         "project": "./tsconfig.test.json"
     },
-	"plugins": ["@typescript-eslint", "@stylistic/ts", "import", "prettier", "sonarjs", "deprecation"],
+	"plugins": ["@typescript-eslint", "@stylistic/ts", "import", "prettier", "sonarjs"],
 	"extends": [
 		"standard",
 		"eslint:recommended",
@@ -16,6 +16,14 @@
 		"plugin:prettier/recommended",
 		"plugin:sonarjs/recommended"
 	],
+	"settings": {
+		"import/resolver": {
+			"typescript": {
+				"extensions": [".ts"],
+				"moduleDirectory": ["node_modules", "src/"]
+			}
+		}
+	},
     "rules": {
 		"sort-imports": "off",
 		"import/order": [
@@ -57,7 +65,7 @@
 				"caughtErrorsIgnorePattern": "^_"
 			}
 		],
-		"deprecation/deprecation": "warn",
+		"@typescript-eslint/no-deprecated": "warn",
 		"no-void": "off",
 		"lines-between-class-members": "off",
 		"@stylistic/ts/lines-between-class-members": [

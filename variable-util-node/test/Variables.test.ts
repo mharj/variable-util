@@ -1,7 +1,7 @@
 import * as path from 'path';
 import type {ILoggerLike} from '@avanio/logger-like';
 import {booleanParser, ConfigMap, getConfigVariable, integerParser, setLogger, stringParser} from '@avanio/variable-util';
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import {beforeEach, describe, expect, it} from 'vitest';
 import {DockerSecretsConfigLoader, DotEnvLoader, FileConfigLoader} from '../src';
 
