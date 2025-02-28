@@ -1,9 +1,9 @@
-import {ConfigLoader, type IConfigLoaderProps, type LoaderValue} from '@avanio/variable-util';
-import {type Loadable} from '@luolapeikko/ts-common';
 import {ExpireCache} from '@avanio/expire-cache';
 import {type ILoggerLike} from '@avanio/logger-like';
-import {SecretClient} from '@azure/keyvault-secrets';
+import {ConfigLoader, type IConfigLoaderProps, type LoaderValue} from '@avanio/variable-util';
 import {type TokenCredential} from '@azure/identity';
+import {SecretClient} from '@azure/keyvault-secrets';
+import {type Loadable} from '@luolapeikko/ts-common';
 
 export interface AzureSecretsConfigLoaderOptions extends IConfigLoaderProps {
 	credentials: TokenCredential;
@@ -40,7 +40,7 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined, A
 		try {
 			const options = await this.getOptions();
 			if (options.cacheLogger) {
-				this.valuePromises.setLogger(options.cacheLogger);
+				this.valuePromises.logger.setLogger(options.cacheLogger);
 			}
 			if (options.expireMs !== undefined) {
 				this.valuePromises.setExpireMs(options.expireMs);

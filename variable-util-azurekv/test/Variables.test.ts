@@ -1,13 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-import * as dotenv from 'dotenv';
-import * as sinon from 'sinon';
-import {beforeAll, beforeEach, describe, expect, it} from 'vitest';
-import {getConfigVariable, setLogger, UrlParser, urlSanitize} from '@avanio/variable-util';
-import {AzureSecretsConfigLoader} from '../src/';
-import {DefaultAzureCredential} from '@azure/identity';
 import {type ILoggerLike} from '@avanio/logger-like';
+import {getConfigVariable, setLogger, UrlParser, urlSanitize} from '@avanio/variable-util';
+import {DefaultAzureCredential} from '@azure/identity';
+import * as dotenv from 'dotenv';
+import sinon from 'sinon';
+import {beforeAll, beforeEach, describe, expect, it} from 'vitest';
+import {AzureSecretsConfigLoader} from '../src';
 
 dotenv.config();
 
@@ -55,7 +52,7 @@ describe('az key vault config variable', {skip: !process.env.KV_URI || !process.
 		const callback2 = getConfigVariable('MONGO_URL', [fetchKv(process.env.KV_MONGO_KEY)], urlParser, undefined, {showValue: true});
 		await callback1;
 		await callback2;
-		expect(debugLogger.error.callCount, debugLogger.error.getCall(0)?.args[0]).to.be.eq(0);
+		expect(debugLogger.error.callCount).to.be.eq(0);
 		expect(debugLogger.info.getCall(0).args[0]).to.be.eq(
 			`ConfigVariables[azure-secrets]: MONGO_URL [${mongoString}] from ${process.env.KV_URI}${process.env.KV_MONGO_KEY}`,
 		);
