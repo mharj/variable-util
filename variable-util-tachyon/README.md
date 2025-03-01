@@ -37,3 +37,4 @@ TachyonConfigLoader have two serializer objects, one for JSON string and one for
 
 - `tachyonConfigJsonStringSerializer` - Serializes the configuration data to a JSON string.
 - `tachyonConfigJsonBufferSerializer` - Serializes the configuration data to a JSON string as Buffer.
+- `tachyonConfigJsonArrayBufferSerializer` - Serializes the configuration data to a JSON string as ArrayBuffer.

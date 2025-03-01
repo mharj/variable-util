@@ -22,3 +22,12 @@ export const tachyonConfigJsonBufferSerializer: IPersistSerializer<TachyonConfig
 	deserialize: (buffer: Buffer) => JSON.parse(buffer.toString()),
 	validator: (data: TachyonConfigStoreType) => dataSchema.safeParse(data).success,
 };
+
+const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
+export const tachyonConfigJsonArrayBufferSerializer: IPersistSerializer<TachyonConfigStoreType, ArrayBuffer> = {
+	name: 'TachyonConfigJsonArrayBufferSerializer',
+	serialize: (data: TachyonConfigStoreType) => textEncoder.encode(JSON.stringify(data)),
+	deserialize: (buffer: ArrayBuffer) => JSON.parse(textDecoder.decode(buffer)),
+	validator: (data: TachyonConfigStoreType) => dataSchema.safeParse(data).success,
+};

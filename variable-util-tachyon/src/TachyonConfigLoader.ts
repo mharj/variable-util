@@ -1,5 +1,5 @@
-import {type IConfigLoaderProps, type LoaderValue, RecordConfigLoader} from '@avanio/variable-util';
 import {type ILoggerLike} from '@avanio/logger-like';
+import {applyStringMap, type IConfigLoaderProps, type LoaderValue, MapConfigLoader} from '@avanio/variable-util';
 import {type IStorageDriver} from 'tachyon-drive';
 import {type TachyonConfigStoreType} from './tachyonConfigSerializer';
 
@@ -16,32 +16,32 @@ export type TachyonConfigLoaderOptions = IConfigLoaderProps & {
  * // using tachyon loader
  * const value = await getConfigVariable('TEST', [tachyonEnv(), env(), fileEnv()], stringParser());
  */
-export class TachyonConfigLoader extends RecordConfigLoader<string | undefined, Partial<TachyonConfigLoaderOptions>, TachyonConfigLoaderOptions> {
+export class TachyonConfigLoader extends MapConfigLoader<string, Partial<TachyonConfigLoaderOptions>, TachyonConfigLoaderOptions> {
 	public readonly type: Lowercase<string>;
 	protected defaultOptions: TachyonConfigLoaderOptions = {
 		disabled: false,
 	};
 
 	private driver: IStorageDriver<TachyonConfigStoreType>;
-	private store: TachyonConfigStoreType = {_v: 1, data: {}};
-	private isHydrated = false;
 
 	constructor(driver: IStorageDriver<TachyonConfigStoreType>, options: Partial<TachyonConfigLoaderOptions> = {}, type: Lowercase<string> = 'tachyon') {
 		super(options);
-		this.driver = driver;
 		this.type = type;
+		this.driver = driver;
+		this.driver.on('update', () => void this.loadData());
 	}
 
 	/**
-	public async set(key: string, value: string): Promise<void> {
+	 * Set a Config variable in the store
 	 * @param key
 	 * @param value
 	 */
 	public async set(key: string, value: string): Promise<void> {
+		await this.hydratedData();
 		const options = await this.getOptions();
-		this.store.data[key] = value;
+		this.data.set(key, value);
 		options.logger?.info(`TachyonConfigLoader: Setting ${key} to ${value}`);
-		return this.driver.store(this.store);
+		return this.driver.store(this.getDataAsStore());
 	}
 
 	/**
@@ -49,10 +49,11 @@ export class TachyonConfigLoader extends RecordConfigLoader<string | undefined, 
 	 * @param key
 	 */
 	public async remove(key: string): Promise<void> {
+		await this.hydratedData();
 		const options = await this.getOptions();
-		Reflect.deleteProperty(this.store.data, key);
+		this.data.delete(key);
 		options.logger?.info(`TachyonConfigLoader: Removing ${key}`);
-		return this.driver.store(this.store);
+		return this.driver.store(this.getDataAsStore());
 	}
 
 	/**
@@ -61,42 +62,66 @@ export class TachyonConfigLoader extends RecordConfigLoader<string | undefined, 
 	 */
 	public async get(key: string): Promise<string | undefined> {
 		await this.hydratedData();
-		return this.store.data[key];
+		return this.data.get(key);
 	}
 
 	/**
 	 * Clear all Config variables from the store
 	 */
 	public async clear(): Promise<void> {
+		await this.hydratedData();
 		const options = await this.getOptions();
-		this.store.data = {};
+		this.data.clear();
 		options.logger?.info('TachyonConfigLoader: Clearing all data');
-		return this.driver.store(this.store);
+		return this.driver.store(this.getDataAsStore());
 	}
 
-	protected async handleData(): Promise<Record<string, string | undefined>> {
-		await this.hydratedData();
-		return this.store.data;
+	public size(): number {
+		return this.data.size;
 	}
 
 	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
-		// check if we have JSON data loaded, if not load it
-		if (!this.dataPromise || !this._isLoaded) {
-			this.dataPromise = this.handleData();
+		if (!this._isLoaded) {
+			await this.loadData();
+			this._isLoaded = true; // only load data once to prevent spamming fetch requests (use reload method to manually update data)
 		}
-		const data = await this.dataPromise;
 		const targetKey = overrideKey || lookupKey; // optional override key, else use actual lookupKey
-		const value = data[targetKey] || undefined;
+		const value = this.data.get(targetKey);
 		return {type: this.type, result: {value, path: `tachyon:${this.driver.name}/${targetKey}`, seen: this.handleSeen(targetKey, value)}};
 	}
 
-	private async hydratedData(): Promise<void> {
-		if (!this.isHydrated) {
-			const data = await this.driver.hydrate();
-			this.isHydrated = true;
-			if (data) {
-				this.store = data;
+	protected async handleLoadData(): Promise<boolean> {
+		let logger: ILoggerLike | undefined;
+		try {
+			logger = (await this.getOptions()).logger;
+			this.data.clear();
+			const content = await this.driver.hydrate();
+			if (content) {
+				applyStringMap(content.data, this.data);
+				logger?.info(`TachyonConfigLoader: Hydrated store with ${this.data.size.toString()} entries`);
 			}
+			return !!content;
+		} catch (err) {
+			logger?.error(err);
+			return false;
 		}
+	}
+
+	private async hydratedData() {
+		if (!this._isLoaded) {
+			await this.loadData();
+			this._isLoaded = true;
+		}
+	}
+
+	private getDataAsStore(): TachyonConfigStoreType {
+		const entries = Array.from(this.data.entries());
+		return {
+			_v: 1,
+			data: entries.reduce<Record<string, string>>((acc, [key, value]) => {
+				acc[key] = value;
+				return acc;
+			}, {}),
+		};
 	}
 }
