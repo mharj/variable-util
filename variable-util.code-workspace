@@ -16,5 +16,7 @@
 			"path": ".github"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"vitest.maximumConfigs": 5
+	}
 }
