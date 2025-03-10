@@ -1,7 +1,7 @@
 import {URL} from 'url';
 import {type IResult} from '@luolapeikko/result-option';
 import * as dotenv from 'dotenv';
-import sinon from 'sinon';
+import {spy} from 'sinon';
 import {beforeAll, beforeEach, describe, expect, it} from 'vitest';
 import {z} from 'zod';
 import {
@@ -19,15 +19,15 @@ import {
 } from '../src';
 import {testObjectFinalSchema, testObjectParser, type TestObjectType} from './testObjectParse';
 
-const updateSpy = sinon.spy();
+const updateSpy = spy();
 
 dotenv.config();
 
-const debugSpy = sinon.spy();
-const infoSpy = sinon.spy();
-const errorSpy = sinon.spy();
-const warnSpy = sinon.spy();
-const traceSpy = sinon.spy();
+const debugSpy = spy();
+const infoSpy = spy();
+const errorSpy = spy();
+const warnSpy = spy();
+const traceSpy = spy();
 
 export const spyLogger = {
 	debug: debugSpy,
@@ -70,7 +70,7 @@ const memoryEnv = new MemoryConfigLoader<{PORT?: string}>(
 	{logger: spyLogger},
 );
 memoryEnv.on('updated', updateSpy);
-// eslint-disable-next-line @typescript-eslint/unbound-method
+
 const memEnv = memoryEnv.getLoader;
 
 const loaders = [memEnv(), env()];

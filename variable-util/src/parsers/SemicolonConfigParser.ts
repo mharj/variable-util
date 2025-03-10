@@ -14,7 +14,7 @@ export interface SemicolonConfigParserOptions<
 	OutType extends OutConfigParseType = OutConfigParseType,
 	RawType extends RawConfigParseType = RawConfigParseType,
 > {
-	keysToHide?: (keyof OutType)[];
+	keysToHide?: Iterable<keyof OutType>;
 	validate?: ValidateCallback<OutType, RawType>;
 	showValue?: ShowValueType;
 	/**
@@ -33,13 +33,13 @@ export class SemicolonConfigParser<Out extends OutConfigParseType = OutConfigPar
 	implements IConfigParser<Out, RawType>
 {
 	public name = 'semicolonConfigParser';
-	private keysToHide: (keyof Out)[] | undefined;
+	private keysToHide: Set<keyof Out>;
 	private validate: ValidateCallback<Out, RawType> | undefined;
 	private keepCase: boolean;
 	private showValue: ShowValueType | undefined;
 
 	constructor({keepCase, keysToHide, validate, showValue}: SemicolonConfigParserOptions<Out> = {}) {
-		this.keysToHide = keysToHide;
+		this.keysToHide = new Set(keysToHide);
 		this.validate = validate;
 		this.keepCase = keepCase ?? true;
 		this.showValue = showValue;

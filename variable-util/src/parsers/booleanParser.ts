@@ -34,7 +34,7 @@ export function booleanParser<Output extends boolean = boolean>(postValidate?: P
 			}
 		},
 		toString: (value: boolean): string => {
-			return value ? 'true' : 'false';
+			return value.toString();
 		},
 	};
 }

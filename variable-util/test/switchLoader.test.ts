@@ -1,8 +1,8 @@
-import sinon from 'sinon';
+import {spy} from 'sinon';
 import {beforeEach, describe, expect, it} from 'vitest';
 import {ConfigMap, stringParser, SwitchLoader} from '../src';
 
-const updateSpy = sinon.spy();
+const updateSpy = spy();
 
 type TestEnv = {
 	DEMO?: string;
@@ -23,7 +23,6 @@ const switchLoader = new SwitchLoader<TestEnv, 'switch1' | 'switch2'>(
 );
 switchLoader.on('updated', updateSpy);
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
 const switcher = switchLoader.getLoader;
 
 const config = new ConfigMap<TestEnv>(

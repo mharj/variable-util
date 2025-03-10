@@ -64,7 +64,6 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 			throw new VariableError(`ConfigMap key ${String(key)} is not a string`);
 		}
 		const entry = this.schema[key];
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (!entry) {
 			throw new VariableLookupError(key, `ConfigMap key ${String(key)} not found in config map`);
 		}
@@ -74,7 +73,7 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 		>;
 		if (undefinedThrowsError && configObject.value === undefined) {
 			buildOptions(this.options).logger?.info(`ConfigMap key ${String(key)} is undefined (expect to throw error)`);
-			throw new VariableError(undefinedErrorMessage || `ConfigMap key ${String(key)} is undefined`);
+			throw new VariableError(undefinedErrorMessage ?? `ConfigMap key ${String(key)} is undefined`);
 		}
 		return configObject;
 	}

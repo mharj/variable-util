@@ -14,7 +14,7 @@ export function reactEnv(overrideKey?: string): IConfigLoader {
 	return {
 		type: 'react-env',
 		callback: (lookupKey): LoaderValue => {
-			const targetKey = `REACT_APP_${overrideKey || lookupKey}`;
+			const targetKey = `REACT_APP_${overrideKey ?? lookupKey}`;
 			const currentValue = process.env[targetKey];
 			return {type: 'react-env', result: {value: currentValue, path: `process.env.${targetKey}`, seen: handleSeen(seenMap, targetKey, currentValue)}};
 		},

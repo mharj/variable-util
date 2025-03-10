@@ -27,6 +27,5 @@ const testObjectSchema = z.object({
 export type TestObjectType = z.infer<typeof testObjectSchema>;
 
 export const testObjectParser = new SemicolonConfigParser<TestObjectType, TestObjectRawType>({
-	// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 	validate: (data) => testObjectSchema.parseAsync(data),
 });

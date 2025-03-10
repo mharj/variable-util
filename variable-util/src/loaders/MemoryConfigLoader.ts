@@ -55,7 +55,7 @@ export class MemoryConfigLoader<MemoryMap extends Record<string, string | undefi
 		if (options.disabled) {
 			return {type: this.type, result: undefined};
 		}
-		const targetKey = overrideKey || lookupKey;
+		const targetKey = overrideKey ?? lookupKey;
 		const currentValue = this.data.get(targetKey);
 		return {type: this.type, result: {value: currentValue, path: `key:${targetKey}`, seen: handleSeen(this.seen, targetKey, currentValue)}};
 	}

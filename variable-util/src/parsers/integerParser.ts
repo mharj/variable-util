@@ -17,7 +17,7 @@ export function integerParser<Output extends number = number>(postValidate?: Pos
 		},
 		postValidate,
 		toString: (value: number): string => {
-			return String(value);
+			return value.toString();
 		},
 	};
 }

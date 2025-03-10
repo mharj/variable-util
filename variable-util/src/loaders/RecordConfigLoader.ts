@@ -10,10 +10,10 @@ export abstract class RecordConfigLoader<HandlerParams, Props extends IConfigLoa
 	Props,
 	DefaultProps
 > {
+	protected abstract defaultOptions: DefaultProps | undefined;
 	protected _isLoaded = false;
 	protected dataPromise: Promise<Record<string, HandlerParams>> | undefined;
 	protected valueSeen = new Map<string, string>();
-	protected abstract defaultOptions: DefaultProps | undefined;
 	/**
 	 * reloads the data
 	 */

@@ -2,7 +2,7 @@ import {URL} from 'url';
 import {type ILoggerLike} from '@avanio/logger-like';
 import * as dotenv from 'dotenv';
 import etag from 'etag';
-import sinon from 'sinon';
+import {spy} from 'sinon';
 import {beforeAll, beforeEach, describe, expect, it} from 'vitest';
 import {z} from 'zod';
 import {
@@ -31,11 +31,11 @@ import {
 import {testObjectParser} from './testObjectParse';
 
 dotenv.config();
-const debugSpy = sinon.spy();
-const infoSpy = sinon.spy();
-const errorSpy = sinon.spy();
-const warnSpy = sinon.spy();
-const traceSpy = sinon.spy();
+const debugSpy = spy();
+const infoSpy = spy();
+const errorSpy = spy();
+const warnSpy = spy();
+const traceSpy = spy();
 
 let isOnline = true;
 const resCache = new Map<string, Response>();
@@ -383,7 +383,7 @@ describe('config variable', () => {
 				process.env.TEST = '__BROKEN__';
 				const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env(), reactEnv()], booleanParser(), undefined, {showValue: true});
 				await expect(call).resolves.toEqual(undefined);
-				const errorLog = errorSpy.getCall(0).args[0];
+				const errorLog = errorSpy.getCall(0).args[0] as Error;
 				expect(errorLog)
 					.to.be.instanceOf(Error)
 					.and.satisfy((err: Error) => err.message.startsWith('variables[env](booleanParser): [__BROKEN__] value for key TEST'), errorLog.message);
@@ -400,7 +400,7 @@ describe('config variable', () => {
 				process.env.TEST = '__BROKEN__';
 				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], integerParser(), undefined, {showValue: true});
 				await expect(call).resolves.toEqual(undefined);
-				const errorLog = errorSpy.getCall(0).args[0];
+				const errorLog = errorSpy.getCall(0).args[0] as Error;
 				expect(errorLog)
 					.to.be.instanceOf(Error)
 					.and.satisfy((err: Error) => err.message.startsWith('variables[env](integerParser): [__BROKEN__] value for key TEST'), errorLog.message);
@@ -417,7 +417,7 @@ describe('config variable', () => {
 				process.env.TEST = '__BROKEN__';
 				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], floatParser(), undefined, {showValue: true});
 				await expect(call).resolves.toEqual(undefined);
-				const errorLog = errorSpy.getCall(0).args[0];
+				const errorLog = errorSpy.getCall(0).args[0] as Error;
 				expect(errorLog)
 					.to.be.instanceOf(Error)
 					.and.satisfy((err: Error) => err.message.startsWith('variables[env](floatParser): [__BROKEN__] value for key TEST'), errorLog.message);
@@ -450,7 +450,7 @@ describe('config variable', () => {
 					},
 				);
 				await expect(call).resolves.toEqual(undefined);
-				const errorLog = errorSpy.getCall(0).args[0];
+				const errorLog = errorSpy.getCall(0).args[0] as Error;
 				expect(errorLog)
 					.to.be.instanceOf(Error)
 					.and.satisfy((err: Error) => err.message.startsWith('variables[env](semicolonConfigParser): [__BROKEN__]'), errorLog.message);
@@ -483,7 +483,7 @@ describe('config variable', () => {
 					},
 				);
 				await expect(call).resolves.toEqual(undefined);
-				const errorLog = errorSpy.getCall(0).args[0];
+				const errorLog = errorSpy.getCall(0).args[0] as Error;
 				expect(errorLog)
 					.to.be.instanceOf(Error)
 					.and.satisfy((err: Error) => err.message.startsWith('variables[env](jsonConfigParser): [__BROKEN__] Unexpected token'), errorLog.message);

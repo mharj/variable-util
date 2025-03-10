@@ -19,7 +19,7 @@ export type OptionalEnvEntry<Value> = {
 	/**
 	 * The default value to use if the variable is not defined
 	 */
-	defaultValue?: Loadable<Value> | undefined;
+	defaultValue?: Loadable<Value>;
 	/**
 	 * The format parameters to use to format the value
 	 */

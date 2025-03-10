@@ -10,10 +10,10 @@ export abstract class MapConfigLoader<HandlerParams, Props extends IConfigLoader
 	Props,
 	DefaultProps
 > {
+	protected abstract defaultOptions: DefaultProps | undefined;
 	protected _isLoaded = false;
 	protected data = new Map<string, HandlerParams>();
 	protected valueSeen = new Map<string, string>();
-	protected abstract defaultOptions: DefaultProps | undefined;
 	/**
 	 * clear maps and reloads the data
 	 */

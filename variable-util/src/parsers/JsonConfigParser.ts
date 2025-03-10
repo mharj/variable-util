@@ -15,7 +15,7 @@ export type JsonParseType = Record<string, unknown>;
  */
 export class JsonConfigParser<Out extends JsonParseType> implements IConfigParser<Out, JsonParseType> {
 	public name = 'jsonConfigParser';
-	private keysToHide: (keyof Out)[];
+	private keysToHide: Set<keyof Out>;
 	private validate: ValidateCallback<Out, JsonParseType> | undefined;
 	private showValue?: ShowValueType;
 
@@ -23,8 +23,8 @@ export class JsonConfigParser<Out extends JsonParseType> implements IConfigParse
 		keysToHide,
 		validate,
 		showValue,
-	}: {keysToHide?: (keyof Out)[]; validate?: ValidateCallback<Out, JsonParseType>; showValue?: ShowValueType} = {}) {
-		this.keysToHide = keysToHide || [];
+	}: {keysToHide?: Iterable<keyof Out>; validate?: ValidateCallback<Out, JsonParseType>; showValue?: ShowValueType} = {}) {
+		this.keysToHide = new Set(keysToHide);
 		this.validate = validate;
 		this.showValue = showValue;
 	}
@@ -52,11 +52,10 @@ export class JsonConfigParser<Out extends JsonParseType> implements IConfigParse
 		return JSON.stringify(
 			Object.entries(value).reduce<Record<string, unknown>>((last, [key, value]) => {
 				if (value) {
-					if (!this.keysToHide.includes(key)) {
-						last[key] = value;
-					} else {
-						// eslint-disable-next-line @typescript-eslint/no-base-to-string
+					if (this.keysToHide.has(key)) {
 						last[key] = buildHiddenValue(String(value), this.showValue);
+					} else {
+						last[key] = value;
 					}
 				}
 				return last;

@@ -1,3 +1,4 @@
+import {toError} from '@luolapeikko/ts-common';
 import {type IConfigParser, type ParserProps} from '../interfaces/IConfigParser';
 
 /**
@@ -26,14 +27,14 @@ export class UrlParser implements IConfigParser<URL, URL> {
 	 * @param {UrlParserProps} properties - Properties for the UrlParser
 	 */
 	constructor({urlSanitize}: UrlParserProps = {}) {
-		this.urlSanitize = urlSanitize || false;
+		this.urlSanitize = urlSanitize ?? false;
 	}
 
 	public parse({value}: ParserProps): URL {
 		try {
 			return new URL(value);
 		} catch (err) {
-			throw err instanceof Error ? err : new Error('unknown error');
+			throw toError(err);
 		}
 	}
 

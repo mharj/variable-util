@@ -11,7 +11,7 @@ import {type IConfigParser, type ParserProps, type PostValidate} from '../interf
  */
 export function arrayParser<Output, RawOutput>(
 	parse: IConfigParser<Output, RawOutput>,
-	separator: string = ';',
+	separator = ';',
 	postValidate?: PostValidate<Output[], RawOutput[]>,
 ): IConfigParser<Output[], RawOutput[]> {
 	return {

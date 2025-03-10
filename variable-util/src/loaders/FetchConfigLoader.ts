@@ -86,7 +86,7 @@ export class FetchConfigLoader extends MapConfigLoader<string, Partial<FetchConf
 			await this.loadData();
 			this._isLoaded = true; // only load data once to prevent spamming fetch requests (use reload method to manually update data)
 		}
-		const targetKey = overrideKey || lookupKey; // optional override key, else use actual lookupKey
+		const targetKey = overrideKey ?? lookupKey; // optional override key, else use actual lookupKey
 		const value = this.data.get(targetKey);
 		return {type: this.type, result: {value, path: this.path, seen: this.handleSeen(targetKey, value)}};
 	}
@@ -127,7 +127,6 @@ export class FetchConfigLoader extends MapConfigLoader<string, Partial<FetchConf
 			res = await this.handleNotModifiedCache(req, res);
 		}
 		const contentType = res.headers.get('content-type');
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (contentType?.startsWith('application/json') && payload === 'json') {
 			applyStringMap(await this.handleJson(res), this.data);
 			logger?.debug('successfully loaded config from FetchEnvConfig');

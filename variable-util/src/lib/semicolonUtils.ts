@@ -66,16 +66,16 @@ export function stringifySemicolonConfig(config: Record<string, unknown>, uriEnc
 export function logStringifySemicolonConfig<Out extends Record<string, unknown>>(
 	config: Out,
 	show: ShowValueType | undefined,
-	keysToHide: (keyof Out)[] = [],
+	keysToHide: Set<keyof Out>,
 ): string {
 	return Object.entries(config)
 		.reduce<string[]>((last, [key, value]) => {
 			if (value !== undefined) {
-				if (!keysToHide.includes(key as keyof Out)) {
-					last.push(`${key}=${String(value)}`);
-				} else {
+				if (keysToHide.has(key)) {
 					const hiddenValue = buildHiddenValue(String(value), show);
 					last.push(`${key}=${hiddenValue}`);
+				} else {
+					last.push(`${key}=${String(value)}`);
 				}
 			}
 			return last;

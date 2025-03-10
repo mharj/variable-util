@@ -14,7 +14,7 @@ export function env(overrideKey?: string): IConfigLoader {
 	return {
 		type: 'env',
 		callback: (lookupKey): LoaderValue => {
-			const targetKey = overrideKey || lookupKey;
+			const targetKey = overrideKey ?? lookupKey;
 			const currentValue = process.env[targetKey];
 			return {type: 'env', result: {value: currentValue, path: `process.env.${targetKey}`, seen: handleSeen(seenMap, targetKey, currentValue)}};
 		},

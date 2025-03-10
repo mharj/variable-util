@@ -33,8 +33,8 @@ export abstract class ConfigLoader<
 	DefaultProps extends Props = Props,
 > extends EventEmitter<ConfigLoaderEventMap> {
 	public abstract type: Lowercase<string>;
-	protected options: Loadable<Props>;
 	protected abstract defaultOptions: DefaultProps | undefined;
+	protected options: Loadable<Props>;
 
 	constructor(props: Loadable<Props>) {
 		super();
@@ -83,14 +83,6 @@ export abstract class ConfigLoader<
 	}
 
 	/**
-	 * implementation of config loader function
-	 * @param lookupKey - key to lookup in config
-	 * @param params - optional passing params for handleLoader (i.e. lookup key override, settings etc.)
-	 * @returns {Promise<LoaderValue>} - Promise of LoaderValue
-	 */
-	protected abstract handleLoader(lookupKey: string, params?: HandlerParams): Promise<LoaderValue>;
-
-	/**
 	 * Build error string `ConfigVariables[<type>]: <message>`
 	 * @param message - error message
 	 * @returns {string} - error string
@@ -111,4 +103,12 @@ export abstract class ConfigLoader<
 		}
 		return this.handleLoader(lookupKey, params);
 	}
+
+	/**
+	 * implementation of config loader function
+	 * @param lookupKey - key to lookup in config
+	 * @param params - optional passing params for handleLoader (i.e. lookup key override, settings etc.)
+	 * @returns {Promise<LoaderValue>} - Promise of LoaderValue
+	 */
+	protected abstract handleLoader(lookupKey: string, params?: HandlerParams): Promise<LoaderValue>;
 }

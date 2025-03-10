@@ -33,5 +33,5 @@ export function resolveLogger(logger: undefined | null | ILoggerLike): ILoggerLi
 	if (logger === undefined) {
 		return getLogger();
 	}
-	return logger || undefined;
+	return logger ?? undefined;
 }
