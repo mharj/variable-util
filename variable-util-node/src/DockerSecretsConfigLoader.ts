@@ -24,7 +24,7 @@ export interface DockerSecretsConfigLoaderOptions {
  */
 export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined, Partial<DockerSecretsConfigLoaderOptions>, DockerSecretsConfigLoaderOptions> {
 	public readonly type: Lowercase<string>;
-	private valuePromises: Record<string, Promise<string | undefined> | undefined> = {};
+	private valuePromises = new Map<string, Promise<string | undefined>>();
 	protected defaultOptions: DockerSecretsConfigLoaderOptions = {
 		disabled: false,
 		fileLowerCase: false,
@@ -44,22 +44,23 @@ export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined, 
 		if (options.disabled) {
 			return {type: this.type, result: undefined};
 		}
-		const targetKey = overrideKey || lookupKey;
+		const targetKey = overrideKey ?? lookupKey;
 		const filePath = this.filePath(targetKey, options);
-		const valuePromise = this.valuePromises[targetKey];
-		const seen = !!valuePromise; // if valuePromise exists, it means we have seen this key before
-		if (!valuePromise) {
+		let valuePromise = this.valuePromises.get(targetKey) ?? Promise.resolve(undefined);
+		const seen = this.valuePromises.has(targetKey); // if valuePromise exists, it means we have seen this key before
+		if (!seen) {
 			if (!existsSync(filePath)) {
 				if (!options.isSilent) {
 					throw new VariableLookupError(targetKey, `ConfigVariables[${this.type}]: ${lookupKey} from ${filePath} not found`);
 				}
 				options.logger?.debug(`ConfigVariables[${this.type}]: ${lookupKey} from ${filePath} not found`);
-				this.valuePromises[targetKey] = Promise.resolve(undefined);
 			} else {
-				this.valuePromises[targetKey] = readFile(filePath, 'utf8');
+				valuePromise = readFile(filePath, 'utf8');
 			}
+			// store value promise as haven't seen this key before
+			this.valuePromises.set(targetKey, valuePromise);
 		}
-		const value = await this.valuePromises[targetKey];
+		const value = await valuePromise;
 		return {type: this.type, result: {path: filePath, value, seen}};
 	}
 

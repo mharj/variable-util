@@ -1,11 +1,11 @@
 import * as path from 'path';
 import type {ILoggerLike} from '@avanio/logger-like';
 import {booleanParser, ConfigMap, getConfigVariable, integerParser, setLogger, stringParser} from '@avanio/variable-util';
-import sinon from 'sinon';
+import {spy} from 'sinon';
 import {beforeEach, describe, expect, it} from 'vitest';
 import {DockerSecretsConfigLoader, DotEnvLoader, FileConfigLoader} from '../src';
 
-const logSpy = sinon.spy();
+const logSpy = spy();
 
 const testLogger: ILoggerLike = {
 	debug: logSpy,

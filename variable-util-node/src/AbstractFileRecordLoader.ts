@@ -46,10 +46,9 @@ export abstract class AbstractFileRecordLoader<
 	Options extends AbstractFileRecordLoaderOptions<string> = AbstractFileRecordLoaderOptions<string>,
 > extends MapConfigLoader<string, Partial<Options>, Options> {
 	abstract readonly type: Lowercase<string>;
+	protected abstract defaultOptions: Options;
 	private watcher: FSWatcher | undefined;
 	private timeout: ReturnType<typeof setTimeout> | undefined;
-
-	protected abstract defaultOptions: Options;
 
 	public constructor(options: Loadable<Partial<Options>>) {
 		super(options);
@@ -77,7 +76,7 @@ export abstract class AbstractFileRecordLoader<
 			await this.loadData();
 			this._isLoaded = true; // only load data once to prevent spamming
 		}
-		const targetKey = overrideKey || lookupKey; // optional override key, else use actual lookupKey
+		const targetKey = overrideKey ?? lookupKey; // optional override key, else use actual lookupKey
 		const value = this.data.get(targetKey);
 		return {type: this.type, result: {value, path: fileName, seen: this.handleSeen(targetKey, value)}};
 	}
@@ -121,11 +120,6 @@ export abstract class AbstractFileRecordLoader<
 		return true;
 	}
 
-	/**
-	 * Handle the parsing of the file.
-	 */
-	protected abstract handleParse(rawData: Buffer, options: Options): Record<string, string | undefined> | Promise<Record<string, string | undefined>>;
-
 	private handleFileWatch(options: Options): void {
 		if (options.watch && !this.watcher) {
 			options.logger?.debug(this.buildErrorStr(`opening file watcher for ${options.fileName}`));
@@ -149,4 +143,9 @@ export abstract class AbstractFileRecordLoader<
 			options.logger?.error(this.buildErrorStr(`error reloading file ${options.fileName}: ${toError(err).message}`));
 		}
 	}
+
+	/**
+	 * Handle the parsing of the file.
+	 */
+	protected abstract handleParse(rawData: Buffer, options: Options): Record<string, string | undefined> | Promise<Record<string, string | undefined>>;
 }
