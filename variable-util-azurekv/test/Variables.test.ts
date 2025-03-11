@@ -2,7 +2,7 @@ import {type ILoggerLike} from '@avanio/logger-like';
 import {getConfigVariable, setLogger, UrlParser, urlSanitize} from '@avanio/variable-util';
 import {DefaultAzureCredential} from '@azure/identity';
 import * as dotenv from 'dotenv';
-import sinon from 'sinon';
+import {spy} from 'sinon';
 import {beforeAll, beforeEach, describe, expect, it} from 'vitest';
 import {AzureSecretsConfigLoader} from '../src';
 
@@ -13,11 +13,11 @@ function sleep(ms: number) {
 }
 
 const debugLogger = {
-	debug: sinon.spy(),
-	error: sinon.spy(),
-	info: sinon.spy(),
-	trace: sinon.spy(),
-	warn: sinon.spy(),
+	debug: spy(),
+	error: spy(),
+	info: spy(),
+	trace: spy(),
+	warn: spy(),
 } satisfies ILoggerLike;
 
 setLogger(debugLogger);
@@ -38,7 +38,7 @@ describe('az key vault config variable', {skip: !process.env.KV_URI || !process.
 			logger.resetHistory();
 		}
 	});
-	it('should return fetch value', async function () {
+	it('should return value', async function () {
 		const urlParser = new UrlParser({urlSanitize: true});
 		const fetchKvInstance = new AzureSecretsConfigLoader(() => ({
 			credentials: new DefaultAzureCredential(),

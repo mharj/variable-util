@@ -63,7 +63,7 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined, A
 			return {type: this.type, result: undefined};
 		}
 		try {
-			const targetKey = key || rootKey;
+			const targetKey = key ?? rootKey;
 			// only read once per key
 			let seen = true;
 			let lastValuePromise = this.valuePromises.get(targetKey);
