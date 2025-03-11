@@ -1,6 +1,6 @@
 import {type ILoggerLike} from '@avanio/logger-like';
 import {getConfigObjectResult, stringParser} from '@avanio/variable-util';
-import sinon from 'sinon';
+import {spy} from 'sinon';
 import {type IStorageDriver, MemoryStorageDriver} from 'tachyon-drive';
 import {beforeEach, describe, expect, it} from 'vitest';
 import {
@@ -11,7 +11,7 @@ import {
 	type TachyonConfigStoreType,
 } from '../src/index';
 
-const anyLogSpy = sinon.spy();
+const anyLogSpy = spy();
 
 const loggerSpy: ILoggerLike = {
 	debug: anyLogSpy,

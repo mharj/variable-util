@@ -83,9 +83,9 @@ export class TachyonConfigLoader extends MapConfigLoader<string, Partial<Tachyon
 	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
 		if (!this._isLoaded) {
 			await this.loadData();
-			this._isLoaded = true; // only load data once to prevent spamming fetch requests (use reload method to manually update data)
+			this._isLoaded = true; // only load data once to prevent spamming load requests (use reload method to manually update data)
 		}
-		const targetKey = overrideKey || lookupKey; // optional override key, else use actual lookupKey
+		const targetKey = overrideKey ?? lookupKey; // optional override key, else use actual lookupKey
 		const value = this.data.get(targetKey);
 		return {type: this.type, result: {value, path: `tachyon:${this.driver.name}/${targetKey}`, seen: this.handleSeen(targetKey, value)}};
 	}

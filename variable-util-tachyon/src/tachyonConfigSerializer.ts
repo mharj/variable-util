@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import {type IPersistSerializer} from 'tachyon-drive';
 import {z} from 'zod';
 
