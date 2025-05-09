@@ -1,6 +1,7 @@
 {
-    "$schema": "https://typedoc.org/schema.json",
-    "entryPoints": ["./src/index.ts"],
-    "out": "docs",
-    "tsconfig": "./variable-util/tsconfig.json",
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["./variable-util/src/index.ts"],
+  "out": "docs",
+  "tsconfig": "./variable-util/tsconfig.json",
+  "front_page": "./variable-util/README.md"
 }
