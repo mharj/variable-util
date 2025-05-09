@@ -37,12 +37,11 @@ jobs:
 
     # Specify runner + deployment step
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./variable-util
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          path: variable-util
       - uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
@@ -50,7 +49,8 @@ jobs:
 
       - name: TSDoc hack
         run: |
-          cp -v tsconfig.json ${GITHUB_WORKSPACE}/
+          pwd
+          ls -la
 
       - name: TSDoc Action
         uses: erikyo/tsdoc-action@v1
