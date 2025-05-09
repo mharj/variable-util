@@ -67,7 +67,7 @@ jobs:
         with:
           source_dir: ./variable-util/src
           output_dir: ./docs
-          options: ./variable-util/typedoc.json
+          options: ./typedoc.json
           front_page: ./variable-util/README.md
 
       - name: Setup Pages
