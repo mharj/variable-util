@@ -50,7 +50,7 @@ jobs:
 
       - name: TSDoc hack
         run: |
-          cp -v tsconfig ${GITHUB_WORKSPACE}/
+          cp -v tsconfig.json ${GITHUB_WORKSPACE}/
 
       - name: TSDoc Action
         uses: erikyo/tsdoc-action@v1
