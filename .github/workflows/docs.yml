@@ -25,10 +25,6 @@ permissions:
 env:
   NPM: 'npm'
 
-defaults:
-  run:
-    working-directory: variable-util
-
 jobs:
   # Single deploy job since we're just deploying
   deploy:
