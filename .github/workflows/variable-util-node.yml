@@ -1,4 +1,4 @@
-name: Validate and publish variable-util-node to npmjs
+name: variable-util-node to npmjs
 on:
   push:
     branches: [main]

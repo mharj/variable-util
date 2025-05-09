@@ -1,4 +1,4 @@
-name: Validate and publish package to npmjs
+name: variable-util-vite to npmjs
 on:
   push:
     branches: [main]
@@ -13,13 +13,13 @@ on:
 
 env:
   # Setting an environment variable with the value of a configuration variable
-  PUBLISH_BRANCH: 'refs/heads/main'
+  PUBLISH_BRANCH: "refs/heads/main"
   CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-  PACKAGE_NAME: 'unknown'
-  PACKAGE_VERSION: 'unknown'
-  NPM: 'npm'
-  NPM_VERSION: 'unknown'
+  PACKAGE_NAME: "unknown"
+  PACKAGE_VERSION: "unknown"
+  NPM: "npm"
+  NPM_VERSION: "unknown"
   HAVE_COVERAGE_SCRIPT: false
   HAVE_VALIDATE_SCRIPT: false
   HAVE_LINT_SCRIPT: false
@@ -49,13 +49,12 @@ jobs:
       - uses: pnpm/action-setup@v4
         if: env.NPM == 'pnpm'
         with:
-          version: 'latest'
-          run_install: false
+          package_json_file: variable-util-vite/package.json
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "lts/*"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Get current npmjs version for ${{env.PACKAGE_NAME}}
         run: |
