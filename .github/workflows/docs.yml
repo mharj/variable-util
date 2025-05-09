@@ -25,10 +25,6 @@ permissions:
 env:
   NPM: "pnpm"
 
-defaults:
-  run:
-    working-directory: .
-
 jobs:
   # Single deploy job since we're just deploying
   deploy:
@@ -41,6 +37,9 @@ jobs:
 
     # Specify runner + deployment step
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./variable-util
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -51,6 +50,7 @@ jobs:
 
       - name: Debug
         run: |
+          echo $GITHUB_WORKSPACE
           pwd
           ls -la
 
