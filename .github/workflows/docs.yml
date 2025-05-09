@@ -41,7 +41,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          repository: "${{ github.repository }}/variable-util"
+          path: variable-util
 
       - uses: actions/setup-node@v4
         with:
@@ -50,13 +50,12 @@ jobs:
 
       - name: TSDoc hack
         run: |
-          pwd
-          ls -la
+          mv variable-util/* .
 
       - name: TSDoc Action
         uses: erikyo/tsdoc-action@v1
         with:
-          source_dir: ./variable-util/src
+          source_dir: ./src
           options: ./typedoc.json
 
       - name: Setup Pages
