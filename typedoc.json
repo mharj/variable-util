@@ -3,6 +3,6 @@
   "basePath": "./variable-util",
   "entryPoints": ["./variable-util/src/index.ts"],
   "out": "docs",
-  "tsconfig": "./variable-util/variable-util/tsconfig.json",
+  "tsconfig": "./variable-util/tsconfig.json",
   "front_page": "./README.md"
 }
