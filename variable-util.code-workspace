@@ -1,22 +1,28 @@
 {
 	"folders": [
 		{
+			"name": "variable-util",
 			"path": "variable-util"
 		},
 		{
+			"name": "variable-util-azurekv",
 			"path": "variable-util-azurekv"
 		},
 		{
+			"name": "variable-util-node",
 			"path": "variable-util-node"
 		},
 		{
+			"name": "variable-util-tachyon",
 			"path": "variable-util-tachyon"
 		},
 		{
-			"path": ".github"
+			"name": "variable-util-vite",
+			"path": "variable-util-vite"
 		},
 		{
-			"path": "variable-util-vite"
+			"name": ".github",
+			"path": ".github"
 		}
 	],
 	"settings": {
