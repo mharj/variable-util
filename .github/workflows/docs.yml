@@ -23,7 +23,7 @@ permissions:
   id-token: write
 
 env:
-  NPM: "pnpm"
+  NPM: "npm"
 
 jobs:
   # Single deploy job since we're just deploying
@@ -51,8 +51,23 @@ jobs:
 
       - name: TSDoc hack
         run: |
-          mv variable-util/* . && \
-          rm -rf variable-util
+          mv -v variable-util/* . && \
+          rm -vrf variable-util
+
+      - name: Identify project environment variables
+        run: |
+          [ -f pnpm-lock.yaml ] && echo "NPM=pnpm" | tee -a $GITHUB_ENV
+
+      - uses: pnpm/action-setup@v4
+        if: env.NPM == 'pnpm'
+  
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: ${{ env.NPM }} install
 
       - name: TSDoc Action
         uses: erikyo/tsdoc-action@v1
