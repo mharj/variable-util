@@ -23,7 +23,7 @@ permissions:
   id-token: write
 
 env:
-  NPM: 'npm'
+  NPM: 'pnpm'
 
 jobs:
   # Single deploy job since we're just deploying
@@ -40,10 +40,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Identify project environment variables
-        run: |
-          [ -f pnpm-lock.yaml ] && echo "NPM=pnpm" | tee -a $GITHUB_ENV
 
       - uses: pnpm/action-setup@v4
         if: env.NPM == 'pnpm'
