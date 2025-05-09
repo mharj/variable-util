@@ -96,9 +96,7 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined, A
 	}
 
 	private getAzureSecretClient(options: AzureSecretsConfigLoaderOptions): SecretClient {
-		if (!this.client) {
-			this.client = new SecretClient(options.url, options.credentials);
-		}
+		this.client ??= new SecretClient(options.url, options.credentials);
 		return this.client;
 	}
 }
