@@ -25,6 +25,10 @@ permissions:
 env:
   NPM: 'pnpm'
 
+defaults:
+  run:
+    working-directory: .
+
 jobs:
   # Single deploy job since we're just deploying
   deploy:
