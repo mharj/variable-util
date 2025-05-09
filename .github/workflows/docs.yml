@@ -44,15 +44,15 @@ jobs:
           sparse-checkout: variable-util
           sparse-checkout-cone-mode: false
 
+      - name: Subdirectory hack for TSDoc
+        run: |
+          mv -v variable-util/* . && \
+          rm -vrf variable-util
+
       - uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
           registry-url: "https://registry.npmjs.org"
-
-      - name: TSDoc hack
-        run: |
-          mv -v variable-util/* . && \
-          rm -vrf variable-util
 
       - name: Identify project environment variables
         run: |
@@ -60,7 +60,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         if: env.NPM == 'pnpm'
-  
+
       - uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
