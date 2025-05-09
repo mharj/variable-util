@@ -51,6 +51,7 @@ jobs:
 
       - name: Debug
         run: |
+          pwd
           ls -la
 
       - name: TSDoc Action
