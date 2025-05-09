@@ -41,7 +41,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          path: variable-util
+          sparse-checkout: variable-util
+          sparse-checkout-cone-mode: false
 
       - uses: actions/setup-node@v4
         with:
@@ -50,7 +51,8 @@ jobs:
 
       - name: TSDoc hack
         run: |
-          mv variable-util/* .
+          mv variable-util/* . && \
+          rm -rf variable-util
 
       - name: TSDoc Action
         uses: erikyo/tsdoc-action@v1
