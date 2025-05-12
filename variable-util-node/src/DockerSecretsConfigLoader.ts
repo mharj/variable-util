@@ -2,7 +2,7 @@ import {existsSync} from 'fs';
 import {readFile} from 'fs/promises';
 import * as path from 'path';
 import type {ILoggerLike} from '@avanio/logger-like';
-import {ConfigLoader, type LoaderValue, VariableLookupError} from '@avanio/variable-util';
+import {ConfigLoader, type LoaderValue, type OverrideKeyMap, VariableLookupError} from '@avanio/variable-util';
 import {type Loadable} from '@luolapeikko/ts-common';
 
 export interface DockerSecretsConfigLoaderOptions {
@@ -20,10 +20,14 @@ export interface DockerSecretsConfigLoaderOptions {
 
 /**
  * Loader for docker secrets, reads secrets from the `/run/secrets` directory.
- * @since v0.8.0
+ * @template OverrideMap Type of the override keys
+ * @since v1.0.0
  */
-export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined, Partial<DockerSecretsConfigLoaderOptions>, DockerSecretsConfigLoaderOptions> {
-	public readonly type: Lowercase<string>;
+export class DockerSecretsConfigLoader<OverrideMap extends OverrideKeyMap = OverrideKeyMap> extends ConfigLoader<
+	DockerSecretsConfigLoaderOptions,
+	OverrideMap
+> {
+	public readonly loaderType: Lowercase<string>;
 	private valuePromises = new Map<string, Promise<string | undefined>>();
 	protected defaultOptions: DockerSecretsConfigLoaderOptions = {
 		disabled: false,
@@ -33,35 +37,33 @@ export class DockerSecretsConfigLoader extends ConfigLoader<string | undefined, 
 		path: '/run/secrets',
 	};
 
-	public constructor(options: Loadable<Partial<DockerSecretsConfigLoaderOptions>>, type: Lowercase<string> = 'docker-secrets') {
-		super(options);
-		this.getLoader = this.getLoader.bind(this);
-		this.type = type;
+	public constructor(
+		options: Loadable<Partial<DockerSecretsConfigLoaderOptions>>,
+		overrideKeys?: Partial<OverrideMap>,
+		loaderType: Lowercase<string> = 'docker-secrets',
+	) {
+		super(options, overrideKeys);
+		this.loaderType = loaderType;
 	}
 
-	protected async handleLoader(lookupKey: string, overrideKey?: string): Promise<LoaderValue> {
+	protected async handleLoaderValue(lookupKey: string): Promise<LoaderValue> {
 		const options = await this.getOptions();
-		if (options.disabled) {
-			return {type: this.type, result: undefined};
-		}
-		const targetKey = overrideKey ?? lookupKey;
-		const filePath = this.filePath(targetKey, options);
-		let valuePromise = this.valuePromises.get(targetKey) ?? Promise.resolve(undefined);
-		const seen = this.valuePromises.has(targetKey); // if valuePromise exists, it means we have seen this key before
+		const filePath = this.filePath(lookupKey, options);
+		let valuePromise = this.valuePromises.get(lookupKey) ?? Promise.resolve(undefined);
+		const seen = this.valuePromises.has(lookupKey); // if valuePromise exists, it means we have seen this key before
 		if (!seen) {
 			if (!existsSync(filePath)) {
 				if (!options.isSilent) {
-					throw new VariableLookupError(targetKey, `ConfigVariables[${this.type}]: ${lookupKey} from ${filePath} not found`);
+					throw new VariableLookupError(lookupKey, `ConfigVariables[${this.loaderType}]: ${lookupKey} from ${filePath} not found`);
 				}
-				options.logger?.debug(`ConfigVariables[${this.type}]: ${lookupKey} from ${filePath} not found`);
+				options.logger?.debug(`ConfigVariables[${this.loaderType}]: ${lookupKey} from ${filePath} not found`);
 			} else {
 				valuePromise = readFile(filePath, 'utf8');
 			}
 			// store value promise as haven't seen this key before
-			this.valuePromises.set(targetKey, valuePromise);
+			this.valuePromises.set(lookupKey, valuePromise);
 		}
-		const value = await valuePromise;
-		return {type: this.type, result: {path: filePath, value, seen}};
+		return {path: filePath, value: await valuePromise};
 	}
 
 	private filePath(key: string, options: DockerSecretsConfigLoaderOptions): string {

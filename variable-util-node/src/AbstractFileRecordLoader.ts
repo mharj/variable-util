@@ -1,13 +1,22 @@
 import {existsSync, type FSWatcher, watch} from 'fs';
 import {readFile} from 'fs/promises';
 import type {ILoggerLike} from '@avanio/logger-like';
-import {applyStringMap, type IConfigLoaderProps, type LoaderValue, MapConfigLoader, type ValidateCallback, VariableError} from '@avanio/variable-util';
+import {
+	applyStringMap,
+	type IConfigLoaderProps,
+	type LoaderValue,
+	MapConfigLoader,
+	type OverrideKeyMap,
+	type ValidateCallback,
+	VariableError,
+} from '@avanio/variable-util';
 import {Err, type IResult, Ok} from '@luolapeikko/result-option';
 import {type Loadable, toError} from '@luolapeikko/ts-common';
 
 /**
  * Options for the AbstractFileRecordLoader.
- * @since v0.8.0
+ * @template FileType Type of the file
+ * @since v1.0.0
  */
 export interface AbstractFileRecordLoaderOptions<FileType extends string> extends IConfigLoaderProps {
 	fileType: FileType;
@@ -23,7 +32,6 @@ export interface AbstractFileRecordLoaderOptions<FileType extends string> extend
 	disabled: boolean;
 	/**
 	 * optional validator for data (Record<string, string | undefined>)
-	 *
 	 * @example
 	 * // using zod
 	 * const stringRecordSchema = z.record(z.string().min(1), z.string());
@@ -40,19 +48,21 @@ export interface AbstractFileRecordLoaderOptions<FileType extends string> extend
 
 /**
  * Abstract class for loading records from a file.
- * @since v0.8.0
+ * @template Options Options for the loader
+ * @template OverrideMap Type of the override keys
+ * @since v1.0.0
  */
 export abstract class AbstractFileRecordLoader<
 	Options extends AbstractFileRecordLoaderOptions<string> = AbstractFileRecordLoaderOptions<string>,
-> extends MapConfigLoader<string, Partial<Options>, Options> {
-	abstract readonly type: Lowercase<string>;
+	OverrideMap extends OverrideKeyMap = OverrideKeyMap,
+> extends MapConfigLoader<Options, OverrideMap> {
+	abstract readonly loaderType: Lowercase<string>;
 	protected abstract defaultOptions: Options;
 	private watcher: FSWatcher | undefined;
 	private timeout: ReturnType<typeof setTimeout> | undefined;
 
-	public constructor(options: Loadable<Partial<Options>>) {
-		super(options);
-		this.getLoader = this.getLoader.bind(this);
+	public constructor(options: Loadable<Partial<Options>>, overrideKeys?: Partial<OverrideMap>) {
+		super(options, overrideKeys);
 		this.handleFileChange = this.handleFileChange.bind(this);
 	}
 
@@ -67,18 +77,14 @@ export abstract class AbstractFileRecordLoader<
 		}
 	}
 
-	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
-		const {disabled, fileName} = await this.getOptions();
-		if (disabled) {
-			return {type: this.type, result: undefined};
-		}
+	protected async handleLoaderValue(lookupKey: string): Promise<LoaderValue> {
+		const {fileName} = await this.getOptions();
 		if (!this._isLoaded) {
 			await this.loadData();
 			this._isLoaded = true; // only load data once to prevent spamming
 		}
-		const targetKey = overrideKey ?? lookupKey; // optional override key, else use actual lookupKey
-		const value = this.data.get(targetKey);
-		return {type: this.type, result: {value, path: fileName, seen: this.handleSeen(targetKey, value)}};
+		const value = this.data.get(lookupKey);
+		return {value, path: fileName};
 	}
 
 	protected async handleData(): Promise<IResult<Record<string, string | undefined>, VariableError>> {
