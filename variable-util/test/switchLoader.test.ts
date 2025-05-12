@@ -23,12 +23,10 @@ const switchLoader = new SwitchLoader<TestEnv, 'switch1' | 'switch2'>(
 );
 switchLoader.on('updated', updateSpy);
 
-const switcher = switchLoader.getLoader;
-
 const config = new ConfigMap<TestEnv>(
 	{
-		DEMO: {loaders: [switcher()], parser: stringParser()},
-		ANOTHER: {loaders: [switcher()], parser: stringParser()},
+		DEMO: {loaders: [switchLoader], parser: stringParser()},
+		ANOTHER: {loaders: [switchLoader], parser: stringParser()},
 	},
 	{namespace: 'Demo'},
 );

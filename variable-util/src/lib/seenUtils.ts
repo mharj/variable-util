@@ -4,6 +4,7 @@
  * @param {string} key - key to check
  * @param {string | undefined} value - value to check
  * @returns {boolean} - true if already seen value, false if not
+ * @since v1.0.0
  */
 export function handleSeen(seenMap: Map<string, string>, key: string, value: string | undefined): boolean {
 	// ignore undefined values

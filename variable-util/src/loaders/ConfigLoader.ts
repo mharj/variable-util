@@ -1,6 +1,7 @@
 import {EventEmitter} from 'events';
-import {type Loadable} from '@luolapeikko/ts-common';
-import {type IConfigLoader, type LoaderValue} from '../interfaces';
+import {type Loadable, resolveLoadable} from '@luolapeikko/ts-common';
+import {type IConfigLoader, type OverrideKeyMap} from '../interfaces';
+import {handleSeen} from '../lib';
 
 /**
  * ConfigLoaderEventMap is the event map for the ConfigLoader
@@ -18,97 +19,85 @@ export type ConfigLoaderEventMap = {
  * @since v0.8.0
  */
 export interface IConfigLoaderProps {
-	disabled?: boolean | Promise<boolean> | (() => boolean | Promise<boolean>);
+	disabled?: Loadable<boolean>;
 }
+
+export type LoaderValue = {value: string | undefined; path: string};
 
 /**
  * Abstract base class for config loaders
+ * @template Props - the type of the props
+ * @template OverrideMap - the type of the override key map
  * @category Loaders
  * @abstract
- * @since v0.8.0
+ * @since v1.0.0
  */
-export abstract class ConfigLoader<
-	HandlerParams,
-	Props extends IConfigLoaderProps,
-	DefaultProps extends Props = Props,
-> extends EventEmitter<ConfigLoaderEventMap> {
-	public abstract type: Lowercase<string>;
-	protected abstract defaultOptions: DefaultProps | undefined;
-	protected options: Loadable<Props>;
+export abstract class ConfigLoader<Props extends IConfigLoaderProps, OverrideMap extends OverrideKeyMap = OverrideKeyMap>
+	extends EventEmitter<ConfigLoaderEventMap>
+	implements IConfigLoader
+{
+	public abstract loaderType: Lowercase<string>;
+	protected abstract defaultOptions: Props;
+	protected options: Loadable<Partial<Props>>;
+	protected overrideKeys: Partial<OverrideMap>;
+	protected valueSeen = new Map<string, string>();
 
-	constructor(props: Loadable<Props>) {
+	constructor(props: Loadable<Partial<Props>> = {}, overrideKeys: Partial<OverrideMap> = {}) {
 		super();
-		this.getLoader = this.getLoader.bind(this); // bind this to getLoader
 		this.options = props;
+		this.overrideKeys = overrideKeys;
 	}
 
-	/**
-	 * builds config loader object and passes extra params to implementation
-	 * @param params - optional passing params for handleLoader (i.e. lookup key override, settings etc.)
-	 * @returns {IConfigLoader} - IConfigLoader object
-	 */
-	public getLoader(params?: HandlerParams): IConfigLoader {
+	public async getLoaderResult(lookupKey: string) {
+		const loaderValue = await this.handleLoaderValue(this.overrideKeys[lookupKey] ?? lookupKey);
+		if (!loaderValue) {
+			return undefined;
+		}
 		return {
-			type: this.type,
-			callback: (lookupKey) => this.callLoader(lookupKey, params),
+			value: loaderValue.value,
+			path: loaderValue.path,
+			seen: handleSeen(this.valueSeen, lookupKey, loaderValue.value),
 		};
 	}
 
-	/**
-	 * Check if loader is disabled
-	 * @returns {Promise<boolean | undefined>} - Promise of boolean or undefined
-	 */
-	public async isDisabled(): Promise<boolean | undefined> {
+	public async isLoaderDisabled() {
 		const loadableDisabled = (await this.getOptions()).disabled;
-		return typeof loadableDisabled === 'function' ? loadableDisabled() : loadableDisabled;
+		return resolveLoadable(loadableDisabled);
+	}
+
+	public setDisabled(disabled: Loadable<boolean>) {
+		return this.setOption('disabled', disabled);
 	}
 
 	/**
 	 * Get options from loader and merge with default options
 	 * @returns {Promise<DefaultProps>} - Promise of DefaultProps & Props
 	 */
-	protected async getOptions(): Promise<DefaultProps & Props> {
+	protected async getOptions(): Promise<Props> {
 		const resolvedOptions = await (typeof this.options === 'function' ? this.options() : this.options);
 		return Object.assign({}, this.defaultOptions, resolvedOptions);
 	}
 
-	/**
-	 * Set options to loader
-	 * @param options - options
-	 * @returns Promise of void
-	 */
-	protected async setOptions(options: Partial<DefaultProps & Props>) {
-		const resolvedOptions = await (typeof this.options === 'function' ? this.options() : this.options);
-		this.options = Object.assign({}, resolvedOptions, options);
+	protected async setOption<Key extends keyof Props>(key: Key, value: Props[Key]) {
+		this.options = Object.assign({}, await this.getOptions(), {
+			[key]: value,
+		});
 	}
 
 	/**
 	 * Build error string `ConfigVariables[<type>]: <message>`
-	 * @param message - error message
+	 * @param {string} message - error message
 	 * @returns {string} - error string
 	 */
 	protected buildErrorStr(message: string): string {
-		return `ConfigLoader[${this.type}]: ${message}`;
-	}
-
-	/**
-	 * Call the loader function if not disabled
-	 * @param lookupKey - key to lookup in config
-	 * @param params - optional passing params for handleLoader (i.e. lookup key override, settings etc.)
-	 * @returns {Promise<LoaderValue>} - Promise of LoaderValue
-	 */
-	private async callLoader(lookupKey: string, params?: HandlerParams): Promise<LoaderValue> {
-		if (await this.isDisabled()) {
-			return {type: this.type, result: undefined};
-		}
-		return this.handleLoader(lookupKey, params);
+		return `ConfigLoader[${this.loaderType}]: ${message}`;
 	}
 
 	/**
 	 * implementation of config loader function
 	 * @param lookupKey - key to lookup in config
 	 * @param params - optional passing params for handleLoader (i.e. lookup key override, settings etc.)
-	 * @returns {Promise<LoaderValue>} - Promise of LoaderValue
+	 * @returns {LoaderValue | Promise<LoaderValue>} - Promise of LoaderValue
 	 */
-	protected abstract handleLoader(lookupKey: string, params?: HandlerParams): Promise<LoaderValue>;
+	protected abstract handleLoaderValue(lookupKey: string): undefined | LoaderValue | Promise<undefined | LoaderValue>;
 }

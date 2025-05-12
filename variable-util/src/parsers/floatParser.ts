@@ -1,21 +1,26 @@
-import {type IConfigParser, type ParserProps, type PostValidate, type PreValidateProps} from '../interfaces/IConfigParser';
+import {type IConfigParser, type ParserProps, type PreValidateProps, type TypeGuardValidate} from '../interfaces/IConfigParser';
 import {getFloat} from '../lib/primitiveUtils';
 
 /**
  * Build parser and have optional post validation (as example for literal values)
  * @template Output - Type of output, defaults to number
- * @param {PostValidate<Output, number>} [postValidate] - optional post validation
- * @returns {IConfigParser<Output, number>}
+ * @param {TypeGuardValidate<Output>} [validate] - optional post validation
+ * @returns {IConfigParser<number, Output>} - parser
  * @category Parsers
- * @since v0.3.0
+ * @since v1.0.0
  */
-export function floatParser<Output extends number = number>(postValidate?: PostValidate<Output, number>): IConfigParser<Output, number> {
+export function floatParser<Output extends number = number>(validate?: TypeGuardValidate<Output>): IConfigParser<number, Output> {
 	return {
 		name: 'floatParser',
 		parse: ({key, value}: ParserProps) => {
 			return getFloat(value).unwrap(() => new TypeError(`value for key ${key} is not a float string`));
 		},
-		postValidate,
+		postValidate: async (props) => {
+			if (!(await validate)?.(props.value)) {
+				return undefined;
+			}
+			return props.value;
+		},
 		preValidate: ({key, value}: PreValidateProps) => {
 			if (typeof value !== 'string') {
 				throw new TypeError(`value for key ${key} is not a string`);

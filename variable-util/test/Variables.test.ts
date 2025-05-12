@@ -9,26 +9,27 @@ import {
 	booleanParser,
 	clearDefaultValueSeenMap,
 	createRequestNotReady,
-	env,
+	EnvConfigLoader,
 	FetchConfigLoader,
 	type FetchConfigLoaderOptions,
 	floatParser,
 	getConfigVariable,
-	type IConfigLoader,
 	integerParser,
 	type IRequestCache,
 	JsonConfigParser,
 	MemoryConfigLoader,
-	reactEnv,
+	ReactEnvConfigLoader,
 	type RequestNotReady,
 	SemicolonConfigParser,
 	setLogger,
 	stringParser,
 	UrlParser,
 	type ValidateCallback,
-	validLiteral,
 } from '../src';
 import {testObjectParser} from './testObjectParse';
+
+const env = new EnvConfigLoader();
+const reactEnv = new ReactEnvConfigLoader();
 
 dotenv.config();
 const debugSpy = spy();
@@ -84,21 +85,22 @@ const spyLogger = {
 const objectSchema = z.object({
 	foo: z.string(),
 	baz: z.string(),
+	secret: z.string().optional(),
 });
 type ObjectSchema = z.infer<typeof objectSchema>;
 
-const validate: ValidateCallback<ObjectSchema, Record<string, unknown>> = async (data: Record<string, unknown>) => {
+const validate: ValidateCallback<object, ObjectSchema> = async (data) => {
 	return objectSchema.parseAsync(data);
 };
 
 const stringRecordSchema = z.record(z.string().min(1), z.string().optional());
 
-const fetchValidate: ValidateCallback<Record<string, string | undefined>, Record<string, unknown>> = async (data: Record<string, unknown>) => {
+const fetchValidate: ValidateCallback<Record<string, string | undefined>, Record<string, string | undefined>> = async (data) => {
 	return stringRecordSchema.parseAsync(data);
 };
 
 let fetchLoader: FetchConfigLoader;
-let fetchEnv: (params?: string) => IConfigLoader;
+
 const urlDefault = new URL('http://localhost/api');
 let fetchRequestData: Request | undefined;
 let isFetchDisabled = false;
@@ -113,7 +115,6 @@ const fetchLoaderOptions = {
 let memoryEnv: MemoryConfigLoader<{
 	TEST: undefined;
 }>;
-let memoryEnvLoader: IConfigLoader;
 
 function handleFetchRequest(): Request | RequestNotReady {
 	if (fetchRequestData) {
@@ -193,13 +194,13 @@ describe('config variable', () => {
 	describe('loaders', () => {
 		it('should return process env value', async function () {
 			process.env.TEST = 'asd';
-			const call: Promise<string | undefined> = getConfigVariable('TEST', [env()], stringParser(), undefined, {showValue: true});
+			const call: Promise<string | undefined> = getConfigVariable('TEST', [env], stringParser(), undefined, {showValue: true});
 			await expect(call).resolves.toEqual('asd');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [asd] from process.env.TEST`);
 		});
 		it('should return process react env value', async function () {
 			process.env.REACT_APP_TEST = 'asd';
-			const call: Promise<string | undefined> = getConfigVariable('TEST', [reactEnv()], stringParser(), undefined, {showValue: true});
+			const call: Promise<string | undefined> = getConfigVariable('TEST', [reactEnv], stringParser(), undefined, {showValue: true});
 			await expect(call).resolves.toEqual('asd');
 			expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[react-env]: TEST [asd] from process.env.REACT_APP_TEST`);
 		});
@@ -207,12 +208,11 @@ describe('config variable', () => {
 			beforeEach(function () {
 				clearDefaultValueSeenMap();
 				fetchLoader = new FetchConfigLoader(handleFetchRequest, fetchLoaderOptions);
-				fetchEnv = fetchLoader.getLoader;
 				isFetchDisabled = false;
 			});
 			it('should return default if fetch request not ready yet', async function () {
 				expect(fetchLoader.isLoaded()).to.be.eq(false);
-				expect(await getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true})).to.be.eql(urlDefault);
+				expect(await getConfigVariable('API_SERVER', [fetchLoader], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true})).to.be.eql(urlDefault);
 				expect(infoSpy.callCount).to.be.eq(1);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[default]: API_SERVER [${urlDefault}] from default`);
 				expect(debugSpy.callCount).to.be.eq(1);
@@ -222,7 +222,7 @@ describe('config variable', () => {
 				const value = new URL(API_SERVER);
 				const req = new Request(configRequestUrl);
 				fetchRequestData = req;
-				const call = getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
+				const call = getConfigVariable('API_SERVER', [fetchLoader], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
 				const output = await call;
 				expect(infoSpy.callCount).to.be.eq(1);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[fetch]: API_SERVER [${value}] from ${configRequestUrl}`);
@@ -235,7 +235,7 @@ describe('config variable', () => {
 			it('should return fetch Object value', async function () {
 				const req = new Request(configRequestUrl, {headers: {'If-None-Match': '123'}});
 				fetchRequestData = req;
-				const call = getConfigVariable('TEST_OBJECT', [fetchEnv()], testObjectParser, undefined, {showValue: true});
+				const call = getConfigVariable('TEST_OBJECT', [fetchLoader], testObjectParser, undefined, {showValue: true});
 				await call;
 				expect(infoSpy.callCount).to.be.eq(1);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[fetch]: TEST_OBJECT [First=false;Second=false;Third=true] from ${configRequestUrl}`);
@@ -247,14 +247,14 @@ describe('config variable', () => {
 			it('should not get null value', async function () {
 				const req = new Request(configRequestUrl, {headers: {'If-None-Match': '123'}});
 				fetchRequestData = req;
-				expect(await getConfigVariable('NULL_VALUE', [fetchEnv()], testObjectParser, undefined, {showValue: true})).to.be.eq(undefined);
+				expect(await getConfigVariable('NULL_VALUE', [fetchLoader], testObjectParser, undefined, {showValue: true})).to.be.eq(undefined);
 				expect(infoSpy.callCount).to.be.eq(0);
 			});
 			it('should get cache hit', async function () {
 				const value = new URL(API_SERVER);
 				const req = new Request(configRequestUrl);
 				fetchRequestData = req;
-				const call = getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
+				const call = getConfigVariable('API_SERVER', [fetchLoader], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
 				const output = await call;
 				expect(infoSpy.callCount).to.be.eq(1);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[fetch]: API_SERVER [${value}] from ${configRequestUrl}`);
@@ -269,7 +269,7 @@ describe('config variable', () => {
 				const value = new URL(API_SERVER);
 				const req = new Request(configRequestUrl);
 				fetchRequestData = req;
-				const call = getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
+				const call = getConfigVariable('API_SERVER', [fetchLoader], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
 				const output = await call;
 				expect(errorSpy.callCount).to.be.eq(0);
 				expect(infoSpy.callCount).to.be.eq(1);
@@ -286,7 +286,7 @@ describe('config variable', () => {
 				isOnline = false;
 				const req = new Request(configRequestUrl);
 				fetchRequestData = req;
-				const call = getConfigVariable('API_SERVER', [fetchEnv()], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
+				const call = getConfigVariable('API_SERVER', [fetchLoader], new UrlParser({urlSanitize: true}), urlDefault, {showValue: true});
 				const output = await call;
 				expect(errorSpy.callCount).to.be.eq(0);
 				expect(infoSpy.callCount).to.be.eq(1);
@@ -306,10 +306,9 @@ describe('config variable', () => {
 					},
 					{logger: spyLogger},
 				);
-				memoryEnvLoader = memoryEnv.getLoader();
 			});
 			it('should return undefined value', async function () {
-				const call: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnvLoader], stringParser(), undefined, {showValue: true});
+				const call: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnv], stringParser(), undefined, {showValue: true});
 				await expect(call).resolves.toEqual(undefined);
 				expect(infoSpy.callCount).to.be.eq(0);
 			});
@@ -317,7 +316,7 @@ describe('config variable', () => {
 				await memoryEnv.set('TEST', 'asd');
 				expect(debugSpy.callCount).to.be.eq(1);
 				expect(debugSpy.getCall(0).args[0]).to.be.eq(`ConfigLoader[memory]: setting key TEST to 'asd'`);
-				const call: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnvLoader], stringParser(), undefined, {showValue: true});
+				const call: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnv], stringParser(), undefined, {showValue: true});
 				await expect(call).resolves.toEqual('asd');
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[memory]: TEST [asd] from key:TEST`);
 			});
@@ -325,7 +324,7 @@ describe('config variable', () => {
 				await memoryEnv.set('TEST', 'asd');
 				expect(debugSpy.callCount).to.be.eq(1);
 				expect(debugSpy.getCall(0).args[0]).to.be.eq(`ConfigLoader[memory]: setting key TEST to 'asd'`);
-				const call1: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnvLoader], stringParser(), undefined, {showValue: true});
+				const call1: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnv], stringParser(), undefined, {showValue: true});
 				await expect(call1).resolves.toEqual('asd');
 				expect(infoSpy.callCount).to.be.eq(1);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[memory]: TEST [asd] from key:TEST`);
@@ -333,7 +332,7 @@ describe('config variable', () => {
 				await memoryEnv.set('TEST', 'asd2');
 				expect(debugSpy.callCount).to.be.eq(2);
 				expect(debugSpy.getCall(1).args[0]).to.be.eq(`ConfigLoader[memory]: setting key TEST to 'asd2'`);
-				const call2: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnvLoader], stringParser(), undefined, {showValue: true});
+				const call2: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnv], stringParser(), undefined, {showValue: true});
 				await expect(call2).resolves.toEqual('asd2');
 				expect(infoSpy.callCount).to.be.eq(2);
 				expect(infoSpy.getCall(1).args[0]).to.be.eq(`ConfigVariables[memory]: TEST [asd2] from key:TEST`);
@@ -343,11 +342,11 @@ describe('config variable', () => {
 				await memoryEnv.set('TEST', 'asd');
 				expect(debugSpy.callCount).to.be.eq(1);
 				expect(debugSpy.getCall(0).args[0]).to.be.eq(`ConfigLoader[memory]: setting key TEST to 'asd'`);
-				const call1: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnvLoader, env()], stringParser(), undefined, {showValue: true});
+				const call1: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnv, env], stringParser(), undefined, {showValue: true});
 				await expect(call1).resolves.toEqual('asd');
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[memory]: TEST [asd] from key:TEST`);
 				await memoryEnv.set('TEST', undefined);
-				const call2: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnvLoader, env()], stringParser(), undefined, {showValue: true});
+				const call2: Promise<string | undefined> = getConfigVariable('TEST', [memoryEnv, env], stringParser(), undefined, {showValue: true});
 				await expect(call2).resolves.toEqual('asd2');
 				expect(infoSpy.getCall(1).args[0]).to.be.eq(`ConfigVariables[env]: TEST [asd2] from process.env.TEST`);
 			});
@@ -357,9 +356,12 @@ describe('config variable', () => {
 		describe('string', () => {
 			it('should return process env string literal value', async function () {
 				process.env.TEST = 'one';
-				const options = ['one', 'two', 'three'] as const;
-				type Options = (typeof options)[number];
-				const value: Options | undefined = await getConfigVariable('TEST', [env()], stringParser(validLiteral(options)), undefined, {
+				const optionSchema = z.enum(['one', 'two', 'three']);
+				type Options = z.infer<typeof optionSchema>;
+				const typeGuard = (value: unknown): value is Options => {
+					return optionSchema.safeParse(value).success;
+				};
+				const value: Options | undefined = await getConfigVariable('TEST', [env], stringParser(typeGuard), undefined, {
 					showValue: true,
 				});
 				expect(value).to.be.eq('one');
@@ -369,19 +371,19 @@ describe('config variable', () => {
 		describe('boolean', () => {
 			it('should return process env boolean true value', async function () {
 				process.env.TEST = 'YES';
-				const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env(), reactEnv()], booleanParser(), undefined, {showValue: true});
+				const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env, reactEnv], booleanParser(), undefined, {showValue: true});
 				await expect(call).resolves.toEqual(true);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [true] from process.env.TEST`);
 			});
 			it('should return process env boolean false value', async function () {
 				process.env.TEST = 'N';
-				const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env(), reactEnv()], booleanParser(), undefined, {showValue: true});
+				const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env, reactEnv], booleanParser(), undefined, {showValue: true});
 				await expect(call).resolves.toEqual(false);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [false] from process.env.TEST`);
 			});
 			it('should return undefined value if not valid', async function () {
 				process.env.TEST = '__BROKEN__';
-				const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env(), reactEnv()], booleanParser(), undefined, {showValue: true});
+				const call: Promise<boolean | undefined> = getConfigVariable('TEST', [env, reactEnv], booleanParser(), undefined, {showValue: true});
 				await expect(call).resolves.toEqual(undefined);
 				const errorLog = errorSpy.getCall(0).args[0] as Error;
 				expect(errorLog)
@@ -392,13 +394,13 @@ describe('config variable', () => {
 		describe('integer', () => {
 			it('should return process env integer value', async function () {
 				process.env.TEST = '02';
-				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], integerParser(), undefined, {showValue: true});
+				const call: Promise<number | undefined> = getConfigVariable('TEST', [env, reactEnv], integerParser(), undefined, {showValue: true});
 				await expect(call).resolves.toEqual(2);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [2] from process.env.TEST`);
 			});
 			it('should return undefined value if not valid', async function () {
 				process.env.TEST = '__BROKEN__';
-				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], integerParser(), undefined, {showValue: true});
+				const call: Promise<number | undefined> = getConfigVariable('TEST', [env, reactEnv], integerParser(), undefined, {showValue: true});
 				await expect(call).resolves.toEqual(undefined);
 				const errorLog = errorSpy.getCall(0).args[0] as Error;
 				expect(errorLog)
@@ -409,13 +411,13 @@ describe('config variable', () => {
 		describe('float', () => {
 			it('should return process env float value', async function () {
 				process.env.TEST = '2.5';
-				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], floatParser(), undefined, {showValue: true});
+				const call: Promise<number | undefined> = getConfigVariable('TEST', [env, reactEnv], floatParser(), undefined, {showValue: true});
 				await expect(call).resolves.toEqual(2.5);
 				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [2.5] from process.env.TEST`);
 			});
 			it('should return undefined value if not valid', async function () {
 				process.env.TEST = '__BROKEN__';
-				const call: Promise<number | undefined> = getConfigVariable('TEST', [env(), reactEnv()], floatParser(), undefined, {showValue: true});
+				const call: Promise<number | undefined> = getConfigVariable('TEST', [env, reactEnv], floatParser(), undefined, {showValue: true});
 				await expect(call).resolves.toEqual(undefined);
 				const errorLog = errorSpy.getCall(0).args[0] as Error;
 				expect(errorLog)
@@ -425,25 +427,25 @@ describe('config variable', () => {
 		});
 		describe('config', () => {
 			it('should return process env config', async function () {
-				process.env.TEST = 'foo=bar;baz=qux';
+				process.env.TEST = 'foo=bar;baz=qux;secret=some-long-secret-value';
 				const call: Promise<ObjectSchema | undefined> = getConfigVariable(
 					'TEST',
-					[env(), reactEnv()],
-					new SemicolonConfigParser({validate, keysToHide: ['baz']}),
+					[env, reactEnv],
+					new SemicolonConfigParser({validate, protectedKeys: ['secret'], showProtectedKeys: 'prefix-suffix'}),
 					undefined,
 					{
 						showValue: true,
 					},
 				);
-				await expect(call).resolves.toEqual({foo: 'bar', baz: 'qux'});
-				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [foo=bar;baz=***] from process.env.TEST`);
+				await expect(call).resolves.toEqual({foo: 'bar', baz: 'qux', secret: 'some-long-secret-value'});
+				expect(infoSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[env]: TEST [foo=bar;baz=qux;secret=so******************ue] from process.env.TEST`);
 			});
 			it('should return undefined value if not valid', async function () {
 				process.env.TEST = '__BROKEN__';
 				const call: Promise<ObjectSchema | undefined> = getConfigVariable(
 					'TEST',
-					[env(), reactEnv()],
-					new SemicolonConfigParser({validate, keysToHide: ['baz']}),
+					[env, reactEnv],
+					new SemicolonConfigParser({validate, protectedKeys: ['baz']}),
 					undefined,
 					{
 						showValue: true,
@@ -461,8 +463,8 @@ describe('config variable', () => {
 				process.env.TEST = '{"foo": "bar", "baz": "qux"}';
 				const call: Promise<ObjectSchema | undefined> = getConfigVariable(
 					'TEST',
-					[env(), reactEnv()],
-					new JsonConfigParser({validate, keysToHide: ['baz']}),
+					[env, reactEnv],
+					new JsonConfigParser({validate, protectedKeys: ['baz']}),
 					undefined,
 					{
 						showValue: true,
@@ -475,8 +477,8 @@ describe('config variable', () => {
 				process.env.TEST = '__BROKEN__';
 				const call: Promise<ObjectSchema | undefined> = getConfigVariable(
 					'TEST',
-					[env(), reactEnv()],
-					new JsonConfigParser({validate, keysToHide: ['baz']}),
+					[env, reactEnv],
+					new JsonConfigParser({validate, protectedKeys: ['baz']}),
 					undefined,
 					{
 						showValue: true,

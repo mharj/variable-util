@@ -1,25 +1,40 @@
-import {type IConfigParser, type ParserProps, type PostValidate} from '../interfaces';
+import {type IConfigParser, type ParserProps, type TypeGuardValidate} from '../interfaces';
 
 /**
  * Build parser for array of values
- * @param parse parser for the array values
- * @param separator separator for the array values, defaults to ';'
- * @param postValidate optional post validation
- * @returns {IConfigParser<Output[], RawOutput[]>} Parser for array of values
+ * @template Input - Type of input
+ * @template Output - Type of output
+ * @param {IConfigParser<Input, Output>} parse parser for the array values
+ * @param {string} separator separator for the array values, defaults to ';'
+ * @param {TypeGuardValidate<Output> | undefined} validate optional post validation
+ * @returns {IConfigParser<Output[], Input[]>} Parser for array of values
  * @category Parsers
- * @since v0.9.1
+ * @since v1.0.0
  */
-export function arrayParser<Output, RawOutput>(
-	parse: IConfigParser<Output, RawOutput>,
+export function arrayParser<Input, Output>(
+	parse: IConfigParser<Input, Output>,
 	separator = ';',
-	postValidate?: PostValidate<Output[], RawOutput[]>,
-): IConfigParser<Output[], RawOutput[]> {
+	validate?: TypeGuardValidate<Output>,
+): IConfigParser<Input[], Output[]> {
 	return {
 		name: 'arraySeparatorParser',
 		parse: (props: ParserProps) => {
 			return Promise.all(props.value.split(separator).map((v) => parse.parse({...props, value: v})));
 		},
-		postValidate,
+		postValidate: async (props) => {
+			if (!validate) {
+				return undefined;
+			}
+			const valueList = await Promise.all(
+				props.value.map(async (v) => {
+					if (!(await validate)?.(v)) {
+						return undefined;
+					}
+					return v;
+				}),
+			);
+			return valueList.filter((v) => v !== undefined);
+		},
 		toString: (value: Output[]) => {
 			return value.map((v) => parse.toString(v)).join(separator);
 		},

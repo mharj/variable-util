@@ -1,19 +1,20 @@
-import {handleSeen} from '../lib/seenUtils';
+import {type OverrideKeyMap} from '../interfaces';
 import {ConfigLoader, type IConfigLoaderProps} from './ConfigLoader';
 
 /**
  * MapConfigLoader is a class that extends ConfigLoader and adds the ability to reload the data.
- * @since v0.13.0
+ * @template Props - the type of the options for the loader
+ * @template OverrideMap - the type of the override key map
+ * @since v1.0.0
+ * @category Loaders
  */
-export abstract class MapConfigLoader<HandlerParams, Props extends IConfigLoaderProps, DefaultProps extends Props = Props> extends ConfigLoader<
-	HandlerParams,
+export abstract class MapConfigLoader<Props extends IConfigLoaderProps, OverrideMap extends OverrideKeyMap = OverrideKeyMap> extends ConfigLoader<
 	Props,
-	DefaultProps
+	OverrideMap
 > {
-	protected abstract defaultOptions: DefaultProps | undefined;
+	protected abstract defaultOptions: Props;
 	protected _isLoaded = false;
-	protected data = new Map<string, HandlerParams>();
-	protected valueSeen = new Map<string, string>();
+	protected data = new Map<string, string>();
 	/**
 	 * clear maps and reloads the data
 	 */
@@ -25,6 +26,7 @@ export abstract class MapConfigLoader<HandlerParams, Props extends IConfigLoader
 
 	/**
 	 * is the data loaded
+	 * @returns {boolean} Whether the data is loaded
 	 */
 	public isLoaded(): boolean {
 		return this._isLoaded;
@@ -39,16 +41,6 @@ export abstract class MapConfigLoader<HandlerParams, Props extends IConfigLoader
 		if (await this.handleLoadData()) {
 			this.emit('updated');
 		}
-	}
-
-	/**
-	 * Set seen value and return last "seen" value
-	 * @param targetKey
-	 * @param currentValue
-	 * @returns
-	 */
-	protected handleSeen(targetKey: string, currentValue: string | undefined): boolean {
-		return handleSeen(this.valueSeen, targetKey, currentValue);
 	}
 
 	protected abstract handleLoadData(): Promise<boolean>;

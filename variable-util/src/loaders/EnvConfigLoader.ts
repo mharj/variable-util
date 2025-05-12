@@ -1,22 +1,21 @@
-import {type IConfigLoader, type LoaderValue} from '../interfaces/IConfigLoader';
-import {handleSeen} from '../lib/seenUtils';
-
-const seenMap = new Map<string, string>();
+import {type OverrideKeyMap} from '../interfaces';
+import {ConfigLoader, type IConfigLoaderProps} from './ConfigLoader';
 
 /**
- * env loader function is used to load env variables from process.env
+ * env loader class is used to load env variables from process.env
+ * @template OverrideMap - the type of the override key map
  * @param {string} [overrideKey] - optional override key for lookup
  * @returns {IConfigLoader} - IConfigLoader object
  * @category Loaders
- * @since v0.5.0
+ * @since v1.0.0
  */
-export function env(overrideKey?: string): IConfigLoader {
-	return {
-		type: 'env',
-		callback: (lookupKey): LoaderValue => {
-			const targetKey = overrideKey ?? lookupKey;
-			const currentValue = process.env[targetKey];
-			return {type: 'env', result: {value: currentValue, path: `process.env.${targetKey}`, seen: handleSeen(seenMap, targetKey, currentValue)}};
-		},
+export class EnvConfigLoader<OverrideMap extends OverrideKeyMap = OverrideKeyMap> extends ConfigLoader<IConfigLoaderProps, OverrideMap> {
+	public readonly loaderType = 'env';
+	public override defaultOptions: IConfigLoaderProps = {
+		disabled: false,
 	};
+
+	protected handleLoaderValue(lookupKey: string) {
+		return {value: process.env[lookupKey], path: `process.env.${lookupKey}`};
+	}
 }

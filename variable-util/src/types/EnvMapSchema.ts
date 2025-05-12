@@ -5,6 +5,7 @@ import {type FormatParameters} from '../lib/formatUtils';
 
 /**
  * Optional environment entry
+ * @template Value - type of value
  * @since v0.8.0
  */
 export type OptionalEnvEntry<Value> = {
@@ -15,7 +16,7 @@ export type OptionalEnvEntry<Value> = {
 	/**
 	 * The parser to use to parse the value
 	 */
-	parser: IConfigParser<Value, unknown>;
+	parser: IConfigParser<unknown, Value>;
 	/**
 	 * The default value to use if the variable is not defined
 	 */
@@ -36,6 +37,7 @@ export type OptionalEnvEntry<Value> = {
 
 /**
  * Required environment entry
+ * @template Value - type of value
  * @since v0.8.0
  */
 export type RequiredEnvEntry<Value> = {
@@ -46,7 +48,7 @@ export type RequiredEnvEntry<Value> = {
 	/**
 	 * The parser to use to parse the value
 	 */
-	parser: IConfigParser<Value, unknown>;
+	parser: IConfigParser<unknown, Value>;
 	/**
 	 * The default value to use if the variable is not defined
 	 */
@@ -67,6 +69,7 @@ export type RequiredEnvEntry<Value> = {
 
 /**
  * Required environment entry with undefinedThrowsError
+ * @template Value - type of value
  * @since v0.8.0
  */
 export type RequiredUndefinedThrowEntry<Value> = {
@@ -77,7 +80,7 @@ export type RequiredUndefinedThrowEntry<Value> = {
 	/**
 	 * The parser to use to parse the value
 	 */
-	parser: IConfigParser<Value, unknown>;
+	parser: IConfigParser<unknown, Value>;
 	/**
 	 * The default value to use if the variable is not defined
 	 */
@@ -98,6 +101,7 @@ export type RequiredUndefinedThrowEntry<Value> = {
 
 /**
  * Environment map schema
+ * @template Output - type of output value
  * @since v0.2.15
  */
 export type EnvMapSchema<Output extends Record<string, unknown>> = {

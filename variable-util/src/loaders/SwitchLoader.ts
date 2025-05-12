@@ -1,8 +1,6 @@
 import {type ILoggerLike} from '@avanio/logger-like';
 import type {Loadable} from '@luolapeikko/ts-common';
-import {type LoaderValue} from '../interfaces/IConfigLoader';
-import {handleSeen} from '../lib/seenUtils';
-import {ConfigLoader, type IConfigLoaderProps} from './ConfigLoader';
+import {ConfigLoader, type IConfigLoaderProps, type LoaderValue} from './ConfigLoader';
 
 export interface ISwitchLoaderProps extends IConfigLoaderProps {
 	logger?: ILoggerLike;
@@ -34,19 +32,24 @@ export type SwitchConfigMap<Map extends Record<string, unknown>, Key extends str
  * await switchLoader.activateSwitch('switch1'); // when you want enable switch1 values
  * @template Config - The configuration map
  * @template Key - The key to switch between
- * @since v0.10.1
+ * @since v1.0.0
+ * @category Loaders
  */
-export class SwitchLoader<Config extends Record<string, unknown>, Key extends string> extends ConfigLoader<string, ISwitchLoaderProps> {
-	public readonly type: Lowercase<string>;
-	protected override defaultOptions: ISwitchLoaderProps | undefined;
+export class SwitchLoader<Config extends Record<string, unknown>, Key extends string> extends ConfigLoader<ISwitchLoaderProps> {
+	public readonly loaderType: Lowercase<string>;
+
 	private readonly config: Readonly<SwitchConfigMap<Config, Key>>;
 	private readonly keys = new Set<Key>();
-	private readonly seen = new Map<string, string>();
 
-	constructor(configs: SwitchConfigMap<Config, Key>, props: Loadable<ISwitchLoaderProps> = {}, type: Lowercase<string> = 'switch') {
+	protected override defaultOptions: ISwitchLoaderProps = {
+		disabled: false,
+		logger: undefined,
+	};
+
+	constructor(configs: SwitchConfigMap<Config, Key>, props: Loadable<Partial<ISwitchLoaderProps>> = {}, type: Lowercase<string> = 'switch') {
 		super(props);
 		this.config = configs;
-		this.type = type;
+		this.loaderType = type;
 	}
 
 	public async activateSwitch(key: Key) {
@@ -67,20 +70,12 @@ export class SwitchLoader<Config extends Record<string, unknown>, Key extends st
 		return this.keys;
 	}
 
-	protected async handleLoader(lookupKey: string, overrideKey?: string): Promise<LoaderValue> {
-		const options = await this.getOptions();
-		if (options.disabled) {
-			return {type: this.type, result: undefined};
-		}
-		const targetKey = overrideKey ?? lookupKey;
-		let output: LoaderValue = {type: this.type, result: undefined};
+	protected handleLoaderValue(lookupKey: string) {
+		let output: LoaderValue | undefined;
 		for (const key of Array.from(this.keys)) {
-			const currentValue = this.config[key][targetKey];
+			const currentValue = this.config[key][lookupKey];
 			if (currentValue) {
-				output = {
-					type: this.type,
-					result: {value: currentValue, path: `switch:${String(key)}:${targetKey}`, seen: handleSeen(this.seen, targetKey, currentValue)},
-				};
+				output = {value: currentValue, path: `switch:${String(key)}:${lookupKey}`};
 			}
 		}
 		return output;

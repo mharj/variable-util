@@ -3,6 +3,7 @@ import {type IConfigParser, type ParserProps} from '../interfaces/IConfigParser'
 
 /**
  * Properties for the UrlParser
+ * @since v0.2.5
  */
 export interface UrlParserProps {
 	urlSanitize?: boolean;
@@ -51,7 +52,7 @@ export class UrlParser implements IConfigParser<URL, URL> {
 
 	/**
 	 * Build a URL object from a string and sanitize the username and password
-	 * @param value string to parse
+	 * @param {string} value string to parse
 	 * @returns {URL} URL object with sanitized username and password
 	 */
 	private handleUrlSanitize(value: string): string {

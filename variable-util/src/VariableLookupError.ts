@@ -3,7 +3,7 @@ import {VariableError} from './VariableError';
 /**
  * Custom error class for variable lookup errors.
  * @class VariableLookupError
- * @extends VariableError
+ * @augments VariableError
  * @category Errors
  * @since v0.2.2
  */

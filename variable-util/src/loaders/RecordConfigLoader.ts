@@ -1,19 +1,19 @@
-import {handleSeen} from '../lib/seenUtils';
+import {type OverrideKeyMap} from '../interfaces';
 import {ConfigLoader, type IConfigLoaderProps} from './ConfigLoader';
 
 /**
  * RecordConfigLoader is a class that extends ConfigLoader and adds the ability to reload the data.
- * @since v0.8.0
+ * @template Props - the type of the options for the loader
+ * @template OverrideMap - the type of the override key map
+ * @since v1.0.0
  */
-export abstract class RecordConfigLoader<HandlerParams, Props extends IConfigLoaderProps, DefaultProps extends Props = Props> extends ConfigLoader<
-	HandlerParams,
+export abstract class RecordConfigLoader<Props extends IConfigLoaderProps, OverrideMap extends OverrideKeyMap = OverrideKeyMap> extends ConfigLoader<
 	Props,
-	DefaultProps
+	OverrideMap
 > {
-	protected abstract defaultOptions: DefaultProps | undefined;
+	protected abstract defaultOptions: Props;
 	protected _isLoaded = false;
-	protected dataPromise: Promise<Record<string, HandlerParams>> | undefined;
-	protected valueSeen = new Map<string, string>();
+	protected dataPromise: Promise<Record<string, string>> | undefined;
 	/**
 	 * reloads the data
 	 */
@@ -24,6 +24,7 @@ export abstract class RecordConfigLoader<HandlerParams, Props extends IConfigLoa
 
 	/**
 	 * is the data loaded
+	 * @returns {boolean} - true if the data is loaded, false otherwise
 	 */
 	public isLoaded(): boolean {
 		return this._isLoaded;
@@ -40,15 +41,5 @@ export abstract class RecordConfigLoader<HandlerParams, Props extends IConfigLoa
 		this.emit('updated');
 	}
 
-	/**
-	 * Set seen value and return last "seen" value
-	 * @param targetKey
-	 * @param currentValue
-	 * @returns
-	 */
-	protected handleSeen(targetKey: string, currentValue: string | undefined): boolean {
-		return handleSeen(this.valueSeen, targetKey, currentValue);
-	}
-
-	protected abstract handleData(): Promise<Record<string, HandlerParams>>;
+	protected abstract handleData(): Promise<Record<string, string>>;
 }

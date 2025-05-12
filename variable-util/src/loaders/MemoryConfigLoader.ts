@@ -1,40 +1,48 @@
 import {type ILoggerLike} from '@avanio/logger-like';
-import {type Loadable, resolveLoadable} from '@luolapeikko/ts-common';
-import {type LoaderValue} from '../interfaces';
-import {handleSeen} from '../lib/seenUtils';
+import {type Loadable} from '@luolapeikko/ts-common';
+import {type OverrideKeyMap} from '../interfaces';
 import {ConfigLoader, type IConfigLoaderProps} from './ConfigLoader';
 
 export interface IMemoryConfigLoaderProps extends IConfigLoaderProps {
-	logger?: ILoggerLike;
+	logger: ILoggerLike | undefined;
 }
 
 /**
  * Config loader with in-memory data which can be set and retrieved variables on the fly.
  * - Useful for temporary controlled overrides or testing
- * @since v0.9.2
+ * @template MemoryMap - the type of the memory map
+ * @template OverrideMap - the type of the override key map
+ * @since v1.0.0
+ * @category Loaders
  */
-export class MemoryConfigLoader<MemoryMap extends Record<string, string | undefined>> extends ConfigLoader<
-	string,
+export class MemoryConfigLoader<MemoryMap extends Record<string, string | undefined>, OverrideMap extends OverrideKeyMap = OverrideKeyMap> extends ConfigLoader<
 	IMemoryConfigLoaderProps,
-	IMemoryConfigLoaderProps
+	OverrideMap
 > {
-	public readonly type: Lowercase<string>;
-	protected defaultOptions: IMemoryConfigLoaderProps | undefined;
+	public readonly loaderType: Lowercase<string>;
 	private data: Map<keyof MemoryMap, string | undefined>;
-	private seen = new Map<string, string>();
 
-	public constructor(initialData: MemoryMap, options: Loadable<IMemoryConfigLoaderProps> = {}, type: Lowercase<string> = 'memory') {
-		super(options);
-		this.getLoader = this.getLoader.bind(this);
+	protected defaultOptions: IMemoryConfigLoaderProps = {
+		disabled: false,
+		logger: undefined,
+	};
+
+	public constructor(
+		initialData: MemoryMap,
+		options: Loadable<Partial<IMemoryConfigLoaderProps>> = {},
+		overrideKeys: Partial<OverrideMap> = {},
+		type: Lowercase<string> = 'memory',
+	) {
+		super(options, overrideKeys);
 		this.data = new Map(Object.entries(initialData));
-		this.type = type;
+		this.loaderType = type;
 	}
 
 	public async set(key: keyof MemoryMap, value: string | undefined): Promise<void> {
 		const options = await this.getOptions();
 		options.logger?.debug(this.buildErrorStr(`setting key ${String(key)} to '${String(value)}'`));
 		if (this.data.get(key) !== value) {
-			this.seen.delete(String(key));
+			this.valueSeen.delete(String(key));
 		}
 		this.data.set(key, value);
 		this.emit('updated');
@@ -46,17 +54,7 @@ export class MemoryConfigLoader<MemoryMap extends Record<string, string | undefi
 		return this.data.get(key);
 	}
 
-	public async setDisabled(disabled: Loadable<boolean>): Promise<void> {
-		await this.setOptions({disabled: await resolveLoadable(disabled)});
-	}
-
-	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
-		const options = await this.getOptions();
-		if (options.disabled) {
-			return {type: this.type, result: undefined};
-		}
-		const targetKey = overrideKey ?? lookupKey;
-		const currentValue = this.data.get(targetKey);
-		return {type: this.type, result: {value: currentValue, path: `key:${targetKey}`, seen: handleSeen(this.seen, targetKey, currentValue)}};
+	protected handleLoaderValue(lookupKey: string) {
+		return {value: this.data.get(lookupKey), path: `key:${lookupKey}`};
 	}
 }

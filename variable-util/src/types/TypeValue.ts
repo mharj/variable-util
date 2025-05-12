@@ -1,5 +1,6 @@
 /**
  * Loader type value
+ * @template T - type of value
  * @since 0.2.18
  */
 export type LoaderTypeValue<T> = {
@@ -15,6 +16,7 @@ export type LoaderTypeValue<T> = {
 
 /**
  * Loader type strict value
+ * @template T - type of value
  * @since 0.2.18
  */
 export type LoaderTypeValueStrict<T> = {

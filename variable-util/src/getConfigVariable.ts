@@ -13,11 +13,20 @@ import {type FormatParameters} from './lib/formatUtils';
  * const port: Promise<string> = await getConfigVariable('PORT', [env(), fileEnv()], stringParser, '8080', {showValue: true});
  * // with override key
  * const port: Promise<string> = await getConfigVariable('PORT', [env('HTTP_PORT', fileEnv())], stringParser, '8080', {showValue: true});
+ * @param {string} rootKey - root key of config variable
+ * @param {IConfigLoader[]} loaders - loaders to use
+ * @param {IConfigParser<unknown, Output>} parser - parser to use
+ * @param {Loadable<Output>} [defaultValueLoadable] - default value to use
+ * @param {FormatParameters} [params] - optional format parameters
+ * @param {ConfigOptions} [options] - optional config options
+ * @param {EncodeOptions} [encodeOptions] - optional encode options
+ * @returns {Promise<Output>} - config variable
+ * @since v0.2.5
  */
 export async function getConfigVariable<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
-	parser: IConfigParser<Output, unknown>,
+	parser: IConfigParser<unknown, Output>,
 	defaultValueLoadable: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
@@ -26,7 +35,7 @@ export async function getConfigVariable<Output>(
 export async function getConfigVariable<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
-	parser: IConfigParser<Output, unknown>,
+	parser: IConfigParser<unknown, Output>,
 	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
@@ -35,7 +44,7 @@ export async function getConfigVariable<Output>(
 export async function getConfigVariable<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
-	parser: IConfigParser<Output, unknown>,
+	parser: IConfigParser<unknown, Output>,
 	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,

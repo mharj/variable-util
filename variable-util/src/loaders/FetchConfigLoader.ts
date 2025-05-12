@@ -1,6 +1,6 @@
 import type {ILoggerLike} from '@avanio/logger-like';
 import type {Loadable} from '@luolapeikko/ts-common';
-import type {LoaderValue} from '../interfaces/IConfigLoader';
+import type {OverrideKeyMap} from '../interfaces/IConfigLoader';
 import type {IRequestCache} from '../interfaces/IRequestCache';
 import type {ValidateCallback} from '../interfaces/IValidate';
 import {applyStringMap, buildStringObject, isValidObject} from '../lib';
@@ -12,26 +12,13 @@ import {MapConfigLoader} from './MapConfigLoader';
 
 /**
  * Options for the FetchConfigLoader
+ * @since v1.0.0
  */
 export interface FetchConfigLoaderOptions extends IConfigLoaderProps {
 	fetchClient: typeof fetch;
 	/** this prevents Error to be thrown if have http error */
 	isSilent: boolean;
 	payload: 'json';
-	/**
-	 * optional validator for JSON response (Record<string, string | undefined>)
-	 *
-	 * @example
-	 * // using zod
-	 * const stringRecordSchema = z.record(z.string().min(1), z.string());
-	 * const validate: ValidateCallback<Record<string, string>> = async (data) => {
-	 *   const result = await stringRecordSchema.safeParseAsync(data);
-	 *   if (!result.success) {
-	 *     return {success: false, message: result.error.message};
-	 *   }
-	 *   return {success: true};
-	 * };
-	 */
 	validate: ValidateCallback<Record<string, string | undefined>, Record<string, string | undefined>> | undefined;
 	logger: ILoggerLike | undefined;
 	cache: IRequestCache | undefined;
@@ -42,19 +29,14 @@ export interface FetchConfigLoaderOptions extends IConfigLoaderProps {
 export type ConfigRequest = Request | RequestNotReady;
 
 /**
- * FetchConfigRequest is used to load config from a fetch request
- */
-export type FetchConfigRequest = ConfigRequest | Promise<ConfigRequest> | (() => ConfigRequest | Promise<ConfigRequest>);
-
-/**
  * FetchConfigLoader is used to load config from a fetch request
+ * @template OverrideMap - the type of the override key map
  * @category Loaders
- * @implements {IConfigLoader}
- * @since v0.8.0
+ * @since v1.0.0
  */
-export class FetchConfigLoader extends MapConfigLoader<string, Partial<FetchConfigLoaderOptions>, FetchConfigLoaderOptions> {
-	public readonly type: Lowercase<string>;
-	private request: FetchConfigRequest;
+export class FetchConfigLoader<OverrideMap extends OverrideKeyMap = OverrideKeyMap> extends MapConfigLoader<FetchConfigLoaderOptions, OverrideMap> {
+	public readonly loaderType: Lowercase<string>;
+	private request: Loadable<ConfigRequest>;
 	private path = 'undefined';
 
 	protected defaultOptions: FetchConfigLoaderOptions = {
@@ -70,25 +52,29 @@ export class FetchConfigLoader extends MapConfigLoader<string, Partial<FetchConf
 
 	/**
 	 * Constructor for FetchConfigLoader
-	 * @param request - callback that returns a fetch request or a message object that the request is not ready
-	 * @param options - optional options for FetchConfigLoader
-	 * @param type - optional name type for FetchConfigLoader (default: 'fetch')
+	 * @param {Loadable<ConfigRequest>} request - callback that returns a fetch request or a message object that the request is not ready
+	 * @param {Loadable<Partial<FetchConfigLoaderOptions>>} options - optional options for FetchConfigLoader
+	 * @param {Partial<OverrideMap>} overrideKeys - optional override keys for FetchConfigLoader
+	 * @param {Lowercase<string>} type - optional name type for FetchConfigLoader (default: 'fetch')
 	 */
-	constructor(request: FetchConfigRequest, options: Loadable<Partial<FetchConfigLoaderOptions>> = {}, type: Lowercase<string> = 'fetch') {
-		super(options);
+	constructor(
+		request: Loadable<ConfigRequest>,
+		options: Loadable<Partial<FetchConfigLoaderOptions>> = {},
+		overrideKeys: Partial<OverrideMap> = {},
+		type: Lowercase<string> = 'fetch',
+	) {
+		super(options, overrideKeys);
 		this.request = request;
-		this.type = type;
+		this.loaderType = type;
 	}
 
-	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
+	protected async handleLoaderValue(lookupKey: string) {
 		// check if we have JSON data loaded, if not load it
 		if (!this._isLoaded) {
 			await this.loadData();
 			this._isLoaded = true; // only load data once to prevent spamming fetch requests (use reload method to manually update data)
 		}
-		const targetKey = overrideKey ?? lookupKey; // optional override key, else use actual lookupKey
-		const value = this.data.get(targetKey);
-		return {type: this.type, result: {value, path: this.path, seen: this.handleSeen(targetKey, value)}};
+		return {value: this.data.get(lookupKey), path: this.path};
 	}
 
 	protected async handleLoadData(): Promise<boolean> {
@@ -141,6 +127,8 @@ export class FetchConfigLoader extends MapConfigLoader<string, Partial<FetchConf
 
 	/**
 	 * if client is offline, we will try return the cached response else add cache validation (ETag) and try get the response from the fetch request
+	 * @param {Request} req - request to fetch
+	 * @returns {Promise<Response | undefined>} - response or undefined
 	 */
 	private async fetchRequestOrCacheResponse(req: Request): Promise<Response | undefined> {
 		const {logger, cache, fetchClient} = await this.getOptions();
@@ -167,6 +155,9 @@ export class FetchConfigLoader extends MapConfigLoader<string, Partial<FetchConf
 
 	/**
 	 * on error, check if we have a valid cached response
+	 * @param {Request} req - request to fetch
+	 * @param {Response} res - response from fetch
+	 * @returns {Promise<Response>} - response
 	 */
 	private async checkIfValidCacheResponse(req: Request, res: Response): Promise<Response> {
 		const {cache} = await this.getOptions();
@@ -181,6 +172,9 @@ export class FetchConfigLoader extends MapConfigLoader<string, Partial<FetchConf
 
 	/**
 	 * if we get a 304, get the cached response
+	 * @param {Request} req - request to fetch
+	 * @param {Response} res - response from fetch
+	 * @returns {Promise<Response>} - response
 	 */
 	private async handleNotModifiedCache(req: Request, res: Response): Promise<Response> {
 		const {cache, logger} = await this.getOptions();

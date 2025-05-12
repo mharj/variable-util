@@ -23,7 +23,7 @@ export function getLogger(): ILoggerLike | undefined {
 
 /**
  * resolve logger: undefined = global logger, null = no logger else it's ILoggerLike
- * @param logger - logger to resolve
+ * @param {ILoggerLike | undefined | null} logger - logger to resolve
  * @category Utils
  * @returns {ILoggerLike | undefined} - resolved logger
  * @since v0.5.9

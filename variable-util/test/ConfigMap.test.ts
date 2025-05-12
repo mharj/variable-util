@@ -6,18 +6,20 @@ import {beforeAll, beforeEach, describe, expect, it} from 'vitest';
 import {z} from 'zod';
 import {
 	arrayParser,
+	bigIntParser,
 	booleanParser,
 	ConfigMap,
-	env,
+	EnvConfigLoader,
 	integerParser,
 	MemoryConfigLoader,
 	setLogger,
 	stringParser,
 	UrlParser,
-	validLiteral,
 	VariableError,
 } from '../src';
 import {testObjectFinalSchema, testObjectParser, type TestObjectType} from './testObjectParse';
+
+const env = new EnvConfigLoader();
 
 const updateSpy = spy();
 
@@ -48,6 +50,7 @@ type TestEnv = {
 	NOT_EXISTS: string;
 	ARRAY: string[];
 	SILENT_VALUE: number;
+	BIG_INT: bigint;
 };
 
 const testEnvSchema = z.object({
@@ -61,6 +64,7 @@ const testEnvSchema = z.object({
 	NOT_EXISTS: z.string(),
 	ARRAY: z.array(z.string()),
 	SILENT_VALUE: z.number(),
+	BIG_INT: z.bigint(),
 });
 
 const memoryEnv = new MemoryConfigLoader<{PORT?: string}>(
@@ -71,9 +75,17 @@ const memoryEnv = new MemoryConfigLoader<{PORT?: string}>(
 );
 memoryEnv.on('updated', updateSpy);
 
-const memEnv = memoryEnv.getLoader;
+const loaders = [memoryEnv, env];
 
-const loaders = [memEnv(), env()];
+function zodTypeGuard<T>(schema: z.ZodType<T>) {
+	return (value: unknown): value is T => {
+		const result = schema.safeParse(value);
+		if (!result.success) {
+			throw new Error(result.error.message);
+		}
+		return true;
+	};
+}
 
 const config = new ConfigMap<TestEnv>(
 	{
@@ -87,11 +99,12 @@ const config = new ConfigMap<TestEnv>(
 			defaultValue: new URL('http://localhost:3000'),
 			params: {showValue: true},
 		},
-		CONSTANT: {loaders, parser: stringParser(validLiteral(['constant'] as const)), defaultValue: 'constant'},
+		CONSTANT: {loaders, parser: stringParser(zodTypeGuard(z.literal('constant'))), defaultValue: 'constant'},
 		TEST_OBJECT: {loaders, parser: testObjectParser, defaultValue: {First: false, Second: false, Third: true}},
 		NOT_EXISTS: {loaders, parser: stringParser(), undefinedThrowsError: true, undefinedErrorMessage: 'add NOT_EXISTS to env'},
 		ARRAY: {loaders, parser: arrayParser(stringParser()), defaultValue: ['a', 'b', 'c'], params: {showValue: true}},
 		SILENT_VALUE: {loaders, parser: integerParser(), defaultValue: 3000, params: {showValue: true}},
+		BIG_INT: {loaders, parser: bigIntParser(), defaultValue: BigInt(123456789012345), params: {showValue: true}},
 	},
 	{namespace: 'Demo'},
 );
@@ -287,6 +300,12 @@ describe('ConfigMap', () => {
 				},
 				ARRAY: {type: 'default', value: ['a', 'b', 'c'], stringValue: 'a;b;c', namespace: 'Demo'},
 				SILENT_VALUE: {type: 'default', value: 3000, stringValue: '3000', namespace: 'Demo'},
+				BIG_INT: {
+					namespace: 'Demo',
+					stringValue: '123456789012345',
+					type: 'default',
+					value: 123456789012345n,
+				},
 			});
 		});
 	});

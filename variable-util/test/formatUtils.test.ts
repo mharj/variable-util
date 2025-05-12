@@ -11,8 +11,8 @@ describe('Test', function () {
 			expect(buildPartialHiddenValueString(uuidValue, 'suffix')).to.equal('*********************************4be').and.lengthOf(uuidValue.length);
 			expect(buildPartialHiddenValueString(uuidValue, 'prefix-suffix')).to.equal('32********************************be').and.lengthOf(uuidValue.length);
 
-			expect(buildPartialHiddenValueString(shortKey, 'prefix')).to.equal('s************').and.lengthOf(shortKey.length);
-			expect(buildPartialHiddenValueString(shortKey, 'suffix')).to.equal('************y').and.lengthOf(shortKey.length);
+			expect(buildPartialHiddenValueString(shortKey, 'prefix')).to.equal('so***********').and.lengthOf(shortKey.length);
+			expect(buildPartialHiddenValueString(shortKey, 'suffix')).to.equal('***********ey').and.lengthOf(shortKey.length);
 			expect(buildPartialHiddenValueString(shortKey, 'prefix-suffix')).to.equal('s***********y').and.lengthOf(shortKey.length);
 		});
 	});

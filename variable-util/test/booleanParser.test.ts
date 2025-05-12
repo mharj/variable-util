@@ -2,11 +2,9 @@ import {describe, expect, it} from 'vitest';
 import {booleanParser, type IConfigLoader} from '../src';
 
 const testLoader: IConfigLoader = {
-	type: 'unit',
-	callback: () => ({
-		type: 'unit',
-		result: undefined,
-	}),
+	loaderType: 'unit',
+	getLoaderResult: () => undefined,
+	isLoaderDisabled: () => false,
 };
 
 describe('Test boolean parser', function () {

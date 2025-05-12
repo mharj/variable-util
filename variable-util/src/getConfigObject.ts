@@ -14,6 +14,7 @@ const defaultValueSeenMap = new Map<string, string>();
 
 /**
  * Clear the seen map for default values (for unit testing purposes)
+ * @since v0.2.5
  */
 export function clearDefaultValueSeenMap(): void {
 	defaultValueSeenMap.clear();
@@ -21,22 +22,26 @@ export function clearDefaultValueSeenMap(): void {
 
 /**
  * get config object which contains value and type of loader
- * @param rootKey root key of config object
- * @param loaders array of loaders
- * @param parser parser for value
- * @param defaultValueLoadable optional default value
- * @param params optional format parameters
  * @example
  * // from "@avanio/variable-util-node"
  * const fileEnv = new FileConfigLoader({fileName: './settings.json', type: 'json'}).getLoader;
  * const portConfig: {type: string | undefined; value: string} = await getConfigObject('PORT', [env(), fileEnv()], stringParser, '8080', {showValue: true});
  * const value: string = portConfig.value;
  * const type: string | undefined = portConfig.type; // loader type name
+ * @param {string} rootKey root key of config object
+ * @param {IConfigLoader[]} loaders array of loaders
+ * @param {IConfigParser<unknown, Output>} parser parser for value
+ * @param {Loadable<Output>} defaultValueLoadable optional default value
+ * @param {FormatParameters} params optional format parameters
+ * @param {ConfigOptions} options optional config options
+ * @param {EncodeOptions} [encodeOptions] optional encode options
+ * @returns {Promise<LoaderTypeValue<Output>>} config object
+ * @since v0.2.5
  */
 export async function getConfigObject<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
-	parser: IConfigParser<Output, unknown>,
+	parser: IConfigParser<unknown, Output>,
 	defaultValueLoadable: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
@@ -45,7 +50,7 @@ export async function getConfigObject<Output>(
 export async function getConfigObject<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
-	parser: IConfigParser<Output, unknown>,
+	parser: IConfigParser<unknown, Output>,
 	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
@@ -54,7 +59,7 @@ export async function getConfigObject<Output>(
 export async function getConfigObject<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
-	parser: IConfigParser<Output, unknown>,
+	parser: IConfigParser<unknown, Output>,
 	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,

@@ -6,3 +6,4 @@ export * from './booleanParser';
 export * from './floatParser';
 export * from './integerParser';
 export * from './arrayParser';
+export * from './bigIntParser';

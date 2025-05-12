@@ -20,6 +20,7 @@ export type SolvedConfigOptions = {
  * @param {Partial<ConfigOptions>} options - partial config options
  * @returns {SolvedConfigOptions} - solved config options
  * @category Config
+ * @since v0.6.0
  */
 export function buildOptions({logger, namespace}: Partial<ConfigOptions> = {}): SolvedConfigOptions {
 	return {

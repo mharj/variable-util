@@ -22,6 +22,7 @@ export type PreValidateProps = {
 
 /**
  * PostValidate method props
+ * @template T - Type of value
  * @since v0.11.0
  */
 export type PostValidateProps<T> = {
@@ -32,9 +33,10 @@ export type PostValidateProps<T> = {
 
 /**
  * PreValidate function
- * @since v0.11.0
+ * @template Output - Type of output value
+ * @since v1.0.0
  */
-export type PostValidate<Output, RawOutput> = (postValidateProps: PostValidateProps<RawOutput>) => Promise<Output | undefined>;
+export type TypeGuardValidate<Output> = ((value: unknown) => value is Output) | Promise<(value: unknown) => value is Output>;
 
 /**
  * String encoder options for parsers
@@ -53,11 +55,11 @@ export type EncodeOptions = {
 
 /**
  * Interface for config parsers
- * @template Output - Type of output
- * @template RawOutput - Type of raw output
- * @since v0.11.0
+ * @template Input - Type of raw input value
+ * @template Output - Type of output value
+ * @since v1.0.0
  */
-export interface IConfigParser<Output, RawOutput> {
+export interface IConfigParser<Input, Output> {
 	/**
 	 * name of the parser
 	 */
@@ -67,7 +69,7 @@ export interface IConfigParser<Output, RawOutput> {
 	 * Config parser function
 	 * @throws Error if parsing fails
 	 */
-	parse(parserProps: ParserProps): RawOutput | Promise<RawOutput>;
+	parse(parserProps: ParserProps): Input | Promise<Input>;
 
 	/**
 	 * Optional raw string value validation before parsing.
@@ -79,16 +81,16 @@ export interface IConfigParser<Output, RawOutput> {
 	 * Optional value validation after parsing
 	 * @throws Error if validation fails
 	 */
-	postValidate?(postValidateProps: PostValidateProps<RawOutput>): Output | undefined | Promise<Output | undefined>;
+	postValidate?(postValidateProps: PostValidateProps<Input>): Output | undefined | Promise<Output | undefined>;
 
 	/**
 	 * Build readable string from value
 	 */
-	toString(value: Output, options?: EncodeOptions): string;
+	toString(config: Output, options?: EncodeOptions): string;
 
 	/**
 	 * Optional build readable string from value for log (can hide sensitive part from logs) else toString is used
-	 * @param value - value to log
+	 * @param config - value to log
 	 */
-	toLogString?(value: Output): string;
+	toLogString?(config: Output): string;
 }

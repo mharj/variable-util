@@ -2,44 +2,56 @@ import {type IConfigParser, type ParserProps, type PostValidateProps} from '../i
 import {type ValidateCallback} from '../interfaces/IValidate';
 import {buildHiddenValue, type ShowValueType} from '../lib/formatUtils';
 
-/**
- * The base type of the parsed JSON object
- */
-export type JsonParseType = Record<string, unknown>;
+export type JsonConfigParserOptions<Out extends Record<string, unknown>> = {
+	validate?: ValidateCallback<object, Out>;
+	/** keys to hide or partially hide */
+	protectedKeys?: Iterable<keyof Out>;
+	/** if and how to show protected keys */
+	showProtectedKeys?: ShowValueType;
+};
 
 /**
- * A parser for JSON sting as config
- * @implements {IConfigParser<Out, JsonParseType>}
+ * Config parser to parse JSON string as object
+ * @example
+ * const objectSchema = z.object({
+ *   foo: z.string(),
+ *   baz: z.string(),
+ *   secret: z.string(),
+ * });
+ * // parses '{"foo": "bar", "baz": "qux", "secret": "secret"}' string to {foo: "bar", baz: "qux", secret: "secret"}
+ * const fooBarJsonParser = new JsonConfigParser({
+ *   validate: (value) => objectSchema.parse(value),
+ *   protectedKeys: ['secret'],
+ *   showProtectedKeys: 'prefix-suffix', // shows secret value with few characters from start and end on logging
+ * });
+ * @template Out - the type of the output object
+ * @implements {IConfigParser<Out, object>}
  * @category Parsers
- * @since v0.9.0
+ * @since v1.0.0
  */
-export class JsonConfigParser<Out extends JsonParseType> implements IConfigParser<Out, JsonParseType> {
+export class JsonConfigParser<Out extends Record<string, unknown>> implements IConfigParser<object, Out> {
 	public name = 'jsonConfigParser';
-	private keysToHide: Set<keyof Out>;
-	private validate: ValidateCallback<Out, JsonParseType> | undefined;
-	private showValue?: ShowValueType;
+	private validate: ValidateCallback<object, Out> | undefined;
+	private showProtectedKeys?: ShowValueType;
+	private protectedKeys: Set<keyof Out>;
 
-	constructor({
-		keysToHide,
-		validate,
-		showValue,
-	}: {keysToHide?: Iterable<keyof Out>; validate?: ValidateCallback<Out, JsonParseType>; showValue?: ShowValueType} = {}) {
-		this.keysToHide = new Set(keysToHide);
+	constructor({protectedKeys, validate, showProtectedKeys}: JsonConfigParserOptions<Out> = {}) {
+		this.protectedKeys = new Set(protectedKeys);
 		this.validate = validate;
-		this.showValue = showValue;
+		this.showProtectedKeys = showProtectedKeys;
 	}
 
 	public parse({value}: ParserProps) {
-		return JSON.parse(value) as JsonParseType;
+		return this.buildBaseRecord(JSON.parse(value));
 	}
 
-	public async postValidate({value}: PostValidateProps<JsonParseType>): Promise<Out | undefined> {
+	public async postValidate({value}: PostValidateProps<Record<string, unknown>>) {
 		return await this.validate?.(value);
 	}
 
-	public toString(value: Out): string {
+	public toString(config: Out): string {
 		return JSON.stringify(
-			Object.entries(value).reduce<Record<string, unknown>>((last, [key, value]) => {
+			Object.entries(config).reduce<Record<string, unknown>>((last, [key, value]) => {
 				if (value) {
 					last[key] = value;
 				}
@@ -48,12 +60,12 @@ export class JsonConfigParser<Out extends JsonParseType> implements IConfigParse
 		);
 	}
 
-	public toLogString(value: Out): string {
+	public toLogString(config: Out): string {
 		return JSON.stringify(
-			Object.entries(value).reduce<Record<string, unknown>>((last, [key, value]) => {
+			Object.entries(config).reduce<Record<string, unknown>>((last, [key, value]) => {
 				if (value) {
-					if (this.keysToHide.has(key)) {
-						last[key] = buildHiddenValue(String(value), this.showValue);
+					if (this.protectedKeys.has(key)) {
+						last[key] = buildHiddenValue(String(value), this.showProtectedKeys);
 					} else {
 						last[key] = value;
 					}
@@ -61,5 +73,17 @@ export class JsonConfigParser<Out extends JsonParseType> implements IConfigParse
 				return last;
 			}, {}),
 		);
+	}
+
+	/**
+	 * Build a string record from the given data
+	 * @param {unknown} data - to be validated as object
+	 * @returns {object} A record with string values
+	 */
+	private buildBaseRecord(data: unknown): object {
+		if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+			return {};
+		}
+		return data;
 	}
 }

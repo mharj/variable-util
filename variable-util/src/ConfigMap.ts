@@ -10,6 +10,8 @@ import {VariableLookupError} from './VariableLookupError';
 
 /**
  * TypeValueRecords
+ * @template T - type of config map
+ * @since v0.6.0
  */
 export type TypeValueRecords<T> = Record<keyof T, LoaderTypeValueStrict<T[keyof T]>>;
 
@@ -29,6 +31,7 @@ export type TypeValueRecords<T> = Record<keyof T, LoaderTypeValueStrict<T[keyof 
  * 	 URL: {loaders: [env()], parser: new UrlParser({urlSanitize: true}), defaultValue: new URL('http://localhost:3000')},
  * });
  * console.log('port', await config.get('PORT'));
+ * @template Data - type of config map
  * @since v0.6.0
  */
 export class ConfigMap<Data extends Record<string, unknown>> implements ISetOptionalLogger {
@@ -58,6 +61,8 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * @example
 	 * const valueObject: LoaderTypeValue<number> = await config.getObject('PORT');
 	 * console.log(valueObject.type, valueObject.value); // 'env', 3000
+	 * @param {string} key - key of config map
+	 * @param {EncodeOptions} [encodeOptions] - optional encode options
 	 */
 	public async getObject<Key extends keyof Data = keyof Data>(key: Key, encodeOptions?: EncodeOptions): Promise<LoaderTypeValueStrict<Data[Key]>> {
 		if (typeof key !== 'string') {
@@ -87,6 +92,8 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 *   const {type, value} = valueObject.ok();
 	 * 	 console.log(type, value); // 'env', 3000
 	 * }
+	 * @param {string} key - key of config map
+	 * @param {EncodeOptions} [encodeOptions] - optional encode options
 	 */
 	public async getObjectResult<Key extends keyof Data = keyof Data>(
 		key: Key,
@@ -104,6 +111,8 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * @returns {Promise<Data[Key]>} Promise of value or undefined
 	 * @example
 	 * const port: number = await config.get('PORT');
+	 * @param {string} key - key of config map
+	 * @param {EncodeOptions} [encodeOptions] - optional encode options
 	 */
 	public async get<Key extends keyof Data = keyof Data>(key: Key, encodeOptions?: EncodeOptions): Promise<Data[Key]> {
 		return (await this.getObject(key, encodeOptions)).value;
@@ -114,6 +123,8 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * @returns {Promise<string | undefined>} Promise of string value or undefined
 	 * @example
 	 * const port: string = await config.getString('PORT');
+	 * @param {string} key - key of config map
+	 * @param {EncodeOptions} [encodeOptions] - optional encode options
 	 */
 	public async getString<Key extends keyof Data = keyof Data>(
 		key: Key,
@@ -130,6 +141,8 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * if (port.isOk()) {
 	 * 	 console.log('port', port.ok());
 	 * }
+	 * @param {string} key - key of config map
+	 * @param {EncodeOptions} [encodeOptions] - optional encode options
 	 */
 	public async getResult<Key extends keyof Data = keyof Data>(key: Key, encodeOptions?: EncodeOptions): Promise<IResult<Data[Key]>> {
 		try {
@@ -147,6 +160,8 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * if (port.isOk()) {
 	 * 	 console.log('port', port.ok());
 	 * }
+	 * @param {string} key - key of config map
+	 * @param {EncodeOptions} [encodeOptions] - optional encode options
 	 */
 	public async getStringResult<Key extends keyof Data = keyof Data>(
 		key: Key,
@@ -195,6 +210,7 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * @example
 	 * const values: Record<keyof Data, string> = await config.getAllStringValues();
 	 * console.log('PORT', values.PORT); // '3000' (string)
+	 * @param {EncodeOptions} [encodeOptions] - optional encode options
 	 */
 	public async getAllStringValues(encodeOptions?: EncodeOptions): Promise<Record<keyof Data, string>> {
 		const values = await this.getAllPromises(encodeOptions);
@@ -209,8 +225,7 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 
 	/**
 	 * Validate all env values from config map, expect to throw error if error exists
-	 *
-	 * @param callback callback function
+	 * @param {(data: Data) => void} callback callback function
 	 */
 	public async validateAll(callback: (data: Data) => void): Promise<void> {
 		const data = await this.getAllValues();
@@ -219,6 +234,8 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 
 	/**
 	 * run lookup to all keys and return all promises
+	 * @param {EncodeOptions} [encodeOptions] - optional encode options
+	 * @returns {Promise<[keyof Data, LoaderTypeValueStrict<Data[keyof Data]>][]>} Promise of all values
 	 */
 	private getAllPromises(encodeOptions?: EncodeOptions): Promise<[keyof Data, LoaderTypeValueStrict<Data[keyof Data]>][]> {
 		return Promise.all(

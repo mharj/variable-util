@@ -12,6 +12,7 @@ export type ShowValueType = boolean | PartialHiddenValueStringType;
 
 /**
  * Format parameters for the variables
+ * @since v0.2.5
  */
 export interface FormatParameters {
 	/**
@@ -33,6 +34,7 @@ export interface FormatParameters {
  * @param {ILoggerLike} [logger] - An optional logger to use for logging warnings.
  * @returns {string} The sanitized URL.
  * @category Utils
+ * @since v0.2.5
  */
 export function urlSanitize(value: string, logger?: ILoggerLike): string {
 	try {
@@ -53,6 +55,7 @@ export function urlSanitize(value: string, logger?: ILoggerLike): string {
  * @param {FormatParameters | undefined} config - An optional configuration object.
  * @returns {string} The formatted string representation of the value.
  * @category Utils
+ * @since v0.2.5
  */
 export function printValue(value: string | undefined, config: FormatParameters | undefined): string {
 	if (!value || !config) {
@@ -61,6 +64,16 @@ export function printValue(value: string | undefined, config: FormatParameters |
 	return ` [${buildHiddenValue(value, config.showValue)}]`;
 }
 
+/**
+ * Constructs a hidden value string based on the specified visibility option.
+ * @param {string} value - The original string value to be hidden.
+ * @param {ShowValueType | undefined} show - Determines how the value should be displayed:
+ * - `true`: shows the full value
+ * - `undefined` or `false`: hides the value completely with asterisks
+ * - `PartialHiddenValueStringType`: shows part of the value (prefix, suffix, or both)
+ * @returns {string} The resulting string with the specified visibility.
+ * @since v0.2.5
+ */
 export function buildHiddenValue(value: string, show: ShowValueType | undefined): string {
 	if (show === true) {
 		return value;
@@ -73,16 +86,23 @@ export function buildHiddenValue(value: string, show: ShowValueType | undefined)
 
 /**
  * Builds a hidden value string, replacing each character with an asterisk.
+ * @param {string} value - The value to be hidden.
+ * @returns {string} The hidden value string with asterisks.
+ * @since v0.2.5
  */
 export function buildHiddenAsterisksValueString(value: string): string {
 	return '*'.repeat(value.length);
 }
 
 /**
- * Show only 1-3 characters of the secret value based on length of the value
+ * Show only 1-3 characters of the secret value based on length of the value.
+ * @param {string} value - The value to partially hide.
+ * @param {PartialHiddenValueStringType} type - The type of partial hiding to apply ('prefix', 'suffix', or 'prefix-suffix').
+ * @returns {string} The partially hidden value string.
+ * @since v0.2.5
  */
 export function buildPartialHiddenValueString(value: string, type: PartialHiddenValueStringType): string {
-	const visibleCharacters = Math.min(3, Math.max(1, Math.floor(value.length * 0.1)));
+	const visibleCharacters = Math.min(3, Math.max(1, Math.floor(value.length * 0.2)));
 	switch (type) {
 		case 'prefix':
 			return `${value.slice(0, visibleCharacters)}${'*'.repeat(value.length - visibleCharacters)}`;

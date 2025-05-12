@@ -6,6 +6,7 @@ import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import sonarjs from 'eslint-plugin-sonarjs';
 import tsParser from '@typescript-eslint/parser';
 import cspellESLintPluginRecommended from '@cspell/eslint-plugin/recommended';
+import jsdoc from 'eslint-plugin-jsdoc';
 
 /**
  * install
@@ -21,6 +22,7 @@ export default tseslint.config(
 	importPlugin.flatConfigs.typescript,
 	sonarjs.configs.recommended,
 	cspellESLintPluginRecommended,
+	jsdoc.configs['flat/recommended-typescript'],
 	prettierRecommended,
 	{
 		ignores: ['**/dist', '**/node_modules', '**/.github', '**/.nyc_output', '**/vite.config.mts', 'eslint.config.mjs'],
@@ -44,6 +46,7 @@ export default tseslint.config(
 					moduleDirectory: ['node_modules', 'src/'],
 				},
 			},
+			jsdoc: {preferredTypes: {category: true}},
 		},
 		rules: {
 			'sort-imports': 'off',
@@ -118,22 +121,47 @@ export default tseslint.config(
 				},
 			],
 			'@typescript-eslint/consistent-type-definitions': 'off',
-			'sonarjs/different-types-comparison': 'off',
 			'@typescript-eslint/no-base-to-string': 'off',
+			'jsdoc/no-types': 'off',
+			'jsdoc/require-param-type': 'warn',
+			'jsdoc/require-param': 'warn',
+			'jsdoc/require-template': 'warn',
+			'jsdoc/require-throws': 'warn',
+			'jsdoc/require-returns': 'warn',
+			'jsdoc/require-returns-type': 'warn',
+			'jsdoc/check-values': 'error',
+			'jsdoc/check-types': 'error',
+			'jsdoc/check-tag-names': ['warn', {definedTags: ['category'], typed: false}],
+			'jsdoc/no-restricted-syntax': [
+				'warn',
+				{
+					contexts: [
+						{
+							comment: 'JsdocBlock:not(*:has(JsdocTag[tag=since]))',
+							context: 'ExportNamedDeclaration',
+							message: '@since required on each block',
+						},
+					],
+				},
+			],
+			'sonarjs/different-types-comparison': 'off',
 			'sonarjs/no-ignored-exceptions': 'off',
-			'sonarjs/todo-tag':'warn',
+			'sonarjs/todo-tag': 'warn',
+			'sonarjs/no-empty-collection': 'off',
 		},
 	},
 	{
 		files: ['**/*.test.ts'],
 		rules: {
-			'sonarjs/no-nested-functions': 'off',
-			'sonarjs/no-clear-text-protocols': 'off',
-			'sonarjs/assertions-in-tests': 'off',
-			'@typescript-eslint/restrict-template-expressions': 'off',
 			'@cspell/spellchecker': 'off',
 			'@typescript-eslint/no-explicit-any': 'off',
+			'@typescript-eslint/restrict-template-expressions': 'off',
 			'@typescript-eslint/unbound-method': 'off',
+			'jsdoc/no-restricted-syntax': 'off',
+			'jsdoc/require-jsdoc': 'off',
+			'sonarjs/assertions-in-tests': 'off',
+			'sonarjs/no-clear-text-protocols': 'off',
+			'sonarjs/no-nested-functions': 'off',
 			'sort-keys': 'off',
 		},
 	},

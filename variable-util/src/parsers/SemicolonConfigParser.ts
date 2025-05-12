@@ -3,61 +3,62 @@ import {type ValidateCallback} from '../interfaces/IValidate';
 import {type ShowValueType} from '../lib';
 import {logStringifySemicolonConfig, parseSemicolonConfig, stringifySemicolonConfig} from '../lib/semicolonUtils';
 
-/**
- * The base type of the parsed JSON object
- */
-export type RawConfigParseType = Record<string, string>;
-
-export type OutConfigParseType = Record<string, unknown>;
-
-export interface SemicolonConfigParserOptions<
-	OutType extends OutConfigParseType = OutConfigParseType,
-	RawType extends RawConfigParseType = RawConfigParseType,
-> {
-	keysToHide?: Iterable<keyof OutType>;
-	validate?: ValidateCallback<OutType, RawType>;
-	showValue?: ShowValueType;
-	/**
-	 * keep case of keys, if set as false then will convert keys first letters to lower case (Js Style)
-	 */
+export interface SemicolonConfigParserOptions<OutType extends Record<string, unknown> = Record<string, unknown>> {
+	validate?: ValidateCallback<Record<string, string>, OutType>;
+	/** keys to hide or partially hide */
+	protectedKeys?: Iterable<keyof OutType>;
+	/** if and how to show protected keys */
+	showProtectedKeys?: ShowValueType;
+	/** keep case of keys, if set as false then will convert keys first letters to lower case (Js Style) */
 	keepCase?: boolean;
 }
 
 /**
- * A parser for semicolon separated string as config
- * @implements {IConfigParser<Out, RawType>}
+ * Config parser to parse semicolon separated string key=value pairs as object
+ * @example
+ * const objectSchema = z.object({
+ *   foo: z.string(),
+ *   baz: z.string(),
+ *   secret: z.string(),
+ * });
+ * // parses 'foo=bar;baz=qux;secret=secret' string to {foo: "bar", baz: "qux", secret: "secret"}
+ * const fooBarJsonParser = new SemicolonConfigParser({
+ *   validate: (value) => objectSchema.parse(value),
+ *   protectedKeys: ['secret'],
+ *   showProtectedKeys: 'prefix-suffix', // shows secret value with few characters from start and end on logging
+ * });
+ * @template Out - the type of the output object
+ * @implements {IConfigParser<Out, Record<string, string>>}
  * @category Parsers
- * @since v0.9.0
+ * @since v1.0.0
  */
-export class SemicolonConfigParser<Out extends OutConfigParseType = OutConfigParseType, RawType extends RawConfigParseType = RawConfigParseType>
-	implements IConfigParser<Out, RawType>
-{
+export class SemicolonConfigParser<Out extends Record<string, unknown> = Record<string, unknown>> implements IConfigParser<Record<string, string>, Out> {
 	public name = 'semicolonConfigParser';
-	private keysToHide: Set<keyof Out>;
-	private validate: ValidateCallback<Out, RawType> | undefined;
+	private validate: ValidateCallback<Record<string, string>, Out> | undefined;
 	private keepCase: boolean;
-	private showValue: ShowValueType | undefined;
+	private showProtectedKeys: ShowValueType | undefined;
+	private protectedKeys: Set<keyof Out>;
 
-	constructor({keepCase, keysToHide, validate, showValue}: SemicolonConfigParserOptions<Out> = {}) {
-		this.keysToHide = new Set(keysToHide);
+	constructor({keepCase, protectedKeys, validate, showProtectedKeys}: SemicolonConfigParserOptions<Out> = {}) {
+		this.protectedKeys = new Set(protectedKeys);
 		this.validate = validate;
 		this.keepCase = keepCase ?? true;
-		this.showValue = showValue;
+		this.showProtectedKeys = showProtectedKeys;
 	}
 
-	public parse({value}: ParserProps): Promise<RawType> {
-		return Promise.resolve(parseSemicolonConfig(value, this.keepCase) as RawType);
+	public parse({value}: ParserProps) {
+		return Promise.resolve(parseSemicolonConfig(value, this.keepCase));
 	}
 
-	public async postValidate({value}: PostValidateProps<RawType>): Promise<Out | undefined> {
+	public async postValidate({value}: PostValidateProps<Record<string, string>>) {
 		return await this.validate?.(value);
 	}
 
-	public toString(value: Out, options?: EncodeOptions): string {
-		return stringifySemicolonConfig(value, options?.uriEncode);
+	public toString(config: Out, options?: EncodeOptions): string {
+		return stringifySemicolonConfig(config, options?.uriEncode);
 	}
 
-	public toLogString(value: Out): string {
-		return logStringifySemicolonConfig(value, this.showValue, this.keysToHide);
+	public toLogString(config: Out): string {
+		return logStringifySemicolonConfig(config, this.showProtectedKeys, this.protectedKeys);
 	}
 }

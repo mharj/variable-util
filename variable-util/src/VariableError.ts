@@ -1,10 +1,10 @@
 /**
  * Custom error class for variable errors.
  * @class VariableError
- * @extends Error
+ * @augments Error
  * @param {string} message - The error message.
  * @category Errors
- * @since V0.2.2
+ * @since v0.2.2
  * @example
  * throw new VariableError('Variable not found');
  */
