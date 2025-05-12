@@ -1,6 +1,6 @@
 import {ExpireCache} from '@avanio/expire-cache';
 import {type ILoggerLike} from '@avanio/logger-like';
-import {ConfigLoader, type IConfigLoaderProps, type LoaderValue} from '@avanio/variable-util';
+import {ConfigLoader, type IConfigLoaderProps, type LoaderValue, type OverrideKeyMap} from '@avanio/variable-util';
 import {type TokenCredential} from '@azure/identity';
 import {SecretClient} from '@azure/keyvault-secrets';
 import {type Loadable} from '@luolapeikko/ts-common';
@@ -16,17 +16,50 @@ export interface AzureSecretsConfigLoaderOptions extends IConfigLoaderProps {
 	expireMs?: number;
 }
 
-export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined, AzureSecretsConfigLoaderOptions, AzureSecretsConfigLoaderOptions> {
-	public readonly type: Lowercase<string>;
+/**
+ * Mapping of keys to Azure Key Vault secrets
+ * - true means get direct key  from Azure Key Vault
+ * - string means map string value key from Azure Key Vault
+ * @template T Keys to map to Azure Key Vault secrets
+ * @since v1.0.0
+ */
+export type KeyVaultKeyMapping<T extends OverrideKeyMap> = Partial<Record<keyof T, string | boolean>>;
+
+/**
+ * AzureSecretsConfigLoader to get config values from Azure Key Vault secrets
+ * @template OverrideKeys Keys to map to Azure Key Vault secrets.
+ * @since v1.0.0
+ */
+export class AzureSecretsConfigLoader<OverrideKeys extends OverrideKeyMap> extends ConfigLoader<AzureSecretsConfigLoaderOptions> {
+	public readonly loaderType: Lowercase<string>;
 	private client: SecretClient | undefined;
 	private readonly valuePromises = new ExpireCache<Promise<{value: string | undefined; path: string}>>();
+	private keyMapping: KeyVaultKeyMapping<OverrideKeys>;
 
-	protected defaultOptions: undefined;
+	protected defaultOptions: AzureSecretsConfigLoaderOptions = {
+		credentials: {
+			getToken: () => {
+				throw new Error('credentials not set');
+			},
+		},
+		url: 'http://localhost',
+	};
 
-	constructor(options: Loadable<AzureSecretsConfigLoaderOptions>, type: Lowercase<string> = 'azure-secrets') {
+	/**
+	 * Create AzureSecretsConfigLoader
+	 * @param {Loadable<AzureSecretsConfigLoaderOptions>} options - AzureSecretsConfigLoader options
+	 * @param {KeyVaultKeyMapping<OverrideKeys>} secretsKeyMapping - mapping of keys to Azure Key Vault secrets (true means get direct key from Azure Key Vault secrets, string means map string value key from Azure Key Vault)
+	 * @param {Lowercase<string>} loaderType - loader type name
+	 */
+	constructor(
+		options: Loadable<AzureSecretsConfigLoaderOptions>,
+		secretsKeyMapping: KeyVaultKeyMapping<OverrideKeys>,
+		loaderType: Lowercase<string> = 'azure-secrets',
+	) {
 		super(options);
 		this.options = options;
-		this.type = type;
+		this.keyMapping = secretsKeyMapping;
+		this.loaderType = loaderType;
 		void this.init();
 	}
 
@@ -34,7 +67,7 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined, A
 	 * Initialize AzureSecretsConfigLoader
 	 * - set optional cacheLogger for cache logging
 	 * - set optional expireMs for value cache
-	 * @returns Promise<void> - this never throws
+	 * @returns {Promise<void>} - this never throws
 	 */
 	public async init(): Promise<void> {
 		try {
@@ -57,37 +90,35 @@ export class AzureSecretsConfigLoader extends ConfigLoader<string | undefined, A
 		this.valuePromises.clear();
 	}
 
-	protected async handleLoader(rootKey: string, key?: string): Promise<LoaderValue> {
+	protected async handleLoaderValue(lookupKey: string): Promise<LoaderValue | undefined> {
 		const options = await this.getOptions();
-		if (options.disabled) {
-			return {type: this.type, result: undefined};
-		}
 		try {
-			const targetKey = key ?? rootKey;
+			const sourceKey: string | boolean | undefined = this.keyMapping[lookupKey];
+			if (!sourceKey) {
+				return undefined;
+			}
+			const targetKey = sourceKey === true ? lookupKey : sourceKey;
 			// only read once per key
-			let seen = true;
 			let lastValuePromise = this.valuePromises.get(targetKey);
 			if (!lastValuePromise) {
-				seen = false;
 				lastValuePromise = this.handleLoaderPromise(targetKey);
 				this.valuePromises.set(targetKey, lastValuePromise);
 			}
-			const {value, path} = await lastValuePromise;
-			return {type: this.type, result: {value, path, seen}};
+			return await lastValuePromise;
 		} catch (e) {
 			if (options.isSilent === false) {
 				throw e;
 			}
 			// if we have logger, log error as warning.
-			options.logger?.warn(this.type, e);
-			return {type: this.type, result: undefined};
+			options.logger?.warn(this.loaderType, e);
+			return undefined;
 		}
 	}
 
-	private async handleLoaderPromise(targetKey: string): Promise<{value: string | undefined; path: string}> {
+	private async handleLoaderPromise(targetKey: string): Promise<LoaderValue> {
 		const options = await this.getOptions();
 		const client = this.getAzureSecretClient(options);
-		options.logger?.debug(this.type, `getting ${targetKey} from ${options.url}`);
+		options.logger?.debug(this.loaderType, `getting ${targetKey} from ${options.url}`);
 		const {
 			value,
 			properties: {vaultUrl},

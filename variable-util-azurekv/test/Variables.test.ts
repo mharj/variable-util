@@ -40,16 +40,20 @@ describe('az key vault config variable', {skip: !process.env.KV_URI || !process.
 	});
 	it('should return value', async function () {
 		const urlParser = new UrlParser({urlSanitize: true});
-		const fetchKvInstance = new AzureSecretsConfigLoader(() => ({
-			credentials: new DefaultAzureCredential(),
-			expireMs: 100,
-			isSilent: false,
-			logger: debugLogger,
-			url: `${process.env.KV_URI}`,
-		}));
-		const fetchKv = fetchKvInstance.getLoader;
-		const callback1 = getConfigVariable('MONGO_URL', [fetchKv(process.env.KV_MONGO_KEY)], urlParser, undefined, {showValue: true});
-		const callback2 = getConfigVariable('MONGO_URL', [fetchKv(process.env.KV_MONGO_KEY)], urlParser, undefined, {showValue: true});
+		const fetchKv = new AzureSecretsConfigLoader<{MONGO_URL: string}>(
+			() => ({
+				credentials: new DefaultAzureCredential(),
+				expireMs: 100,
+				isSilent: false,
+				logger: debugLogger,
+				url: `${process.env.KV_URI}`,
+			}),
+			{
+				MONGO_URL: process.env.KV_MONGO_KEY,
+			},
+		);
+		const callback1 = getConfigVariable('MONGO_URL', [fetchKv], urlParser, undefined, {showValue: true});
+		const callback2 = getConfigVariable('MONGO_URL', [fetchKv], urlParser, undefined, {showValue: true});
 		await callback1;
 		await callback2;
 		expect(debugLogger.error.callCount).to.be.eq(0);
@@ -62,7 +66,7 @@ describe('az key vault config variable', {skip: !process.env.KV_URI || !process.
 		expect(await callback1).to.be.eql(mongoUrl);
 		// should be expired after 100ms
 		await sleep(200);
-		await getConfigVariable('MONGO_URL', [fetchKv(process.env.KV_MONGO_KEY)], urlParser, undefined, {showValue: true});
+		await getConfigVariable('MONGO_URL', [fetchKv], urlParser, undefined, {showValue: true});
 		expect(debugLogger.debug.callCount).to.be.eq(2);
 		expect(debugLogger.debug.getCall(1).args).to.be.eql(['azure-secrets', `getting ${process.env.KV_MONGO_KEY} from ${process.env.KV_URI}`]);
 	});
