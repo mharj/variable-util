@@ -1,27 +1,33 @@
 /// <reference types="vite/client" />
-import {handleSeen, type IConfigLoader, type LoaderValue} from '@avanio/variable-util';
-
-const seenMap = new Map<string, string>();
+import {ConfigLoader, type IConfigLoaderProps, type OverrideKeyMap} from '@avanio/variable-util';
 
 /**
- * import meta env loader function is used to load env variables from import.meta.env
- * @param {string} [overrideKey] - optional override key for lookup
+ * Vite env loader class is used to load env variables from import.meta.env.VITE_*
+ * @example
+ * const viteEnv = new ViteEnvConfigLoader();
+ * const loaders = [viteEnv, fetchEnv];
+ * export const envConfig = new ConfigMap<EnvConfig>({
+ *   API_HOST: {loaders, parser: urlParser, defaultValue: new URL('http://localhost:3001'), params: {showValue: true}},
+ * });
+ * @template OverrideMap - the type of the override key map
+ * @param {Partial<OverrideMap>} [override] - optional override key for lookup
  * @returns {IConfigLoader} - IConfigLoader object
  * @category Loaders
- * @since v0.13.0
+ * @since v1.0.0
  */
-export function viteEnv(overrideKey?: string): IConfigLoader {
-	return {
-		type: 'vite-env',
-		callback: (lookupKey): LoaderValue => {
-			const targetKey = `VITE_${overrideKey ?? lookupKey}`;
-			const currentValue: unknown = import.meta.env[targetKey];
-			if (typeof currentValue === 'string' || typeof currentValue === 'number' || typeof currentValue === 'boolean') {
-				const value = String(currentValue);
-				return {type: 'vite-env', result: {value, path: `import.meta.env.${targetKey}`, seen: handleSeen(seenMap, targetKey, value)}};
-			} else {
-				return {type: 'vite-env', result: undefined};
-			}
-		},
+export class ViteEnvConfigLoader<OverrideMap extends OverrideKeyMap = OverrideKeyMap> extends ConfigLoader<IConfigLoaderProps, OverrideMap> {
+	public readonly loaderType = 'vite-env';
+	public override defaultOptions: IConfigLoaderProps = {
+		disabled: false,
 	};
+
+	protected handleLoaderValue(lookupKey: string) {
+		const targetKey = `VITE_${lookupKey}`;
+		const currentValue: unknown = import.meta.env[targetKey];
+		if (typeof currentValue === 'string' || typeof currentValue === 'number' || typeof currentValue === 'boolean') {
+			return {value: String(currentValue), path: `import.meta.env.${targetKey}`};
+		} else {
+			return undefined;
+		}
+	}
 }

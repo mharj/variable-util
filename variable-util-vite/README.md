@@ -14,13 +14,14 @@ npm i @avanio/variable-util @avanio/variable-util-vite --save
 
 ```typescript
 setLogger(console); // or log4js or winston
-const fetchEnv = new FetchConfigLoader(() => new Request('/config.json')).getLoader;
+const fetchEnv = new FetchConfigLoader(() => new Request('/config.json'));
+const viteEnv = new ViteEnvConfigLoader();
 
 // single env lookup from: vite env (import.meta.env) => fetch env
-const databaseUrl: URL = await getConfigVariable('API_HOST', [viteEnv(), fetchEnv()], urlParser, new URL('http://localhost:3001'), {showValue: true});
+const databaseUrl: URL = await getConfigVariable('API_HOST', [viteEnv, fetchEnv], urlParser, new URL('http://localhost:3001'), {showValue: true});
 
 // or with Config map
-const loaders = [viteEnv(), fetchEnv()];
+const loaders = [viteEnv, fetchEnv];
 const urlParser = new UrlParser({urlSanitize: true});
 
 type EnvConfig = {

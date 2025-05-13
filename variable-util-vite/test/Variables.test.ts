@@ -1,8 +1,8 @@
 import type {ILoggerLike} from '@avanio/logger-like';
-import {clearDefaultValueSeenMap, getConfigVariable, setLogger, stringParser} from '@avanio/variable-util';
+import {clearDefaultValueSeenMap, ConfigMap, setLogger, stringParser} from '@avanio/variable-util';
 import {spy} from 'sinon';
 import {beforeAll, beforeEach, describe, expect, it} from 'vitest';
-import {viteEnv} from '../src/index.js';
+import {ViteEnvConfigLoader} from '../src/index.js';
 
 const logSpy = spy();
 
@@ -13,6 +13,18 @@ const spyLogger = {
 	trace: logSpy,
 	warn: logSpy,
 } satisfies ILoggerLike;
+
+const loaders = [new ViteEnvConfigLoader()];
+
+type TestConfig = {
+	TEST: string | undefined;
+	_NOT_EXISTS: string | undefined;
+};
+
+export const testConfig = new ConfigMap<TestConfig>({
+	TEST: {loaders, parser: stringParser(), params: {showValue: true}},
+	_NOT_EXISTS: {loaders, parser: stringParser(), params: {showValue: true}},
+});
 
 describe('config variable', () => {
 	beforeAll(() => {
@@ -26,12 +38,12 @@ describe('config variable', () => {
 	describe('loaders', () => {
 		it('should return import meta env value', async function () {
 			import.meta.env.VITE_TEST = 'asd';
-			const call: Promise<string | undefined> = getConfigVariable('TEST', [viteEnv()], stringParser(), undefined, {showValue: true});
+			const call: Promise<string | undefined> = testConfig.get('TEST');
 			await expect(call).resolves.toEqual('asd');
 			expect(logSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[vite-env]: TEST [asd] from import.meta.env.VITE_TEST`);
 		});
 		it('should return undefined if not found', async function () {
-			const call: Promise<string | undefined> = getConfigVariable('_NOT_EXISTS', [viteEnv()], stringParser(), undefined, {showValue: true});
+			const call: Promise<string | undefined> = testConfig.get('_NOT_EXISTS');
 			await expect(call).resolves.toEqual(undefined);
 		});
 	});
