@@ -1,5 +1,5 @@
 import {type ILoggerLike} from '@avanio/logger-like';
-import {applyStringMap, type IConfigLoaderProps, type LoaderValue, MapConfigLoader} from '@avanio/variable-util';
+import {applyStringMap, type IConfigLoaderProps, type LoaderValue, MapConfigLoader, type OverrideKeyMap} from '@avanio/variable-util';
 import {type IStorageDriver} from 'tachyon-drive';
 import {type TachyonConfigStoreType} from './tachyonConfigSerializer';
 
@@ -11,30 +11,37 @@ export type TachyonConfigLoaderOptions = IConfigLoaderProps & {
  * TachyonConfigLoader
  * @example
  * const driver = new MemoryStorageDriver('MemoryStorageDriver', tachyonConfigJsonStringSerializer, null);
- * const tachyonConfigLoader = new TachyonConfigLoader(driver);
- * const tachyonEnv = tachyonConfigLoader.getLoader;
+ * const tachyonEnv = new TachyonConfigLoader(driver);
  * // using tachyon loader
- * const value = await getConfigVariable('TEST', [tachyonEnv(), env(), fileEnv()], stringParser());
+ * const value = await getConfigVariable('TEST', [tachyonEnv, env, fileEnv], stringParser());
+ * @template OverrideMap Type of the override keys
+ * @since v1.0.0
  */
-export class TachyonConfigLoader extends MapConfigLoader<string, Partial<TachyonConfigLoaderOptions>, TachyonConfigLoaderOptions> {
-	public readonly type: Lowercase<string>;
+export class TachyonConfigLoader<OverrideMap extends OverrideKeyMap = OverrideKeyMap> extends MapConfigLoader<TachyonConfigLoaderOptions> {
+	public readonly loaderType: Lowercase<string>;
 	protected defaultOptions: TachyonConfigLoaderOptions = {
 		disabled: false,
 	};
 
-	private driver: IStorageDriver<TachyonConfigStoreType>;
+	public readonly driver: IStorageDriver<TachyonConfigStoreType>;
 
-	constructor(driver: IStorageDriver<TachyonConfigStoreType>, options: Partial<TachyonConfigLoaderOptions> = {}, type: Lowercase<string> = 'tachyon') {
-		super(options);
-		this.type = type;
+	constructor(
+		driver: IStorageDriver<TachyonConfigStoreType>,
+		options: Partial<TachyonConfigLoaderOptions> = {},
+		overrideKeys?: Partial<OverrideMap>,
+		loaderType: Lowercase<string> = 'tachyon',
+	) {
+		super(options, overrideKeys);
+		this.loaderType = loaderType;
 		this.driver = driver;
 		this.driver.on('update', () => void this.loadData());
 	}
 
 	/**
 	 * Set a Config variable in the store
-	 * @param key
-	 * @param value
+	 * @param {string} key The key to set
+	 * @param {string} value The value to set
+	 * @returns {Promise<void>}
 	 */
 	public async set(key: string, value: string): Promise<void> {
 		await this.hydratedData();
@@ -46,7 +53,8 @@ export class TachyonConfigLoader extends MapConfigLoader<string, Partial<Tachyon
 
 	/**
 	 * Remove a Config variable from the store
-	 * @param key
+	 * @param {string} key - The key to remove
+	 * @returns {Promise<void>}
 	 */
 	public async remove(key: string): Promise<void> {
 		await this.hydratedData();
@@ -58,7 +66,8 @@ export class TachyonConfigLoader extends MapConfigLoader<string, Partial<Tachyon
 
 	/**
 	 * Get a Config variable from the store
-	 * @param key The key to lookup
+	 * @param {string} key The key to lookup
+	 * @returns {Promise<string | undefined>} The value of the key
 	 */
 	public async get(key: string): Promise<string | undefined> {
 		await this.hydratedData();
@@ -67,6 +76,7 @@ export class TachyonConfigLoader extends MapConfigLoader<string, Partial<Tachyon
 
 	/**
 	 * Clear all Config variables from the store
+	 * @returns {Promise<void>}
 	 */
 	public async clear(): Promise<void> {
 		await this.hydratedData();
@@ -80,14 +90,13 @@ export class TachyonConfigLoader extends MapConfigLoader<string, Partial<Tachyon
 		return this.data.size;
 	}
 
-	protected async handleLoader(lookupKey: string, overrideKey: string | undefined): Promise<LoaderValue> {
+	protected async handleLoaderValue(lookupKey: string): Promise<LoaderValue> {
 		if (!this._isLoaded) {
 			await this.loadData();
 			this._isLoaded = true; // only load data once to prevent spamming load requests (use reload method to manually update data)
 		}
-		const targetKey = overrideKey ?? lookupKey; // optional override key, else use actual lookupKey
-		const value = this.data.get(targetKey);
-		return {type: this.type, result: {value, path: `tachyon:${this.driver.name}/${targetKey}`, seen: this.handleSeen(targetKey, value)}};
+		const value = this.data.get(lookupKey);
+		return {value, path: `tachyon:${this.driver.name}/${lookupKey}`};
 	}
 
 	protected async handleLoadData(): Promise<boolean> {
