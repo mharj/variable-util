@@ -1,6 +1,6 @@
 {
   "name": "@avanio/variable-util-vite",
-  "version": "0.13.0",
+  "version": "1.0.0",
   "description": "vite env util",
   "type": "module",
   "module": "./dist/index.js",
