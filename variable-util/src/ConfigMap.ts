@@ -1,7 +1,9 @@
 import type {ILoggerLike, ISetOptionalLogger} from '@avanio/logger-like';
 import {Err, type IResult, Ok} from '@luolapeikko/result-option';
+import {type Loadable, resolveLoadable} from '@luolapeikko/ts-common';
 import {buildOptions, type ConfigOptions} from './ConfigOptions';
 import {getConfigObject} from './getConfigObject';
+import {type IConfigLoader} from './interfaces';
 import {type EncodeOptions} from './interfaces/IConfigParser';
 import {type EnvMapSchema} from './types/EnvMapSchema';
 import {type LoaderTypeValueStrict} from './types/TypeValue';
@@ -32,19 +34,22 @@ export type TypeValueRecords<T> = Record<keyof T, LoaderTypeValueStrict<T[keyof 
  * });
  * console.log('port', await config.get('PORT'));
  * @template Data - type of config map
- * @since v0.6.0
+ * @since v1.1.0
  */
 export class ConfigMap<Data extends Record<string, unknown>> implements ISetOptionalLogger {
 	private schema: EnvMapSchema<Data>;
 	private options: ConfigOptions;
+	private loaders: Loadable<Iterable<IConfigLoader>>;
 	/**
 	 * ConfigMap constructor
 	 * @param {EnvMapSchema<Data>} schema - schema of config map
+	 * @param {Iterable<IConfigLoader>} loaders - iterable of config loaders
 	 * @param {ConfigOptions} options - optional config options (logger, namespace)
 	 */
-	constructor(schema: EnvMapSchema<Data>, options: ConfigOptions = {logger: undefined, namespace: undefined}) {
+	constructor(schema: EnvMapSchema<Data>, loaders: Loadable<Iterable<IConfigLoader>>, options: ConfigOptions = {logger: undefined, namespace: undefined}) {
 		this.schema = schema;
 		this.options = options;
+		this.loaders = loaders;
 	}
 
 	/**
@@ -72,7 +77,8 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 		if (!entry) {
 			throw new VariableLookupError(key, `ConfigMap key ${String(key)} not found in config map`);
 		}
-		const {loaders, parser, defaultValue, params, undefinedThrowsError, undefinedErrorMessage} = entry;
+		const {parser, defaultValue, params, undefinedThrowsError, undefinedErrorMessage} = entry;
+		const loaders = Array.from(await resolveLoadable(this.loaders));
 		const configObject = (await getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params, this.options, encodeOptions)) as LoaderTypeValueStrict<
 			Data[Key]
 		>;

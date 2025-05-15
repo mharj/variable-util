@@ -1,18 +1,13 @@
 import {type Loadable} from '@luolapeikko/ts-common';
-import {type IConfigLoader} from '../interfaces/IConfigLoader';
 import {type IConfigParser} from '../interfaces/IConfigParser';
 import {type FormatParameters} from '../lib/formatUtils';
 
 /**
  * Optional environment entry
  * @template Value - type of value
- * @since v0.8.0
+ * @since v1.1.0
  */
 export type OptionalEnvEntry<Value> = {
-	/**
-	 * The loaders to use to load the value
-	 */
-	loaders: IConfigLoader[];
 	/**
 	 * The parser to use to parse the value
 	 */
@@ -38,13 +33,9 @@ export type OptionalEnvEntry<Value> = {
 /**
  * Required environment entry
  * @template Value - type of value
- * @since v0.8.0
+ * @since v1.1.0
  */
 export type RequiredEnvEntry<Value> = {
-	/**
-	 * The loaders to use to load the value
-	 */
-	loaders: IConfigLoader[];
 	/**
 	 * The parser to use to parse the value
 	 */
@@ -70,13 +61,9 @@ export type RequiredEnvEntry<Value> = {
 /**
  * Required environment entry with undefinedThrowsError
  * @template Value - type of value
- * @since v0.8.0
+ * @since v1.1.0
  */
 export type RequiredUndefinedThrowEntry<Value> = {
-	/**
-	 * The loaders to use to load the value
-	 */
-	loaders: IConfigLoader[];
 	/**
 	 * The parser to use to parse the value
 	 */

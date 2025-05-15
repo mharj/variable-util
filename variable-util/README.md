@@ -54,12 +54,15 @@ export type TestEnv = {
 export type OverrideMap = InferOverrideKeyMap<MainEnv & TestEnv>;
 
 // file: env.ts
-export const mainConfig = new ConfigMap<MainEnv>({
-	DEBUG: {loaders, parser: booleanParser(), defaultValue: false},
-	HOST: {loaders, parser: stringParser(), defaultValue: 'localhost'},
-	PORT: {loaders, parser: integerParser(), defaultValue: 3000},
-	URL: {loaders, parser: new UrlParser({urlSanitize: true}), defaultValue: new URL('http://localhost:3000')},
-});
+export const mainConfig = new ConfigMap<MainEnv>(
+	{
+		DEBUG: {parser: booleanParser(), defaultValue: false},
+		HOST: {parser: stringParser(), defaultValue: 'localhost'},
+		PORT: {parser: integerParser(), defaultValue: 3000},
+		URL: {parser: new UrlParser({urlSanitize: true}), defaultValue: new URL('http://localhost:3000')},
+	},
+	loaders,
+);
 ```
 
 ### Complex parsers

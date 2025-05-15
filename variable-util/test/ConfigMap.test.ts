@@ -89,23 +89,23 @@ function zodTypeGuard<T>(schema: z.ZodType<T>) {
 
 const config = new ConfigMap<TestEnv>(
 	{
-		DEBUG: {loaders, parser: booleanParser(), defaultValue: false},
-		DEMO: {loaders, parser: stringParser()},
-		HOST: {loaders, parser: stringParser(), defaultValue: 'localhost'},
-		PORT: {loaders, parser: integerParser(), defaultValue: 3000},
+		DEBUG: {parser: booleanParser(), defaultValue: false},
+		DEMO: {parser: stringParser()},
+		HOST: {parser: stringParser(), defaultValue: 'localhost'},
+		PORT: {parser: integerParser(), defaultValue: 3000},
 		URL: {
-			loaders,
 			parser: new UrlParser({urlSanitize: true}),
 			defaultValue: new URL('http://localhost:3000'),
 			params: {showValue: true},
 		},
-		CONSTANT: {loaders, parser: stringParser(zodTypeGuard(z.literal('constant'))), defaultValue: 'constant'},
-		TEST_OBJECT: {loaders, parser: testObjectParser, defaultValue: {First: false, Second: false, Third: true}},
-		NOT_EXISTS: {loaders, parser: stringParser(), undefinedThrowsError: true, undefinedErrorMessage: 'add NOT_EXISTS to env'},
-		ARRAY: {loaders, parser: arrayParser(stringParser()), defaultValue: ['a', 'b', 'c'], params: {showValue: true}},
-		SILENT_VALUE: {loaders, parser: integerParser(), defaultValue: 3000, params: {showValue: true}},
-		BIG_INT: {loaders, parser: bigIntParser(), defaultValue: BigInt(123456789012345), params: {showValue: true}},
+		CONSTANT: {parser: stringParser(zodTypeGuard(z.literal('constant'))), defaultValue: 'constant'},
+		TEST_OBJECT: {parser: testObjectParser, defaultValue: {First: false, Second: false, Third: true}},
+		NOT_EXISTS: {parser: stringParser(), undefinedThrowsError: true, undefinedErrorMessage: 'add NOT_EXISTS to env'},
+		ARRAY: {parser: arrayParser(stringParser()), defaultValue: ['a', 'b', 'c'], params: {showValue: true}},
+		SILENT_VALUE: {parser: integerParser(), defaultValue: 3000, params: {showValue: true}},
+		BIG_INT: {parser: bigIntParser(), defaultValue: BigInt(123456789012345), params: {showValue: true}},
 	},
+	() => Promise.resolve(loaders),
 	{namespace: 'Demo'},
 );
 config.setLogger(spyLogger);
