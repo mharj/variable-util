@@ -13,7 +13,9 @@ export function stringParser<Output extends string = string>(validate?: TypeGuar
 	return {
 		name: 'stringParser',
 		parse: ({value, key}: ParserProps) => {
-			return getString(value).unwrap(() => new TypeError(`value for key ${key} is not a string`));
+			return getString(value)
+				.mapErr((cause) => new TypeError(`value for key ${key} is not a string`, {cause}))
+				.unwrap();
 		},
 		postValidate: async (props) => {
 			if (!(await validate)?.(props.value)) {

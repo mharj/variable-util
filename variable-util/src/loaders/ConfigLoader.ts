@@ -1,5 +1,5 @@
 import {EventEmitter} from 'events';
-import {type Loadable, resolveLoadable} from '@luolapeikko/ts-common';
+import {type Loadable, LoadableCore} from '@luolapeikko/ts-common';
 import {type IConfigLoader, type OverrideKeyMap} from '../interfaces';
 import {handleSeen} from '../lib';
 
@@ -62,7 +62,7 @@ export abstract class ConfigLoader<Props extends IConfigLoaderProps, OverrideMap
 
 	public async isLoaderDisabled() {
 		const loadableDisabled = (await this.getOptions()).disabled;
-		return resolveLoadable(loadableDisabled);
+		return LoadableCore.resolve(loadableDisabled);
 	}
 
 	public setDisabled(disabled: Loadable<boolean>) {

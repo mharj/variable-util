@@ -13,7 +13,9 @@ export function integerParser<Output extends number = number>(validate?: TypeGua
 	return {
 		name: 'integerParser',
 		parse: ({key, value}: ParserProps) => {
-			return getInteger(value).unwrap(() => new TypeError(`value for key ${key} is not an integer string`));
+			return getInteger(value)
+				.mapErr((cause) => new TypeError(`value for key ${key} is not an integer string`, {cause}))
+				.unwrap();
 		},
 		postValidate: async (props) => {
 			if (!(await validate)?.(props.value)) {

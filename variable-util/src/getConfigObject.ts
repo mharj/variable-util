@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import {type Loadable, resolveLoadable} from '@luolapeikko/ts-common';
+import {type Loadable, LoadableCore} from '@luolapeikko/ts-common';
 import {buildOptions, type ConfigOptions} from './ConfigOptions';
 import {type EncodeOptions, type IConfigLoader, type IConfigParser} from './interfaces';
 import {type FormatParameters} from './lib/formatUtils';
@@ -28,6 +28,7 @@ export function clearDefaultValueSeenMap(): void {
  * const portConfig: {type: string | undefined; value: string} = await getConfigObject('PORT', [env(), fileEnv()], stringParser, '8080', {showValue: true});
  * const value: string = portConfig.value;
  * const type: string | undefined = portConfig.type; // loader type name
+ * @template Output - Type of output
  * @param {string} rootKey root key of config object
  * @param {IConfigLoader[]} loaders array of loaders
  * @param {IConfigParser<unknown, Output>} parser parser for value
@@ -73,7 +74,7 @@ export async function getConfigObject<Output>(
 	 */
 	if (defaultValueLoadable !== undefined) {
 		try {
-			defaultValue = (await resolveLoadable(defaultValueLoadable)) as Output;
+			defaultValue = (await LoadableCore.resolve(defaultValueLoadable)) as Output;
 			type = 'default';
 		} catch (err) {
 			currentOptions.logger?.error(err);

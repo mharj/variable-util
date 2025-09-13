@@ -1,6 +1,6 @@
 import type {ILoggerLike, ISetOptionalLogger} from '@avanio/logger-like';
 import {Err, type IResult, Ok} from '@luolapeikko/result-option';
-import {type Loadable, resolveLoadable} from '@luolapeikko/ts-common';
+import {type Loadable, LoadableCore} from '@luolapeikko/ts-common';
 import {buildOptions, type ConfigOptions} from './ConfigOptions';
 import {getConfigObject} from './getConfigObject';
 import {type IConfigLoader} from './interfaces';
@@ -78,7 +78,7 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 			throw new VariableLookupError(key, `ConfigMap key ${String(key)} not found in config map`);
 		}
 		const {parser, defaultValue, params, undefinedThrowsError, undefinedErrorMessage} = entry;
-		const loaders = Array.from(await resolveLoadable(this.loaders));
+		const loaders = Array.from(await LoadableCore.resolve(this.loaders));
 		const configObject = (await getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params, this.options, encodeOptions)) as LoaderTypeValueStrict<
 			Data[Key]
 		>;

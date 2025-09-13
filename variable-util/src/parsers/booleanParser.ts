@@ -21,7 +21,9 @@ export function booleanParser<Output extends boolean = boolean>(validate?: TypeG
 	return {
 		name: 'booleanParser',
 		parse: ({key, value}: ParserProps) => {
-			return getBoolean(value).unwrap(() => new TypeError(`value for key ${key} is not a boolean string`));
+			return getBoolean(value)
+				.mapErr((cause) => new TypeError(`value for key ${key} is not a boolean string`, {cause}))
+				.unwrap();
 		},
 		postValidate: async (props) => {
 			if (!(await validate)?.(props.value)) {

@@ -13,7 +13,9 @@ export function bigIntParser<Output extends bigint = bigint>(validate?: TypeGuar
 	return {
 		name: 'bigIntParser',
 		parse: ({key, value}: ParserProps) => {
-			return getBigInt(value).unwrap(() => new TypeError(`value for key ${key} is not an integer string`));
+			return getBigInt(value)
+				.mapErr((cause) => new TypeError(`value for key ${key} is not an integer string`, {cause}))
+				.unwrap();
 		},
 		postValidate: async (props) => {
 			if (!(await validate)?.(props.value)) {

@@ -13,6 +13,7 @@ import {type FormatParameters} from './lib/formatUtils';
  *
  * const value: string = portResult.unwrap(); //  get value or throw error
  * const value: string | undefined = portResult.ok(); //  get value or undefined
+ * @template Output - Type of output
  * @param {string} rootKey - root key of config variable
  * @param {IConfigLoader[]} loaders - loaders to use
  * @param {IConfigParser<unknown, Output>} parser - parser to use

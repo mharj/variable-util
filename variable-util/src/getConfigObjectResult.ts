@@ -16,6 +16,7 @@ import {type FormatParameters} from './lib/formatUtils';
  * } else {
  *   // handle error
  * }
+ * @template Output - Type of output
  * @param {string} rootKey root key of config object
  * @param {IConfigLoader[]} loaders array of loaders
  * @param {IConfigParser<unknown, Output>} parser parser for value

@@ -13,7 +13,9 @@ export function floatParser<Output extends number = number>(validate?: TypeGuard
 	return {
 		name: 'floatParser',
 		parse: ({key, value}: ParserProps) => {
-			return getFloat(value).unwrap(() => new TypeError(`value for key ${key} is not a float string`));
+			return getFloat(value)
+				.mapErr((cause) => new TypeError(`value for key ${key} is not a float string`, {cause}))
+				.unwrap();
 		},
 		postValidate: async (props) => {
 			if (!(await validate)?.(props.value)) {
