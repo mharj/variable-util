@@ -1,6 +1,7 @@
 import eslint from '@eslint/js';
+import {defineConfig} from 'eslint/config';
 import tseslint from 'typescript-eslint';
-import stylisticTs from '@stylistic/eslint-plugin-ts';
+import stylistic from '@stylistic/eslint-plugin';
 import importPlugin from 'eslint-plugin-import';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import sonarjs from 'eslint-plugin-sonarjs';
@@ -8,7 +9,7 @@ import tsParser from '@typescript-eslint/parser';
 import cspellESLintPluginRecommended from '@cspell/eslint-plugin/recommended';
 import jsdoc from 'eslint-plugin-jsdoc';
 
-export default tseslint.config(
+export default defineConfig([
 	eslint.configs.recommended,
 	tseslint.configs.recommendedTypeChecked,
 	tseslint.configs.stylisticTypeChecked,
@@ -24,7 +25,7 @@ export default tseslint.config(
 	},
 	{
 		plugins: {
-			'@stylistic/ts': stylisticTs,
+			'@stylistic/ts': stylistic,
 		},
 		languageOptions: {
 			parser: tsParser,
@@ -143,4 +144,4 @@ export default tseslint.config(
 		files: ['**/*.test.ts'],
 		rules: {},
 	},
-);
+]);
