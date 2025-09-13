@@ -13,11 +13,11 @@ export class VariableLookupError extends VariableError {
 	 * Create a new VariableLookupError
 	 * @param {string} variableKey - The variable key.
 	 * @param {string} message - The error message.
+	 * @param {ErrorOptions} [options] - The error options
 	 */
-	constructor(variableKey: string, message: string) {
-		super(message);
+	constructor(variableKey: string, message: string, options?: ErrorOptions) {
+		super(message, options);
 		this.variableKey = variableKey;
 		this.name = 'VariableLookupError';
-		Error.captureStackTrace(this, this.constructor);
 	}
 }

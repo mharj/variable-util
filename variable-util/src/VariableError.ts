@@ -12,10 +12,10 @@ export class VariableError extends Error {
 	/**
 	 * Create a new VariableError
 	 * @param {string} message - The error message
+	 * @param {ErrorOptions} [options] - The error options
 	 */
-	constructor(message: string) {
-		super(message);
+	constructor(message: string, options?: ErrorOptions) {
+		super(message, options);
 		this.name = 'VariableError';
-		Error.captureStackTrace(this, this.constructor);
 	}
 }
