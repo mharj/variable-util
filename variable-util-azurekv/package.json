@@ -1,6 +1,6 @@
 {
   "name": "@avanio/variable-util-azurekv",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "azure key vault variables",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
