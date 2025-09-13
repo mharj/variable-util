@@ -86,9 +86,12 @@ describe('config variable', () => {
 
 		it('should fail to load not existing file', async function () {
 			const fileEnv = new FileConfigLoader({fileName: '.undefined', isSilent: false, logger: testLogger});
-			const mapper = new ConfigMap<{demo: string}>({
-				demo: {loaders: [fileEnv], parser: stringParser(), undefinedThrowsError: true},
-			});
+			const mapper = new ConfigMap<{demo: string}>(
+				{
+					demo: {parser: stringParser(), undefinedThrowsError: true},
+				},
+				[fileEnv],
+			);
 			const res = await mapper.getResult('demo');
 			expect(() => res.unwrap()).to.throw('ConfigMap key demo is undefined');
 			expect(logSpy.getCall(0).args[0]).to.be.eq(`ConfigLoader[file]: loading file .undefined`);
@@ -96,9 +99,12 @@ describe('config variable', () => {
 		});
 		it('should fail to load non JSON file', async function () {
 			const fileEnv = new FileConfigLoader({fileName: './test/test.txt', isSilent: false, logger: testLogger});
-			const mapper = new ConfigMap<{demo: string}>({
-				demo: {loaders: [fileEnv], parser: stringParser(), undefinedThrowsError: true},
-			});
+			const mapper = new ConfigMap<{demo: string}>(
+				{
+					demo: {parser: stringParser(), undefinedThrowsError: true},
+				},
+				[fileEnv],
+			);
 			const res = await mapper.getResult('demo');
 			expect(() => res.unwrap()).to.throw('ConfigMap key demo is undefined');
 			expect(logSpy.getCall(0).args[0]).to.be.eq(`ConfigLoader[file]: loading file ./test/test.txt`);

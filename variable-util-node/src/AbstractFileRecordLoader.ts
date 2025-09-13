@@ -11,7 +11,7 @@ import {
 	VariableError,
 } from '@avanio/variable-util';
 import {Err, type IResult, Ok} from '@luolapeikko/result-option';
-import {type Loadable, toError} from '@luolapeikko/ts-common';
+import {ErrorCore, type Loadable} from '@luolapeikko/ts-common';
 
 /**
  * Options for the AbstractFileRecordLoader.
@@ -96,8 +96,8 @@ export abstract class AbstractFileRecordLoader<
 		let buffer;
 		try {
 			buffer = await readFile(options.fileName);
-		} catch (unknownErr) {
-			return Err(new VariableError(toError(unknownErr).message));
+		} catch (cause) {
+			return Err(new VariableError(ErrorCore.from(cause).message, {cause}));
 		}
 		try {
 			let data = await this.handleParse(buffer, options);
@@ -106,8 +106,8 @@ export abstract class AbstractFileRecordLoader<
 			}
 			this.handleFileWatch(options); // add watch after successful load
 			return Ok(data);
-		} catch (_err) {
-			return Err(new VariableError(this.buildErrorStr(`file ${options.fileName} is not a valid ${options.fileType}`)));
+		} catch (cause) {
+			return Err(new VariableError(this.buildErrorStr(`file ${options.fileName} is not a valid ${options.fileType}`), {cause}));
 		}
 	}
 
@@ -146,7 +146,7 @@ export abstract class AbstractFileRecordLoader<
 			options.logger?.debug(this.buildErrorStr(`file ${options.fileName} changed`));
 			await this.reload();
 		} catch (err) {
-			options.logger?.error(this.buildErrorStr(`error reloading file ${options.fileName}: ${toError(err).message}`));
+			options.logger?.error(this.buildErrorStr(`error reloading file ${options.fileName}: ${ErrorCore.from(err).message}`));
 		}
 	}
 
