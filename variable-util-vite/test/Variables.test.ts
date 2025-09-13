@@ -21,10 +21,13 @@ type TestConfig = {
 	_NOT_EXISTS: string | undefined;
 };
 
-export const testConfig = new ConfigMap<TestConfig>({
-	TEST: {loaders, parser: stringParser(), params: {showValue: true}},
-	_NOT_EXISTS: {loaders, parser: stringParser(), params: {showValue: true}},
-});
+export const testConfig = new ConfigMap<TestConfig>(
+	{
+		TEST: {parser: stringParser(), params: {showValue: true}},
+		_NOT_EXISTS: {parser: stringParser(), params: {showValue: true}},
+	},
+	loaders,
+);
 
 describe('config variable', () => {
 	beforeAll(() => {
