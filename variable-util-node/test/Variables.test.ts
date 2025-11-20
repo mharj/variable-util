@@ -32,6 +32,8 @@ describe('config variable', () => {
 			expect(await getConfigVariable('SETTINGS_VARIABLE4', [fileDevEnv, fileEnv], booleanParser(), undefined, {showValue: true})).to.be.eq(true); // src: string format
 			expect(await getConfigVariable('SETTINGS_VARIABLE5', [fileDevEnv, fileEnv], integerParser(), undefined, {showValue: true})).to.be.eq(1); // src: number
 			expect(await getConfigVariable('SETTINGS_VARIABLE6', [fileDevEnv, fileEnv], integerParser(), undefined, {showValue: true})).to.be.eq(1); // src: string format
+			expect(await getConfigVariable('SETTINGS_VARIABLE7', [fileDevEnv, fileEnv], booleanParser(), undefined, {showValue: true})).to.be.eq(false); // src: string format
+			expect(await getConfigVariable('SETTINGS_VARIABLE8', [fileDevEnv, fileEnv], booleanParser(), undefined, {showValue: true})).to.be.eq(false); // src: string format
 			expect(await getConfigVariable('SETTINGS_VARIABLE_NULL', [fileEnv], stringParser(), undefined, {showValue: true})).to.be.eq(undefined);
 			expect(await getConfigVariable('NOT_EXISTS', [fileEnv], stringParser(), undefined, {showValue: true})).to.be.eq(undefined);
 			expect(logSpy.getCall(0).args[0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ./test/testSettings.json`);

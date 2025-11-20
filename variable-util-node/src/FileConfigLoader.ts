@@ -1,5 +1,5 @@
 import {type OverrideKeyMap} from '@avanio/variable-util';
-import {type Loadable} from '@luolapeikko/ts-common';
+import {type Loadable, UndefCore} from '@luolapeikko/ts-common';
 import {AbstractFileRecordLoader, type AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
 
 /**
@@ -48,7 +48,7 @@ export class FileConfigLoader<OverrideMap extends OverrideKeyMap = OverrideKeyMa
 	 */
 	private convertObjectToStringRecord(data: object): Record<string, string> {
 		return Object.entries(data).reduce<Record<string, string>>((acc, [key, value]) => {
-			if (value) {
+			if (UndefCore.isNotNullish(value)) {
 				acc[key] = String(value);
 			}
 			return acc;
