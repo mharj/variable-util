@@ -1,23 +1,25 @@
 {
 	"name": "@avanio/variable-util-node",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"description": "nodejs env util",
-	"main": "./dist/index.js",
+	"main": "./dist/index.cjs",
 	"module": "./dist/index.mjs",
-	"types": "./dist/index.d.ts",
+	"types": "./dist/index.d.mts",
 	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"require": "./dist/index.js",
-			"import": "./dist/index.mjs"
-		}
+		"types": {
+			"import": "./dist/index.d.mts",
+			"require": "./dist/index.d.cts"
+		},
+		"import": "./dist/index.mjs",
+		"require": "./dist/index.cjs",
+		"default": "./dist/index.mjs"
 	},
 	"private": false,
 	"engines": {
 		"node": ">=20"
 	},
 	"scripts": {
-		"build": "tsup src/index.ts --sourcemap --format cjs,esm --dts --clean",
+		"build": "tsdown src/index.ts --sourcemap --format cjs,esm --dts --clean",
 		"prepublishOnly": "npm run build",
 		"test": "vitest test --run --no-isolate --coverage",
 		"coverage": "vitest test --run --no-isolate --reporter=dot --coverage --coverage.reporter=lcov",
@@ -27,11 +29,12 @@
 	"files": [
 		"dist"
 	],
+	"repository": "github:mharj/variable-util",
 	"author": "mharj",
 	"license": "MIT",
 	"devDependencies": {
 		"@avanio/logger-like": "^0.2.12",
-		"@avanio/variable-util": "^1.2.1",
+		"@avanio/variable-util": "^1.2.2",
 		"@cspell/eslint-plugin": "^9.2.1",
 		"@eslint/js": "^9.35.0",
 		"@luolapeikko/result-option": "^2.0.1",
@@ -55,7 +58,7 @@
 		"prettier": "^3.6.2",
 		"sinon": "^21.0.0",
 		"source-map-support": "^0.5.21",
-		"tsup": "^8.5.0",
+		"tsdown": "^0.20.3",
 		"typescript": "^5.9.2",
 		"typescript-eslint": "^8.43.0",
 		"vite": "^7.1.5",
@@ -64,7 +67,7 @@
 	"peerDependencies": {
 		"@avanio/logger-like": ">= 0.1.0",
 		"@avanio/variable-util": ">= 1.2.1",
-		"@luolapeikko/result-option": ">= 2.0.0",
+		"@luolapeikko/result-option": ">= 1.0.0",
 		"@luolapeikko/ts-common": ">= 1.0.0",
 		"dotenv": ">= 16.0.0"
 	},
