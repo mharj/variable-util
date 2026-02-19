@@ -1,4 +1,4 @@
-import {ExpireCache} from '@avanio/expire-cache';
+import {ExpireCache, type ExpireCacheLogMapType} from '@avanio/expire-cache';
 import type {ILoggerLike} from '@avanio/logger-like';
 import {ConfigLoader, type IConfigLoaderProps, type LoaderValue, type OverrideKeyMap} from '@avanio/variable-util';
 import type {SecretClient} from '@azure/keyvault-secrets';
@@ -10,6 +10,7 @@ export interface AzureSecretsConfigLoaderOptions extends IConfigLoaderProps {
 	isSilent?: boolean;
 	logger?: ILoggerLike;
 	cacheLogger?: ILoggerLike;
+	cacheLogMapType?: ExpireCacheLogMapType;
 	/** value expire time in ms to force read again from Azure Key Vault, default is never = undefined */
 	expireMs?: number;
 }
@@ -63,7 +64,10 @@ export class AzureSecretsConfigLoader<OverrideKeys extends OverrideKeyMap> exten
 		try {
 			const options = await this.getOptions();
 			if (options.cacheLogger) {
-				this.valuePromises.logger.setLogger(options.cacheLogger);
+				this.valuePromises.logger.setLogger(options.cacheLogger)
+			}
+			if(options.cacheLogMapType) {
+				this.valuePromises.logger.setLogMapping(options.cacheLogMapType)
 			}
 			if (options.expireMs !== undefined) {
 				this.valuePromises.setExpireMs(options.expireMs);
