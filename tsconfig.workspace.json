@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@avanio/variable-util": ["packages/variable-util/src/index.ts"],
+      "@avanio/variable-util-node": ["packages/variable-util-node/src/index.ts"]
+    }
+  },
+  "extends": "./tsconfig.base.json"
+}

@@ -1,0 +1,34 @@
+{
+	"name": "@avanio/variable-util-vite",
+	"version": "1.2.0",
+	"description": "vite env util",
+	"type": "module",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
+	"exports": {
+		"types": {
+			"import": "./dist/index.d.mts"
+		},
+		"import": "./dist/index.mjs",
+		"default": "./dist/index.mjs"
+	},
+	"private": false,
+	"scripts": {
+		"build": "tsdown src/index.ts --minify --sourcemap --format esm --dts --clean -c tsconfig.build.json",
+		"validate": "tsc --noEmit"
+	},
+	"repository": "github:mharj/variable-util",
+	"files": [
+		"dist"
+	],
+	"author": "mharj",
+	"license": "MIT",
+	"devDependencies": {
+		"@avanio/variable-util": "workspace:*"
+	},
+	"peerDependencies": {
+		"@avanio/variable-util": ">= 1.2.1",
+		"events": ">= 3.3.0",
+		"vite": ">= 6.0.0"
+	}
+}

@@ -1,0 +1,4 @@
+{
+  "files": [],
+  "references": [{ "path": "./packages/variable-util" }, { "path": "./packages/variable-util-node" }]
+}

@@ -1,0 +1,47 @@
+{
+	"name": "@avanio/variable-util-tachyon",
+	"version": "1.2.0",
+	"description": "tachyon store for variables",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
+	"exports": {
+		"types": {
+			"import": "./dist/index.d.mts",
+			"require": "./dist/index.d.cts"
+		},
+		"import": "./dist/index.mjs",
+		"require": "./dist/index.cjs",
+		"default": "./dist/index.mjs"
+	},
+	"private": false,
+	"scripts": {
+		"build": "tsdown src/index.ts --sourcemap --format cjs,esm --dts --clean -c tsconfig.build.json",
+		"validate": "tsc --noEmit"
+	},
+	"repository": "github:mharj/variable-util",
+	"files": [
+		"dist"
+	],
+	"author": "mharj",
+	"license": "MIT",
+	"keywords": [
+		"tachyon",
+		"storage",
+		"env",
+		"variable",
+		"util"
+	],
+	"devDependencies": {
+		"@avanio/variable-util": "workspace:*",
+		"quantum-sequence": "^2.0.0",
+		"tachyon-drive": "^2.0.0"
+	},
+	"peerDependencies": {
+		"@avanio/logger-like": ">= 0.0.1",
+		"@avanio/variable-util": ">= 1.2.1",
+		"quantum-sequence": ">= 2.0.0",
+		"tachyon-drive": ">= 2.0.0",
+		"zod": ">= 3.0.0"
+	}
+}
