@@ -17,7 +17,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: dcarbone/install-jq-action@v2
+      - uses: dcarbone/install-jq-action@b7ef57d46ece78760b4019dbc4080a1ba2a40b45 # v3.2.0
       - uses: actions/checkout@v4
 
       - name: Identify project environment variables
@@ -26,7 +26,7 @@ jobs:
           echo "PACKAGE_NAME=$(cat package.json | jq -r .name)" | tee -a $GITHUB_ENV
           echo "PACKAGE_VERSION=$(cat package.json | jq -r .version)" | tee -a $GITHUB_ENV
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@9b5745cdf0a2e8c2620f0746130f809adb911c19 # v4
 
       - uses: actions/setup-node@v4
         with:
