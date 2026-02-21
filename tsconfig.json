@@ -1,4 +1,10 @@
 {
   "files": [],
-  "references": [{ "path": "./packages/variable-util" }, { "path": "./packages/variable-util-node" }]
+  "references": [
+    { "path": "./packages/variable-util" },
+    { "path": "./packages/variable-util-azurekv" },
+    { "path": "./packages/variable-util-node" },
+    { "path": "./packages/variable-util-tachyon" },
+    { "path": "./packages/variable-util-vite" }
+  ]
 }

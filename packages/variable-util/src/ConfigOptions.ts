@@ -1,6 +1,11 @@
 import type {ILoggerLike} from '@avanio/logger-like';
 import {resolveLogger} from './logger';
 
+/**
+ * ConfigOptions
+ * @category Config
+ * @since v0.6.0
+ */
 export type ConfigOptions = {
 	/** undefined = global logger, null = no logger else it's ILoggerLike */
 	logger?: ILoggerLike | null;
@@ -8,6 +13,11 @@ export type ConfigOptions = {
 	namespace?: string;
 };
 
+/**
+ * SolvedConfigOptions
+ * @category Config
+ * @since v0.6.0
+ */
 export type SolvedConfigOptions = {
 	/** optional logger instance */
 	logger: ILoggerLike | undefined;

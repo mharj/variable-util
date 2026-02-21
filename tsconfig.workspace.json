@@ -2,7 +2,10 @@
   "compilerOptions": {
     "paths": {
       "@avanio/variable-util": ["packages/variable-util/src/index.ts"],
-      "@avanio/variable-util-node": ["packages/variable-util-node/src/index.ts"]
+      "@avanio/variable-util-azurekv": ["packages/variable-util-azurekv/src/index.ts"],
+      "@avanio/variable-util-node": ["packages/variable-util-node/src/index.ts"],
+      "@avanio/variable-util-tachyon": ["packages/variable-util-tachyon/src/index.ts"],
+      "@avanio/variable-util-vite": ["packages/variable-util-vite/src/index.ts"]
     }
   },
   "extends": "./tsconfig.base.json"

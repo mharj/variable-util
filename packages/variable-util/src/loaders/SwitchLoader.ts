@@ -2,6 +2,11 @@ import type {ILoggerLike} from '@avanio/logger-like';
 import type {Loadable} from '@luolapeikko/ts-common';
 import {ConfigLoader, type IConfigLoaderProps, type LoaderValue} from './ConfigLoader';
 
+/**
+ * ISwitchLoaderProps is the interface for SwitchLoader props
+ * @category Loaders
+ * @since v1.0.0
+ */
 export interface ISwitchLoaderProps extends IConfigLoaderProps {
 	logger?: ILoggerLike;
 }

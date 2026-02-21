@@ -1,5 +1,13 @@
 import type {ILoggerLike} from '@avanio/logger-like';
 
+/**
+ * PartialHiddenValueStringType is the type for partial hidden value string, it can be 'prefix', 'suffix' or 'prefix-suffix'
+ * - 'prefix': show only prefix of secret "j43****"
+ * - 'suffix': show only suffix of secret "****7hd"
+ * - 'prefix-suffix': show both prefix and suffix of secret "j43****7hd"
+ * @since v0.9.0
+ * @category Utils
+ */
 export type PartialHiddenValueStringType =
 	/** show only prefix of secret "j43****" */
 	| 'prefix'
@@ -8,6 +16,13 @@ export type PartialHiddenValueStringType =
 	/**	show both prefix and suffix of secret "j43****7hd" */
 	| 'prefix-suffix';
 
+/**
+ * ShowValueType is the type for show value option, it can be boolean or PartialHiddenValueStringType
+ * - true: show the actual value
+ * - false: show the value with asterisks
+ * - PartialHiddenValueStringType: shows part of the value (prefix, suffix, or both)
+ * @since v0.9.0
+ */
 export type ShowValueType = boolean | PartialHiddenValueStringType;
 
 /**

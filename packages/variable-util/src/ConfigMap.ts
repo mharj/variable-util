@@ -21,17 +21,21 @@ export type TypeValueRecords<T> = Record<keyof T, LoaderTypeValueStrict<T[keyof 
  * ConfigMap
  * @example
  * type ConfigEnv = {
- * 	 PORT: number;
- * 	 HOST: string;
- * 	 DEBUG: boolean;
- * 	 URL: URL;
+ *   PORT: number;
+ *   HOST: string;
+ *   DEBUG: boolean;
+ *   URL: URL;
  * };
- * const config = new ConfigMap<ConfigEnv>({
- * 	 DEBUG: {loaders: [env()], parser: booleanParser, defaultValue: false},
- * 	 HOST: {loaders: [env()], parser: stringParser, defaultValue: 'localhost'},
- * 	 PORT: {loaders: [env()], parser: integerParser, defaultValue: 3000},
- * 	 URL: {loaders: [env()], parser: new UrlParser({urlSanitize: true}), defaultValue: new URL('http://localhost:3000')},
- * });
+ * const env = new EnvConfigLoader();
+ * const config = new ConfigMap<ConfigEnv>(
+ *   {
+ *     DEBUG: {defaultValue: false, parser: booleanParser()},
+ *     HOST: {defaultValue: 'localhost', parser: stringParser()},
+ *     PORT: {defaultValue: 3000, parser: integerParser()},
+ *     URL: {defaultValue: new URL('http://localhost:3000'), parser: new UrlParser({urlSanitize: true})},
+ *   },
+ *   [env],
+ * );
  * console.log('port', await config.get('PORT'));
  * @template Data - type of config map
  * @since v1.1.0

@@ -5,6 +5,12 @@ import {existsSync} from 'fs';
 import {readFile} from 'fs/promises';
 import * as path from 'path';
 
+/**
+ * DockerSecretsConfigLoaderOptions is the interface for DockerSecretsConfigLoader options
+ * @category Loaders
+ * @since v1.0.0
+ * @template OverrideMap - the type of the override key map
+ */
 export interface DockerSecretsConfigLoaderOptions {
 	/** force file name to lower case */
 	fileLowerCase: boolean;

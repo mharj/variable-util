@@ -1,11 +1,11 @@
-import {LogLevel, type ILoggerLike} from '@avanio/logger-like';
+import type {ExpireCacheLogMapType} from '@avanio/expire-cache';
+import {type ILoggerLike, LogLevel} from '@avanio/logger-like';
 import {getConfigVariable, setLogger, UrlParser} from '@avanio/variable-util';
 import type {SecretClient} from '@azure/keyvault-secrets';
 import * as dotenv from 'dotenv';
 import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 import {AzureSecretsConfigLoader} from '../src';
 import {SecretClientMockup} from './lib/SecretClientMockup';
-import type { ExpireCacheLogMapType } from '@avanio/expire-cache';
 
 dotenv.config({quiet: true});
 
@@ -28,9 +28,9 @@ const cacheLoggin: ExpireCacheLogMapType = {
 	delete: LogLevel.Debug,
 	expires: LogLevel.Debug,
 	get: LogLevel.Debug,
-	set: LogLevel.Debug,
 	has: LogLevel.Debug,
 	onExpire: LogLevel.Debug,
+	set: LogLevel.Debug,
 	size: LogLevel.Debug,
 };
 
@@ -42,11 +42,11 @@ const mongoUrlString = new URL('mongodb://localhost:27017/test');
 
 const fetchKv = new AzureSecretsConfigLoader<{MONGO_URL: string}>(
 	() => ({
+		cacheLogger: debugLogger,
+		cacheLogMapType: cacheLoggin,
 		expireMs: 100,
 		isSilent: false,
 		logger: debugLogger,
-		cacheLogger: debugLogger,
-		cacheLogMapType: cacheLoggin,
 		secretClient: secretClientMockup,
 	}),
 	{
@@ -78,7 +78,6 @@ describe('az key vault config variable', () => {
 		expect(debugLogger.debug.mock.calls[3]).to.be.eql(['azure-secrets', `getting kv-mongo-url from http://localhost`]);
 		expect(await callback1).to.be.eql(mongoUrlString);
 		debugLogger.debug.mockClear();
-
 	});
 	it('should return value (expired)', async function () {
 		// should be expired after 100ms
@@ -92,7 +91,7 @@ describe('az key vault config variable', () => {
 		expect(debugLogger.debug.mock.calls[3]).to.be.eql(['azure-secrets', `getting kv-mongo-url from http://localhost`]);
 	});
 	it('should return value (reload)', async function () {
-		fetchKv.reload()
+		fetchKv.reload();
 		await getConfigVariable('MONGO_URL', [fetchKv], urlParser, undefined, {showValue: true});
 		expect(debugLogger.info.mock.calls.length).to.be.eq(0);
 		expect(debugLogger.debug.mock.calls.length).to.be.eq(4);

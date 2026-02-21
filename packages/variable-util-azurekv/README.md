@@ -11,27 +11,36 @@ npm i @avanio/variable-util @avanio/variable-util-azurekv --save
 ### Examples
 
 ```typescript
-setLogger(console); // or log4js or winston
-// Azure KV loader
-const credentials = new ClientSecretCredential(tenantId, clientId, clientSecret); // or any other Azure credentials (managed identity, etc.)
-const kvEnv = new AzureSecretsConfigLoader(async () => ({credentials, url: `${process.env.KV_URI}`})).getLoader;
-const fileEnv = new FileConfigLoader({fileName: './settings.json', type: 'json'}).getLoader;
-// parser instaces
-const urlParser = new UrlParser({urlSanitize: true}); // urlSanitize hides credentials from logs
-
-// lookup from: env process.env.DATABASE_URI => JSON file "settings.json" DATABASE_URI key => keyvault process.env.KV_URI name  "zz-yy-database"
-const databaseUrl: URL = await getConfigVariable('DATABASE_URI', [env(), fileEnv(), kvEnv('zz-yy-database')], urlParser, new URL('db://localhost'), {
-	showValue: true,
+const secretClient = new SecretClient(
+  vaultUrl,
+  new ClientSecretCredential(tenantId, clientId, clientSecret), // or any other Azure credentials (managed identity, etc.)
+);
+// loaders example
+const env = new EnvConfigLoader();
+const fileEnv = new FileConfigLoader({
+  fileName: "./settings.json",
+  type: "json",
 });
+// note: mapping must exists, else KV secrets lookup does not happen.
+const kvEnv = new AzureSecretsConfigLoader(async () => ({ secretClient }), {
+  DATABASE_URI: "production-database-url", // if variable lookup key is "DATABASE_URI" we pull "production-database-url" value from Azure KV secrets
+});
+// parser instaces
+const urlParser = new UrlParser({ urlSanitize: true }); // urlSanitize hides credentials from logs
+
+// config map setup
+type MainEnv = {
+  DATABASE_URI: URL;
+};
+export const mainConfig = new ConfigMap<MainEnv>(
+  {
+    DATABASE_URI: {
+      defaultValue: new URL("mysql://localhost"),
+      parser: urlParser,
+    },
+  },
+  [env, fileEnv, kvEnv],
+);
+
+const databaseUri = await mainConfig.get("DATABASE_URI");
 ```
-
-### `new AzureSecretsConfigLoader(options).getLoader: IConfigLoader`
-
-A IConfigLoader instance that loads configuration values from Azure Keyvault secrets.
-
-Note: **_getLoader_** is function generator which can override key we are looking for example, kvEnv() with default key or kvEnv('OVERRIDE_KEY')
-
-- options.credentials (required): `TokenCredential`.
-- options.url (required): `string` of Azure Keyvault URL.
-- options.disabled (optional): `boolean` to disable this loader.
-- options.isSilent (optional): `boolean` to hide error messages. (default: true)

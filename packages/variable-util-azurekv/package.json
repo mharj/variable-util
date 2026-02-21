@@ -1,42 +1,42 @@
 {
-  "name": "@avanio/variable-util-azurekv",
-  "version": "1.2.0",
-  "description": "azure key vault variables",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
-  "exports": {
-    "types": {
-      "import": "./dist/index.d.mts",
-      "require": "./dist/index.d.cts"
-    },
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.cjs",
-    "default": "./dist/index.mjs"
-  },
-  "private": false,
-  "scripts": {
-    "build": "tsdown src/index.ts --sourcemap --format cjs,esm --dts --clean -c tsconfig.build.json",
-    "validate": "tsc --noEmit"
-  },
-  "files": [
-    "dist"
-  ],
-  "repository": "github:mharj/variable-util",
-  "author": "mharj",
-  "license": "MIT",
-  "devDependencies": {
-    "@avanio/variable-util": "workspace:*",
-    "@azure/identity": "4.13.0",
-    "@azure/keyvault-secrets": "4.10.0"
-  },
-  "peerDependencies": {
-    "@avanio/expire-cache": "^0.6",
-    "@avanio/logger-like": ">= 0.0.1",
-    "@avanio/variable-util": ">= 1.2.1",
-    "@azure/identity": "3 - 4",
-    "@azure/keyvault-secrets": "4.6 - 4.10",
-    "@luolapeikko/cache-types": ">= 0.0.8",
-    "@luolapeikko/ts-common": ">= 1.0.0"
-  }
+	"name": "@avanio/variable-util-azurekv",
+	"version": "1.3.0",
+	"description": "azure key vault variables",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
+	"exports": {
+		"import": {
+			"types": "./dist/index.d.mts",
+			"default": "./dist/index.mjs"
+		},
+		"require": {
+			"types": "./dist/index.d.cts",
+			"default": "./dist/index.cjs"
+		},
+		"default": "./dist/index.mjs"
+	},
+	"private": false,
+	"scripts": {
+		"build": "tsdown src/index.ts --sourcemap --format cjs,esm --dts --clean -c tsconfig.build.json",
+		"validate": "tsc --noEmit"
+	},
+	"files": [
+		"dist"
+	],
+	"repository": "github:mharj/variable-util",
+	"author": "mharj",
+	"license": "MIT",
+	"devDependencies": {
+		"@avanio/variable-util": "workspace:*",
+		"@azure/keyvault-secrets": "4.10.0"
+	},
+	"peerDependencies": {
+		"@avanio/expire-cache": ">= 0.6.5",
+		"@avanio/logger-like": ">= 0.0.1",
+		"@avanio/variable-util": ">= 1.2.1",
+		"@azure/keyvault-secrets": ">= 4.0.0",
+		"@luolapeikko/cache-types": ">= 0.0.8",
+		"@luolapeikko/ts-common": ">= 1.0.0"
+	}
 }

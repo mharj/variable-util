@@ -4,6 +4,12 @@ import {ConfigLoader, type IConfigLoaderProps, type LoaderValue, type OverrideKe
 import type {SecretClient} from '@azure/keyvault-secrets';
 import type {Loadable} from '@luolapeikko/ts-common';
 
+/**
+ * AzureSecretsConfigLoaderOptions is the interface for AzureSecretsConfigLoader options
+ * @category Loaders
+ * @since v1.0.0
+ * @template OverrideKeys - the type of the override keys
+ */
 export interface AzureSecretsConfigLoaderOptions extends IConfigLoaderProps {
 	secretClient: SecretClient;
 	/** hide error messages, default is true */
@@ -64,10 +70,10 @@ export class AzureSecretsConfigLoader<OverrideKeys extends OverrideKeyMap> exten
 		try {
 			const options = await this.getOptions();
 			if (options.cacheLogger) {
-				this.valuePromises.logger.setLogger(options.cacheLogger)
+				this.valuePromises.logger.setLogger(options.cacheLogger);
 			}
-			if(options.cacheLogMapType) {
-				this.valuePromises.logger.setLogMapping(options.cacheLogMapType)
+			if (options.cacheLogMapType) {
+				this.valuePromises.logger.setLogMapping(options.cacheLogMapType);
 			}
 			if (options.expireMs !== undefined) {
 				this.valuePromises.setExpireMs(options.expireMs);

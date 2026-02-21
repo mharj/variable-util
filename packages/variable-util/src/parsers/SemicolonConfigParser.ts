@@ -3,6 +3,12 @@ import type {ValidateCallback} from '../interfaces/IValidate';
 import type {ShowValueType} from '../lib';
 import {logStringifySemicolonConfig, parseSemicolonConfig, stringifySemicolonConfig} from '../lib/semicolonUtils';
 
+/**
+ * SemicolonConfigParserOptions is the interface for SemicolonConfigParser options
+ * @category Parsers
+ * @since v1.0.0
+ * @template OutType - the type of the output object
+ */
 export interface SemicolonConfigParserOptions<OutType extends Record<string, unknown> = Record<string, unknown>> {
 	validate?: ValidateCallback<Record<string, string>, OutType>;
 	/** keys to hide or partially hide */

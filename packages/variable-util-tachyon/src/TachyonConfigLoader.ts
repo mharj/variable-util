@@ -3,6 +3,11 @@ import {applyStringMap, type IConfigLoaderProps, type LoaderValue, MapConfigLoad
 import type {IStorageDriver} from 'tachyon-drive';
 import type {TachyonConfigStoreType} from './tachyonConfigSerializer';
 
+/**
+ * TachyonConfigLoaderOptions is the interface for TachyonConfigLoader options
+ * @category Loaders
+ * @since v1.0.0
+ */
 export type TachyonConfigLoaderOptions = IConfigLoaderProps & {
 	logger?: ILoggerLike;
 };

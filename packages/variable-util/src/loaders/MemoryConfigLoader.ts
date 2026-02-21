@@ -3,6 +3,11 @@ import type {Loadable} from '@luolapeikko/ts-common';
 import type {OverrideKeyMap} from '../interfaces';
 import {ConfigLoader, type IConfigLoaderProps, type LoaderValue} from './ConfigLoader';
 
+/**
+ * IMemoryConfigLoaderProps is the interface for MemoryConfigLoader props
+ * @category Loaders
+ * @since v1.0.0
+ */
 export interface IMemoryConfigLoaderProps extends IConfigLoaderProps {
 	logger: ILoggerLike | undefined;
 }

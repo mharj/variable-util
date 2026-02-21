@@ -22,6 +22,11 @@ export interface IConfigLoaderProps {
 	disabled?: Loadable<boolean>;
 }
 
+/**
+ * LoaderValueResult is the result of a loader value lookup
+ * @category Loaders
+ * @since v1.0.0
+ */
 export type LoaderValue = {value: string | undefined; path: string};
 
 /**

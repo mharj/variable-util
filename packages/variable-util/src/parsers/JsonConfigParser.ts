@@ -2,6 +2,12 @@ import type {IConfigParser, ParserProps, PostValidateProps} from '../interfaces/
 import type {ValidateCallback} from '../interfaces/IValidate';
 import {buildHiddenValue, type ShowValueType} from '../lib/formatUtils';
 
+/**
+ * JsonConfigParserOptions is the interface for JsonConfigParser options
+ * @category Parsers
+ * @since v1.0.0
+ * @template Out - the type of the output object
+ */
 export type JsonConfigParserOptions<Out extends Record<string, unknown>> = {
 	validate?: ValidateCallback<object, Out>;
 	/** keys to hide or partially hide */
