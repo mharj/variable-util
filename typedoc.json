@@ -20,6 +20,7 @@
       "ReadonlyArray": "https://www.typescriptlang.org/docs/handbook/2/objects.html#readonlyarraytype"
     }
   },
+  "name": "@avanio/variable-util",
   "out": "doc",
   "packageOptions": {
     "entryPoints": ["src/index.ts"]

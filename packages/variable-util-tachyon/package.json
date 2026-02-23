@@ -1,6 +1,6 @@
 {
 	"name": "@avanio/variable-util-tachyon",
-	"version": "1.3.0",
+	"version": "1.3.1",
 	"description": "tachyon store for variables",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.mjs",

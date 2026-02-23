@@ -1,8 +1,14 @@
-# variable-util-node
+# @avanio/variable-util-azurekv
 
-Azure keyvault loader for @avanio/variable-util-azurekv
+[![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
+[![npm version](https://badge.fury.io/js/@avanio%2Fvariable-util-azurekv.svg)](https://badge.fury.io/js/@avanio%2Fvariable-util-azurekv)
+[![Maintainability](https://qlty.sh/gh/mharj/projects/variable-util/maintainability.svg)](https://qlty.sh/gh/mharj/projects/variable-util)
+[![Code Coverage](https://qlty.sh/gh/mharj/projects/variable-util/coverage.svg)](https://qlty.sh/gh/mharj/projects/variable-util)
+[![variable-util to npmjs](https://github.com/mharj/variable-util/actions/workflows/variable-util-azurekv.yml/badge.svg)](https://github.com/mharj/variable-util/actions/workflows/variable-util-azurekv.yml)
 
-## install
+## Azure keyvault loader for @avanio/variable-util
+
+### install
 
 ```bash
 npm i @avanio/variable-util @avanio/variable-util-azurekv --save

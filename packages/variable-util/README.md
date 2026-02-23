@@ -1,15 +1,16 @@
 # @avanio/variable-util
 
-## getConfigVariable
+[![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
+[![npm version](https://badge.fury.io/js/@avanio%2Fvariable-util.svg)](https://badge.fury.io/js/@avanio%2Fvariable-util)
+[![Maintainability](https://qlty.sh/gh/mharj/projects/variable-util/maintainability.svg)](https://qlty.sh/gh/mharj/projects/variable-util)
+[![Code Coverage](https://qlty.sh/gh/mharj/projects/variable-util/coverage.svg)](https://qlty.sh/gh/mharj/projects/variable-util)
+[![variable-util to npmjs](https://github.com/mharj/variable-util/actions/workflows/variable-util.yml/badge.svg)](https://github.com/mharj/variable-util/actions/workflows/variable-util.yml)
 
-getConfigVariable is a utility function that extracts configuration values from different sources like environment variables and even fetches remote configuration values.
-Also have ability to parse (and verify) string, URL and JSON stringified or semicolon separated object values.
 
 ## NodeJS Installation
 
 ```bash
 npm i @avanio/variable-util
-npm i url-polyfill # import this to code if you need to support URL in older nodejs versions
 ```
 
 ## Browser Installation (use browserify events for compatibility)

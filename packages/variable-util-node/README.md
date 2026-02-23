@@ -1,14 +1,21 @@
-# variable-util-node
+# @avanio/variable-util-node
 
-NodeJS loaders for @avanio/variable-util
+[![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
+[![npm version](https://badge.fury.io/js/@avanio%2Fvariable-util-node.svg)](https://badge.fury.io/js/@avanio%2Fvariable-util-node)
+[![Maintainability](https://qlty.sh/gh/mharj/projects/variable-util/maintainability.svg)](https://qlty.sh/gh/mharj/projects/variable-util)
+[![Code Coverage](https://qlty.sh/gh/mharj/projects/variable-util/coverage.svg)](https://qlty.sh/gh/mharj/projects/variable-util)
+[![variable-util to npmjs](https://github.com/mharj/variable-util/actions/workflows/variable-util-node.yml/badge.svg)](https://github.com/mharj/variable-util/actions/workflows/variable-util-node.yml)
 
-## install
+## NodeJS loaders for @avanio/variable-util
+
+
+### install
 
 ```bash
 npm i @avanio/variable-util @avanio/variable-util-node --save
 ```
 
-## [Documentation](https://mharj.github.io/variable-util/)
+### [Documentation](https://mharj.github.io/variable-util/)
 
 ### Examples
 
