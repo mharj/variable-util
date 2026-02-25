@@ -1,7 +1,9 @@
 import type {ILoggerLike} from '@avanio/logger-like';
-import {booleanParser, ConfigMap, getConfigVariable, integerParser, setLogger, stringParser} from '@avanio/variable-util';
+import {booleanParser, ConfigMap, getConfigVariable, integerParser, setLogger, stringParser, type ValidateCallback} from '@avanio/variable-util';
+import * as fs from 'fs';
 import * as path from 'path';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {z} from 'zod';
 import {DockerSecretsConfigLoader, DotEnvLoader, FileConfigLoader} from '../src';
 
 const logSpy = vi.fn();
@@ -18,13 +20,22 @@ setLogger(testLogger);
 
 const jsonFilename = `${__dirname}/testSettings.json`;
 
+const stringRecordSchema = z.record(z.string().min(1), z.string());
+const validate: ValidateCallback<unknown, Record<string, string>> = (data) => {
+	return stringRecordSchema.parse(data);
+};
+
+function sleep(ms: number) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 describe('config variable', () => {
 	beforeEach(() => {
 		logSpy.mockClear();
 	});
 	describe('File loader', () => {
 		it('should return file variable value, filename from string', async function () {
-			const fileEnv = new FileConfigLoader({fileName: jsonFilename});
+			const fileEnv = new FileConfigLoader({fileName: jsonFilename, validate, watch: true});
 			const fileDevEnv = new FileConfigLoader({disabled: true, fileName: `${__dirname}/testDevSettings.json`});
 			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileDevEnv, fileEnv], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
 			expect(await getConfigVariable('SETTINGS_VARIABLE3', [fileDevEnv, fileEnv], booleanParser(), undefined, {showValue: true})).to.be.eq(true); // src: boolean
@@ -40,6 +51,15 @@ describe('config variable', () => {
 			expect(logSpy.mock.calls[2][0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE4 [true] from ${__dirname}/testSettings.json`);
 			expect(logSpy.mock.calls[3][0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE5 [1] from ${__dirname}/testSettings.json`);
 			expect(logSpy.mock.calls[4][0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE6 [1] from ${__dirname}/testSettings.json`);
+			expect(logSpy.mock.calls[5][0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE7 [false] from ${__dirname}/testSettings.json`);
+			expect(logSpy.mock.calls[6][0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE8 [false] from ${__dirname}/testSettings.json`);
+			// touch ${__dirname}/testSettings.json
+			// wait for file change
+			// expect the file to be reloaded
+			fs.utimesSync(jsonFilename, new Date(), new Date());
+			await sleep(1000);
+			expect(await getConfigVariable('SETTINGS_VARIABLE1', [fileEnv], stringParser(), undefined, {showValue: true})).to.be.eq('settings_file');
+			expect(logSpy.mock.calls[7][0]).to.be.eq(`ConfigVariables[file]: SETTINGS_VARIABLE1 [settings_file] from ${__dirname}/testSettings.json`);
 		});
 		it('should logging file watcher', async function () {
 			const fileEnv = new FileConfigLoader({fileName: jsonFilename, logger: testLogger, watch: true});
@@ -96,7 +116,7 @@ describe('config variable', () => {
 			const res = await mapper.getResult('demo');
 			expect(() => res.unwrap()).to.throw('ConfigMap key demo is undefined');
 			expect(logSpy.mock.calls[0][0]).to.be.eq(`ConfigLoader[file]: loading file .undefined`);
-			expect((logSpy.mock.calls[1][0] as Error).message).to.be.eq(`ConfigLoader[file]: file .undefined not found`);
+			expect((logSpy.mock.calls[1][0] as Error).message).to.include(`ConfigLoader[file]: ENOENT: no such file or directory`);
 		});
 		it('should fail to load non JSON file', async function () {
 			const fileEnv = new FileConfigLoader({fileName: `${__dirname}/test.txt`, isSilent: false, logger: testLogger});

@@ -4,6 +4,7 @@ import type {ConfigOptions} from './ConfigOptions';
 import {getConfigObject} from './getConfigObject';
 import type {IConfigLoader, IConfigParser} from './interfaces';
 import type {FormatParameters} from './lib/formatUtils';
+import type {LoaderTypeValue, LoaderTypeValueStrict} from './types/TypeValue';
 
 /**
  * Wrapper around getConfigObject that returns a Result
@@ -33,7 +34,7 @@ export async function getConfigObjectResult<Output>(
 	defaultValueLoadable: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
-): Promise<IResult<{type: string | undefined; value: Output}>>;
+): Promise<IResult<LoaderTypeValueStrict<Output>>>;
 export async function getConfigObjectResult<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
@@ -41,7 +42,7 @@ export async function getConfigObjectResult<Output>(
 	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
-): Promise<IResult<{type: string | undefined; value: Output | undefined}>>;
+): Promise<IResult<LoaderTypeValue<Output>>>;
 export async function getConfigObjectResult<Output>(
 	rootKey: string,
 	loaders: IConfigLoader[],
@@ -49,7 +50,7 @@ export async function getConfigObjectResult<Output>(
 	defaultValueLoadable?: Loadable<Output>,
 	params?: FormatParameters,
 	options?: ConfigOptions,
-): Promise<IResult<{type: string | undefined; value: Output | undefined}>> {
+): Promise<IResult<LoaderTypeValue<Output>>> {
 	try {
 		return Ok(await getConfigObject(rootKey, loaders, parser, defaultValueLoadable, params, options));
 	} catch (err) {

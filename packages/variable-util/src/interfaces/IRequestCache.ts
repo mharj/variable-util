@@ -30,11 +30,16 @@ export interface IRequestCache {
 	 */
 	isOnline(): boolean;
 	/**
-	 * get the cached response for a request
+	 * get the cached response for a Request
+	 * @param {Request} req - Request to get the cached response for
+	 * @returns {Promise<Response | undefined>} - Promise of Response or undefined
 	 */
 	fetchRequest(req: Request): Promise<Response | undefined>;
 	/**
 	 * store the response for a request
+	 * @param {Request} req - Request to store the response for
+	 * @param {Response} res - Response to store for the request
+	 * @returns {Promise<void>} - Promise of void
 	 */
 	storeRequest(req: Request, res: Response): Promise<void>;
 }

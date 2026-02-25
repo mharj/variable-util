@@ -66,8 +66,10 @@ const testEnvSchema = z.object({
 	URL: z.instanceof(URL),
 });
 
-const memoryEnv = new MemoryConfigLoader<{PORT?: string}>(
+const memoryEnv = new MemoryConfigLoader<{PORT?: string; ARRAY?: string; BIG_INT?: string}>(
 	{
+		ARRAY: undefined,
+		BIG_INT: undefined,
 		PORT: undefined,
 	},
 	{logger: spyLogger},
@@ -171,10 +173,27 @@ describe('ConfigMap', () => {
 			// vitest promise rejection
 			await expect(call).rejects.toEqual(new VariableError('add NOT_EXISTS to env'));
 		});
-		it('should return CONSTANT env value', async function () {
+		it('should return default ARRAY env value', async function () {
 			const call: Promise<string[]> = config.get('ARRAY');
 			await expect(call).resolves.toEqual(['a', 'b', 'c']);
 			expect(infoSpy.mock.calls[0]?.[0]).to.be.eq('ConfigVariables:Demo[default]: ARRAY [a;b;c] from default');
+		});
+		it('should return memory ARRAY env value', async function () {
+			memoryEnv.set('ARRAY', 'd;e;f');
+			const call: Promise<string[]> = config.get('ARRAY');
+			await expect(call).resolves.toEqual(['d', 'e', 'f']);
+			expect(infoSpy.mock.calls[0]?.[0]).to.be.eq('ConfigVariables:Demo[memory]: ARRAY [d;e;f] from key:ARRAY');
+		});
+		it('should return default BIG_INT env value', async function () {
+			const call: Promise<bigint> = config.get('BIG_INT');
+			await expect(call).resolves.toEqual(123456789012345n);
+			expect(infoSpy.mock.calls[0]?.[0]).to.be.eq('ConfigVariables:Demo[default]: BIG_INT [123456789012345] from default');
+		});
+		it('should return memory BIG_INT env value', async function () {
+			memoryEnv.set('BIG_INT', '123456789012345');
+			const call: Promise<bigint> = config.get('BIG_INT');
+			await expect(call).resolves.toEqual(123456789012345n);
+			expect(infoSpy.mock.calls[0]?.[0]).to.be.eq('ConfigVariables:Demo[memory]: BIG_INT [123456789012345] from key:BIG_INT');
 		});
 		it('should return PORT env value', async function () {
 			process.env.PORT = '6000';

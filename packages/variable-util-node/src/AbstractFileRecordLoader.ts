@@ -10,7 +10,7 @@ import {
 } from '@avanio/variable-util';
 import {Err, type IResult, Ok} from '@luolapeikko/result-option';
 import {ErrorCore, type Loadable} from '@luolapeikko/ts-common';
-import {existsSync, type FSWatcher, watch} from 'fs';
+import {type FSWatcher, watch} from 'fs';
 import {readFile} from 'fs/promises';
 
 /**
@@ -90,14 +90,11 @@ export abstract class AbstractFileRecordLoader<
 	protected async handleData(): Promise<IResult<Record<string, string | undefined>, VariableError>> {
 		const options = await this.getOptions();
 		options.logger?.debug(this.buildErrorStr(`loading file ${options.fileName}`));
-		if (!existsSync(options.fileName)) {
-			return Err(new VariableError(this.buildErrorStr(`file ${options.fileName} not found`)));
-		}
 		let buffer: Buffer;
 		try {
 			buffer = await readFile(options.fileName);
 		} catch (cause) {
-			return Err(new VariableError(ErrorCore.from(cause).message, {cause}));
+			return Err(new VariableError(this.buildErrorStr(ErrorCore.from(cause).message), {cause}));
 		}
 		try {
 			let data = await this.handleParse(buffer, options);
@@ -113,17 +110,16 @@ export abstract class AbstractFileRecordLoader<
 
 	protected async handleLoadData(): Promise<boolean> {
 		const {logger, isSilent} = await this.getOptions();
-		const res = await this.handleData();
-		if (res.isErr) {
-			if (!isSilent) {
-				res.unwrap();
-			} else {
-				logger?.debug(res.err());
-			}
-			return false;
+		const res = (await this.handleData())
+			.inspectErr((err) => isSilent && logger?.debug(err))
+			.andThen((data) => {
+				applyStringMap(data, this.data);
+				return Ok();
+			});
+		if (res.isErr && !isSilent) {
+			res.unwrap();
 		}
-		applyStringMap(res.ok(), this.data);
-		return true;
+		return res.isOk;
 	}
 
 	private handleFileWatch(options: Options): void {

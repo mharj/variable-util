@@ -14,9 +14,9 @@ export const testObjectFinalSchema = z.object({
 });
 
 const testObjectSchema = z.object({
-	First: booleanParamSchema.optional().default('false'),
-	Second: booleanParamSchema.optional().default('false'),
-	Third: booleanParamSchema.optional().default('false'),
+	First: booleanParamSchema.optional().default(false),
+	Second: booleanParamSchema.optional().default(false),
+	Third: booleanParamSchema.optional().default(false),
 });
 
 export type TestObjectType = z.infer<typeof testObjectSchema>;
