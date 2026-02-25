@@ -111,3 +111,6 @@ packages/*/dist/*
 # documentation
 doc
 docs
+
+# pnpm store
+.pnpm-store
