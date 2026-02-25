@@ -11,7 +11,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**/*.ts", "**/*.mts", "**/*.json", "!**/package.json", "!**/dist", "!azurite-data", ".cspell.json"]
+    "includes": ["**/*.ts", "**/*.mts", "**/*.json", "!**/package.json", "!**/dist", "!azurite-data", ".cspell.json", "!.devcontainer/devcontainer.json"]
   },
   "formatter": {
     "attributePosition": "auto",
