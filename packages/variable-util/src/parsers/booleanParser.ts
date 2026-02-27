@@ -1,4 +1,4 @@
-import type {IConfigParser, ParserProps, PreValidateProps, TypeGuardValidate} from '../interfaces/IConfigParser';
+import type {IConfigParser, ParserProps, TypeGuardValidate} from '../interfaces/IConfigParser';
 import {getBoolean} from '../lib/primitiveUtils';
 
 /**
@@ -25,20 +25,11 @@ export function booleanParser<Output extends boolean = boolean>(validate?: TypeG
 				.mapErr((cause) => new TypeError(`value for key ${key} is not a boolean string`, {cause}))
 				.unwrap();
 		},
-		postValidate: async (props) => {
-			if (!(await validate)?.(props.value)) {
+		postValidate: async ({value}) => {
+			if ((await validate?.(value)) === false) {
 				return undefined;
 			}
-			return props.value;
-		},
-		preValidate: ({key, value}: PreValidateProps) => {
-			// allow boolean values to be passed in as getBoolean can handle them
-			if (typeof value === 'boolean') {
-				return;
-			}
-			if (typeof value !== 'string') {
-				throw new TypeError(`value for key ${key} is not a string`);
-			}
+			return value as Output;
 		},
 		toString: (value: boolean): string => {
 			return value.toString();

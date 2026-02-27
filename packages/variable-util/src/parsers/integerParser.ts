@@ -17,11 +17,11 @@ export function integerParser<Output extends number = number>(validate?: TypeGua
 				.mapErr((cause) => new TypeError(`value for key ${key} is not an integer string`, {cause}))
 				.unwrap();
 		},
-		postValidate: async (props) => {
-			if (!(await validate)?.(props.value)) {
+		postValidate: async ({value}) => {
+			if ((await validate?.(value)) === false) {
 				return undefined;
 			}
-			return props.value;
+			return value as Output;
 		},
 		toString: (value: number): string => {
 			return value.toString();

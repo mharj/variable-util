@@ -11,7 +11,7 @@ import type {IConfigParser, ParserProps, TypeGuardValidate} from '../interfaces'
  * @category Parsers
  * @since v1.0.0
  */
-export function arrayParser<Input, Output>(
+export function arrayParser<Input, Output extends Input>(
 	parse: IConfigParser<Input, Output>,
 	separator = ';',
 	validate?: TypeGuardValidate<Output>,
@@ -21,19 +21,19 @@ export function arrayParser<Input, Output>(
 		parse: (props: ParserProps) => {
 			return Promise.all(props.value.split(separator).map((v) => parse.parse({...props, value: v})));
 		},
-		postValidate: async (props) => {
-			if (!validate) {
-				return undefined;
+		postValidate: async ({value}): Promise<Output[]> => {
+			if (validate) {
+				const valueList = await Promise.all(
+					value.map(async (v) => {
+						if ((await validate?.(value)) === false) {
+							return undefined;
+						}
+						return v;
+					}),
+				);
+				return valueList.filter((v) => v !== undefined) as Output[];
 			}
-			const valueList = await Promise.all(
-				props.value.map(async (v) => {
-					if (!(await validate)?.(v)) {
-						return undefined;
-					}
-					return v;
-				}),
-			);
-			return valueList.filter((v) => v !== undefined);
+			return value as Output[];
 		},
 		toString: (value: Output[]) => {
 			return value.map((v) => parse.toString(v)).join(separator);

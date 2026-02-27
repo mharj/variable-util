@@ -43,6 +43,9 @@ export function getBoolean(value: string | boolean): IResult<boolean, TypeError>
  * @since v0.2.5
  */
 export function getString(value: string): IResult<string, TypeError> {
+	if (typeof value !== 'string') {
+		return Err(new TypeError(`${value} is not a string`));
+	}
 	return Ok(value);
 }
 

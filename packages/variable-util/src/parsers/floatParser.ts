@@ -1,4 +1,4 @@
-import type {IConfigParser, ParserProps, PreValidateProps, TypeGuardValidate} from '../interfaces/IConfigParser';
+import type {IConfigParser, ParserProps, TypeGuardValidate} from '../interfaces/IConfigParser';
 import {getFloat} from '../lib/primitiveUtils';
 
 /**
@@ -17,16 +17,11 @@ export function floatParser<Output extends number = number>(validate?: TypeGuard
 				.mapErr((cause) => new TypeError(`value for key ${key} is not a float string`, {cause}))
 				.unwrap();
 		},
-		postValidate: async (props) => {
-			if (!(await validate)?.(props.value)) {
+		postValidate: async ({value}) => {
+			if ((await validate?.(value)) === false) {
 				return undefined;
 			}
-			return props.value;
-		},
-		preValidate: ({key, value}: PreValidateProps) => {
-			if (typeof value !== 'string') {
-				throw new TypeError(`value for key ${key} is not a string`);
-			}
+			return value as Output;
 		},
 		toString: (value: number): string => {
 			return value.toString();
