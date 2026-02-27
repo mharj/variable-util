@@ -17,7 +17,7 @@ describe('Test string parser', function () {
 	});
 	it('should postValidate values', async function () {
 		expect(await stringParser(trueValidate).postValidate?.({key: 'key', loader: testLoader, value: 'test'})).to.equal('test');
-        expect(await stringParser(falseValidate).postValidate?.({key: 'key', loader: testLoader, value: 'test'})).to.equal(undefined);
-        expect(await stringParser().postValidate?.({key: 'key', loader: testLoader, value: 'test'})).to.equal('test');
+		expect(await stringParser(falseValidate).postValidate?.({key: 'key', loader: testLoader, value: 'test'})).to.equal(undefined);
+		expect(await stringParser().postValidate?.({key: 'key', loader: testLoader, value: 'test'})).to.equal('test');
 	});
 });

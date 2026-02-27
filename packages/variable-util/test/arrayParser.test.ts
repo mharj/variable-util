@@ -19,14 +19,8 @@ describe('Test array parser', function () {
 		);
 	});
 	it('should postValidate values', async function () {
-		expect(await arrayParser(integerParser(), ';', trueValidate).postValidate?.({key: 'key', loader: testLoader, value: [1, 2, 3]})).toEqual([
-			1,
-			2,
-			3,
-		]);
-		expect(await arrayParser(integerParser(), ';', falseValidate).postValidate?.({key: 'key', loader: testLoader, value: [1, 2, 3]})).toEqual(
-			[],
-		);
+		expect(await arrayParser(integerParser(), ';', trueValidate).postValidate?.({key: 'key', loader: testLoader, value: [1, 2, 3]})).toEqual([1, 2, 3]);
+		expect(await arrayParser(integerParser(), ';', falseValidate).postValidate?.({key: 'key', loader: testLoader, value: [1, 2, 3]})).toEqual([]);
 		expect(await arrayParser(integerParser()).postValidate?.({key: 'key', loader: testLoader, value: [7, 8]})).toEqual([7, 8]);
 	});
 });
