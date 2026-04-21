@@ -17,11 +17,11 @@ export function bigIntParser<Output extends bigint = bigint>(validate?: TypeGuar
 				.mapErr((cause) => new TypeError(`value for key ${key} is not an integer string`, {cause}))
 				.unwrap();
 		},
-		postValidate: async (props) => {
-			if (!(await validate)?.(props.value)) {
+		postValidate: async ({value}) => {
+			if ((await validate?.(value)) === false) {
 				return undefined;
 			}
-			return props.value;
+			return value as Output;
 		},
 		toString: (value: bigint): string => {
 			return value.toString();

@@ -1,4 +1,4 @@
-import type {IConfigParser, ParserProps, PreValidateProps, TypeGuardValidate} from '../interfaces/IConfigParser';
+import type {IConfigParser, ParserProps, TypeGuardValidate} from '../interfaces/IConfigParser';
 import {getString} from '../lib/primitiveUtils';
 
 /**
@@ -12,24 +12,19 @@ import {getString} from '../lib/primitiveUtils';
 export function stringParser<Output extends string = string>(validate?: TypeGuardValidate<Output>): IConfigParser<string, Output> {
 	return {
 		name: 'stringParser',
-		parse: ({value, key}: ParserProps) => {
+		parse: ({value, key}: ParserProps): string => {
 			return getString(value)
 				.mapErr((cause) => new TypeError(`value for key ${key} is not a string`, {cause}))
 				.unwrap();
 		},
-		postValidate: async (props) => {
-			if (!(await validate)?.(props.value)) {
+		postValidate: async ({value}) => {
+			if ((await validate?.(value)) === false) {
 				return undefined;
 			}
-			return props.value;
-		},
-		preValidate: ({key, value}: PreValidateProps) => {
-			if (typeof value !== 'string') {
-				throw new TypeError(`value for key ${key} is not a string`);
-			}
+			return value as Output;
 		},
 		toString: (value: string): string => {
 			return value;
 		},
-	};
+	} satisfies IConfigParser<string, Output>;
 }

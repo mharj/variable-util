@@ -34,9 +34,9 @@ export type PostValidateProps<T> = {
 /**
  * PreValidate function
  * @template Output - Type of output value
- * @since v1.0.0
+ * @since v1.3.3
  */
-export type TypeGuardValidate<Output> = ((value: unknown) => value is Output) | Promise<(value: unknown) => value is Output>;
+export type TypeGuardValidate<Output> = ((value: unknown) => value is Output) | ((value: unknown) => Promise<boolean>);
 
 /**
  * String encoder options for parsers
