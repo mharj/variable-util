@@ -5,6 +5,7 @@ on:
   push:
     branches: [main]
     paths:
+      - ".github/workflows/docs.yml"
       - "packages/**"
       - "README.md"
   # Allows you to run this workflow manually from the Actions tab
@@ -31,13 +32,12 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@9b5745cdf0a2e8c2620f0746130f809adb911c19 # v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: "lts/*"
-          registry-url: "https://registry.npmjs.org"
+          node-version: 'lts/*'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: ${{ env.NPM }} install
@@ -49,13 +49,13 @@ jobs:
         run: ${{ env.NPM }} run docs
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: "./doc"
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

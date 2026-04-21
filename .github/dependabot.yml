@@ -5,6 +5,7 @@ updates:
       - "/packages/variable-util"
       - "/packages/variable-util-azurekv"
       - "/packages/variable-util-node"
+      - "/packages/variable-util-tachyon"
       - "/packages/variable-util-vite"
     schedule:
       interval: "weekly"

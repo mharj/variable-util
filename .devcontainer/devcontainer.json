@@ -3,11 +3,7 @@
 {
   "customizations": {
     "vscode": {
-      "extensions": [
-        "biomejs.biome",
-        "esbenp.prettier-vscode",
-        "eamodio.gitlens"
-      ]
+      "extensions": ["biomejs.biome", "esbenp.prettier-vscode", "eamodio.gitlens"]
     }
   },
 
