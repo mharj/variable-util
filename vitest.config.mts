@@ -1,16 +1,16 @@
 import {playwright} from '@vitest/browser-playwright';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import {defineConfig} from 'vitest/config';
 
 export default defineConfig({
 	optimizeDeps: {
 		include: ['@avanio/logger-like', '@luolapeikko/result-option', '@luolapeikko/ts-common', 'events', 'zod'],
 	},
-	plugins: [tsconfigPaths()],
+	plugins: [],
 	resolve: {
 		alias: {
 			events: 'events',
 		},
+		tsconfigPaths: true,
 	},
 	test: {
 		coverage: {
