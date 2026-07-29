@@ -15,6 +15,7 @@ import {
 	stringParser,
 	UrlParser,
 	VariableError,
+	VariableLookupError,
 } from '../src';
 import {type TestObjectType, testObjectFinalSchema, testObjectParser} from './testObjectParse';
 
@@ -336,6 +337,67 @@ describe('ConfigMap', () => {
 	describe('validate', () => {
 		it('should validate all with zod', async function () {
 			expect(await config.getString('TEST_OBJECT')).to.be.eq('First=false;Second=false;Third=true');
+		});
+	});
+	describe('ensure/read cache', () => {
+		it('should cache value with ensure and reads should use cached value', async function () {
+			process.env.PORT = '6000';
+			await expect(config.ensure('PORT')).resolves.toEqual(expect.objectContaining({isOk: true}));
+
+			process.env.PORT = '7000';
+
+			expect(config.read('PORT')).to.be.eq(6000);
+			expect(config.readString('PORT')).to.be.eq('6000');
+			expect(config.readObject('PORT')).to.be.eql({
+				namespace: 'Demo',
+				stringValue: '6000',
+				type: 'env',
+				value: 6000,
+			});
+			expect(config.readResult('PORT').ok()).to.be.eq(6000);
+			expect(config.readStringResult('PORT').ok()).to.be.eq('6000');
+			expect(config.readObjectResult('PORT').ok()).to.be.eql({
+				namespace: 'Demo',
+				stringValue: '6000',
+				type: 'env',
+				value: 6000,
+			});
+		});
+
+		it('should cache multiple keys with ensure iterable', async function () {
+			process.env.PORT = '6100';
+			process.env.HOST = 'cache-host';
+
+			await expect(config.ensure(['PORT', 'HOST'])).resolves.toEqual(expect.objectContaining({isOk: true}));
+
+			process.env.PORT = '6200';
+			process.env.HOST = 'cache-host-updated';
+
+			expect(config.read('PORT')).to.be.eq(6100);
+			expect(config.read('HOST')).to.be.eq('cache-host');
+		});
+
+		it('should throw and return error results when reading a non-cached key', function () {
+			expect(() => config.read('SILENT_VALUE')).to.throw(
+				VariableLookupError,
+				'Key "SILENT_VALUE" is not cached, check if ensure(\'SILENT_VALUE\') was called first',
+			);
+			expect(() => config.readString('SILENT_VALUE')).to.throw(
+				VariableLookupError,
+				'Key "SILENT_VALUE" is not cached, check if ensure(\'SILENT_VALUE\') was called first',
+			);
+			expect(() => config.readObject('SILENT_VALUE')).to.throw(
+				VariableLookupError,
+				'Key "SILENT_VALUE" is not cached, check if ensure(\'SILENT_VALUE\') was called first',
+			);
+
+			const readResult = config.readResult('SILENT_VALUE');
+			const readStringResult = config.readStringResult('SILENT_VALUE');
+			const readObjectResult = config.readObjectResult('SILENT_VALUE');
+
+			expect(readResult.ok()).to.be.eq(undefined);
+			expect(readStringResult.ok()).to.be.eq(undefined);
+			expect(readObjectResult.ok()).to.be.eq(undefined);
 		});
 	});
 });

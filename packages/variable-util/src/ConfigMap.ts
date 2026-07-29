@@ -1,5 +1,5 @@
 import type {ILoggerLike, ISetOptionalLogger} from '@avanio/logger-like';
-import {Err, type IResult, Ok} from '@luolapeikko/result-option';
+import {Err, type IErr, type IResult, Ok} from '@luolapeikko/result-option';
 import {type Loadable, LoadableCore} from '@luolapeikko/ts-common';
 import {buildOptions, type ConfigOptions} from './ConfigOptions';
 import {getConfigObject} from './getConfigObject';
@@ -43,6 +43,7 @@ export type TypeValueRecords<T> = Record<keyof T, LoaderTypeValueStrict<T[keyof 
 export class ConfigMap<Data extends Record<string, unknown>> implements ISetOptionalLogger {
 	private schema: EnvMapSchema<Data>;
 	private options: ConfigOptions;
+	private cachedEntries = new Map<keyof Data, LoaderTypeValueStrict<Data[keyof Data]>>();
 	private loaders: Loadable<Iterable<IConfigLoader>>;
 	/**
 	 * ConfigMap constructor
@@ -186,6 +187,110 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 		} catch (err) {
 			return Err(err);
 		}
+	}
+
+	/**
+	 * Ensure that the specified keys are loaded and cached in the ConfigMap. If any key fails to load, the error will be returned.
+	 * @param {keyof Data | Iterable<keyof Data>} lookupKeys - The key or iterable of keys to ensure are loaded.
+	 * @param {EncodeOptions} [encodeOptions] - Optional encode options to use when loading the keys.
+	 * @returns {Promise<IResult<void>>} - A promise that resolves to an IResult indicating success or failure. If any key fails to load, the error will be returned.
+	 */
+	public async ensure(lookupKeys: keyof Data | Iterable<keyof Data>, encodeOptions?: EncodeOptions): Promise<IResult<void>> {
+		let errorOccurred: IErr<unknown> | undefined;
+		const keysToEnsure = (typeof lookupKeys === 'string' ? [lookupKeys] : lookupKeys) as Iterable<keyof Data>;
+		for (const lookupKey of keysToEnsure) {
+			const data = await this.getObjectResult(lookupKey, encodeOptions);
+			if (data.isErr) {
+				errorOccurred = data;
+			} else {
+				this.cachedEntries.set(lookupKey, data.ok());
+			}
+		}
+		return errorOccurred ?? Ok();
+	}
+
+	/**
+	 * Read the cached configuration value for the given key. (use {@link ensure} to load/reload the value first)
+	 * @param {K} lookupKey - The key to look up in the configuration schema.
+	 * @returns {LoaderTypeValueStrict<Data[Key]>} - The cached configuration entry.
+	 * @throws {VariableLookupError} - If the key is not cached, indicating that {@link ensure} was not called first.
+	 * @template K - The type of the key to look up in the configuration schema.
+	 */
+	public readObject<Key extends keyof Data = keyof Data>(key: Key): LoaderTypeValueStrict<Data[Key]> {
+		const cachedEntry = this.cachedEntries.get(key);
+		if (cachedEntry) {
+			return cachedEntry as LoaderTypeValueStrict<Data[Key]>;
+		}
+		throw new VariableLookupError(String(key), `Key "${String(key)}" is not cached, check if ensure('${String(key)}') was called first`);
+	}
+
+	/**
+	 * Read the cached configuration value for the given key as a Result. (use {@link ensure} to load/reload the value first)
+	 * @param key - The key to look up in the configuration schema.
+	 * @returns {IResult<LoaderTypeValueStrict<Data[Key]>, VariableLookupError>} - The cached configuration entry wrapped in a Result.
+	 * @template Key - The type of the key to look up in the configuration schema.
+	 */
+	public readObjectResult<Key extends keyof Data = keyof Data>(key: Key): IResult<LoaderTypeValueStrict<Data[Key]>> {
+		const cachedEntry = this.cachedEntries.get(key);
+		if (cachedEntry) {
+			return Ok(cachedEntry as LoaderTypeValueStrict<Data[Key]>);
+		}
+		return Err(new VariableLookupError(String(key), `Key "${String(key)}" is not cached, check if ensure('${String(key)}') was called first`));
+	}
+
+	/**
+	 * Read the cached configuration value for the given key. (use {@link ensure} to load/reload the value first)
+	 * @param lookupKey
+	 * @returns {Data[K]} - The cached configuration value.
+	 * @throws {VariableLookupError} - If the key is not cached, indicating that {@link ensure} was not called first.
+	 * @template K - The type of the key to look up in the configuration schema.
+	 */
+	public read<K extends keyof Data>(lookupKey: K): Data[K] {
+		return this.readObject(lookupKey).value;
+	}
+
+	/**
+	 * Read the cached configuration value for the given key as a Result. (use {@link ensure} to load/reload the value first)
+	 * @param lookupKey
+	 * @returns {IResult<Data[K], VariableLookupError>} - The cached configuration value wrapped in a Result.
+	 * @template K - The type of the key to look up in the configuration schema.
+	 */
+	public readResult<K extends keyof Data>(lookupKey: K): IResult<Data[K], VariableLookupError> {
+		const cachedEntry = this.cachedEntries.get(lookupKey);
+		if (cachedEntry) {
+			return Ok(cachedEntry.value as Data[K]);
+		}
+		return Err(
+			new VariableLookupError(String(lookupKey), `Key "${String(lookupKey)}" is not cached, check if ensure('${String(lookupKey)}') was called first`),
+		);
+	}
+
+	/**
+	 * Read the cached configuration value as a string for the given key. (use {@link ensure} to load/reload the value first)
+	 * @param lookupKey - The key to look up in the configuration schema.
+	 * @returns {string} - The cached string value.
+	 * @throws {VariableLookupError} - If the key is not cached, indicating that {@link ensure} was not called first.
+	 * @template K - The type of the key to look up in the configuration schema.
+	 */
+	public readString<K extends keyof Data>(lookupKey: K): string {
+		return this.readObject(lookupKey).stringValue;
+	}
+
+	/**
+	 * Read the cached configuration value as a string for the given key. (use {@link ensure} to load/reload the value first)
+	 * @param lookupKey - The key to look up in the configuration schema.
+	 * @returns {IResult<string, VariableLookupError>} - The cached string value wrapped in a Result.
+	 * @template K - The type of the key to look up in the configuration schema.
+	 * @returns 
+	 */
+	public readStringResult<K extends keyof Data>(lookupKey: K): IResult<string, VariableLookupError> {
+		const cachedEntry = this.cachedEntries.get(lookupKey);
+		if (cachedEntry) {
+			return Ok(cachedEntry.stringValue);
+		}
+		return Err(
+			new VariableLookupError(String(lookupKey), `Key "${String(lookupKey)}" is not cached, check if ensure('${String(lookupKey)}') was called first`),
+		);
 	}
 
 	/**
