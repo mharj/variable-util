@@ -281,7 +281,6 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 	 * @param lookupKey - The key to look up in the configuration schema.
 	 * @returns {IResult<string, VariableLookupError>} - The cached string value wrapped in a Result.
 	 * @template K - The type of the key to look up in the configuration schema.
-	 * @returns 
 	 */
 	public readStringResult<K extends keyof Data>(lookupKey: K): IResult<string, VariableLookupError> {
 		const cachedEntry = this.cachedEntries.get(lookupKey);
