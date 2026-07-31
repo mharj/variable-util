@@ -95,6 +95,10 @@ export class ConfigMap<Data extends Record<string, unknown>> implements ISetOpti
 			buildOptions(this.options).logger?.info(`ConfigMap key ${String(key)} is undefined (expect to throw error)`);
 			throw new VariableError(undefinedErrorMessage ?? `ConfigMap key ${String(key)} is undefined`);
 		}
+		// if the key is already cached, update the cached value also with the new configObject
+		if (this.cachedEntries.has(key)) {
+			this.cachedEntries.set(key, configObject);
+		}
 		return configObject;
 	}
 

@@ -11,7 +11,17 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**/*.ts", "**/*.mts", "**/*.json", "!**/package.json", "!**/dist", "!azurite-data", ".cspell.json", "!.devcontainer/devcontainer.json"]
+    "includes": [
+      "**/*.ts",
+      "**/*.mts",
+      "**/*.json",
+      "!**/package.json",
+      "!**/dist",
+      "!azurite-data",
+      ".cspell.json",
+      "!.devcontainer/devcontainer.json",
+      "!.pnpm-store"
+    ]
   },
   "formatter": {
     "attributePosition": "auto",
@@ -97,7 +107,7 @@
         "useValidTypeof": "error",
         "useYield": "error"
       },
-      "recommended": true,
+      "preset": "recommended",
       "style": {
         "noCommonJs": "error",
         "noInferrableTypes": "error",
