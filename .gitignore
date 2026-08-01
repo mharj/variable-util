@@ -114,3 +114,9 @@ docs
 
 # pnpm store
 .pnpm-store
+
+# screenshots
+__screenshots__
+
+# vitest attachments
+.vitest-attachments

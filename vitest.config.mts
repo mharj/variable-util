@@ -30,7 +30,7 @@ export default defineConfig({
 					name: 'node',
 				},
 			},
-			// Browser tests only for tachyon-drive-browser
+			// Browser tests only for variable-util-vite
 			{
 				test: {
 					browser: {
@@ -45,6 +45,7 @@ export default defineConfig({
 				},
 			},
 		],
+		reporters: ['minimal', 'github-actions'],
 		typecheck: {include: ['**/*.test-d.ts']},
 	},
 });
