@@ -14,9 +14,7 @@
     "validate": "pnpm -r run validate",
     "docs": "typedoc --options typedoc.json --tsconfig tsconfig.workspace.json"
   },
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": ["packages/*"],
   "keywords": [],
   "author": "",
   "license": "ISC",
