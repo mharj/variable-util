@@ -1,26 +1,29 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
 {
+  "name": "variable-util",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:5-24-trixie",
   "customizations": {
     "vscode": {
-      "extensions": ["biomejs.biome", "esbenp.prettier-vscode", "eamodio.gitlens"]
+      "extensions": [
+        "streetsidesoftware.code-spell-checker",
+        "esbenp.prettier-vscode",
+        "mutantdino.resourcemonitor",
+        "vitest.explorer",
+        "biomejs.biome",
+        "github.vscode-github-actions",
+        "eamodio.gitlens"
+      ]
     }
   },
-
-  // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
     "ghcr.io/devcontainers-extra/features/corepack:1": {},
     "ghcr.io/schlich/devcontainer-features/playwright:0": {}
   },
-  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:4-24-bookworm",
-  "name": "variable-util"
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  // "postCreateCommand": "yarn install",
+  "postCreateCommand": "pnpm i"
 
   // Configure tool-specific properties.
   // "customizations": {},

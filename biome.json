@@ -7,21 +7,11 @@
         "useSortedKeys": "on"
       }
     },
-    "enabled": true
+    "enabled": false
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": [
-      "**/*.ts",
-      "**/*.mts",
-      "**/*.json",
-      "!**/package.json",
-      "!**/dist",
-      "!azurite-data",
-      ".cspell.json",
-      "!.devcontainer/devcontainer.json",
-      "!.pnpm-store"
-    ]
+    "includes": ["**/*.ts", "**/*.mts", "**/*.json", "!**/*-lock.json"]
   },
   "formatter": {
     "attributePosition": "auto",
@@ -42,6 +32,9 @@
     }
   },
   "javascript": {
+    "assist": {
+      "enabled": true
+    },
     "formatter": {
       "arrowParentheses": "always",
       "attributePosition": "auto",
@@ -53,7 +46,11 @@
       "quoteProperties": "asNeeded",
       "quoteStyle": "single",
       "semicolons": "always",
-      "trailingCommas": "all"
+      "trailingCommas": "all",
+      "trailingNewline": true,
+      "delimiterSpacing": false,
+      "lineEnding": "lf",
+      "operatorLinebreak": "before"
     },
     "globals": []
   },
@@ -184,7 +181,7 @@
   ],
   "vcs": {
     "clientKind": "git",
-    "enabled": false,
-    "useIgnoreFile": false
+    "enabled": true,
+    "useIgnoreFile": true
   }
 }
