@@ -2,6 +2,7 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directories:
+      - "/"
       - "/packages/variable-util"
       - "/packages/variable-util-azurekv"
       - "/packages/variable-util-node"
