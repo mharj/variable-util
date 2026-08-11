@@ -1,4 +1,4 @@
-import type {ILoggerLike, ISetOptionalLogger} from '@avanio/logger-like';
+import type {ILoggerLike} from '@luolapeikko/logger-type';
 import {Err, type IErr, type IResult, Ok} from '@luolapeikko/result-option';
 import {type Loadable, LoadableCore} from '@luolapeikko/ts-common';
 import {buildOptions, type ConfigOptions} from './ConfigOptions';
@@ -40,7 +40,7 @@ export type TypeValueRecords<T> = Record<keyof T, LoaderTypeValueStrict<T[keyof 
  * @template Data - type of config map
  * @since v1.1.0
  */
-export class ConfigMap<Data extends Record<string, unknown>> implements ISetOptionalLogger {
+export class ConfigMap<Data extends Record<string, unknown>> {
 	private schema: EnvMapSchema<Data>;
 	private options: ConfigOptions;
 	private cachedEntries = new Map<keyof Data, LoaderTypeValueStrict<Data[keyof Data]>>();

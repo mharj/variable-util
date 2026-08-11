@@ -1,5 +1,5 @@
-import type {ILoggerLike} from '@avanio/logger-like';
 import {ConfigLoader, type LoaderValue, type OverrideKeyMap, VariableLookupError} from '@avanio/variable-util';
+import type {ILoggerLike} from '@luolapeikko/logger-type';
 import type {Loadable} from '@luolapeikko/ts-common';
 import {existsSync} from 'fs';
 import {readFile} from 'fs/promises';

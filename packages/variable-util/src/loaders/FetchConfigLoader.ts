@@ -1,4 +1,4 @@
-import type {ILoggerLike} from '@avanio/logger-like';
+import type {ILoggerLike} from '@luolapeikko/logger-type';
 import type {Loadable} from '@luolapeikko/ts-common';
 import type {OverrideKeyMap} from '../interfaces/IConfigLoader';
 import type {IRequestCache} from '../interfaces/IRequestCache';

@@ -1,4 +1,4 @@
-import type {ILoggerLike} from '@avanio/logger-like';
+import type {ILoggerLike} from '@luolapeikko/logger-type';
 
 /**
  * PartialHiddenValueStringType is the type for partial hidden value string, it can be 'prefix', 'suffix' or 'prefix-suffix'

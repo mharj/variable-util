@@ -1,7 +1,7 @@
 import {ExpireCache, type ExpireCacheLogMapType} from '@avanio/expire-cache';
-import type {ILoggerLike} from '@avanio/logger-like';
 import {ConfigLoader, type IConfigLoaderProps, type LoaderValue, type OverrideKeyMap} from '@avanio/variable-util';
 import type {SecretClient} from '@azure/keyvault-secrets';
+import type {ILoggerLike} from '@luolapeikko/logger-type';
 import type {Loadable} from '@luolapeikko/ts-common';
 
 /**

@@ -8,12 +8,12 @@ importers:
 
   .:
     devDependencies:
-      '@avanio/logger-like':
-        specifier: ^0.2.13
-        version: 0.2.13
       '@biomejs/biome':
         specifier: 2.5.6
         version: 2.5.6
+      '@luolapeikko/logger-type':
+        specifier: ^0.1.0
+        version: 0.1.0
       '@luolapeikko/result-option':
         specifier: ^2.4.0
         version: 2.4.0(core-result@0.0.2)
@@ -77,9 +77,9 @@ importers:
 
   packages/variable-util:
     dependencies:
-      '@avanio/logger-like':
+      '@luolapeikko/logger-type':
         specifier: '>= 0.1.0'
-        version: 0.2.12
+        version: 0.1.0
       '@luolapeikko/result-option':
         specifier: '>= 1.0.0'
         version: 2.2.1
@@ -92,12 +92,12 @@ importers:
       '@avanio/expire-cache':
         specifier: '>= 0.6.5'
         version: 0.6.9(@avanio/logger-like@0.2.12)(@luolapeikko/cache-types@0.0.9)
-      '@avanio/logger-like':
-        specifier: '>= 0.0.1'
-        version: 0.2.12
       '@luolapeikko/cache-types':
         specifier: '>= 0.0.8'
         version: 0.0.9
+      '@luolapeikko/logger-type':
+        specifier: '>= 0.1.0'
+        version: 0.1.0
       '@luolapeikko/ts-common':
         specifier: '>= 1.0.0'
         version: 1.1.4
@@ -111,9 +111,9 @@ importers:
 
   packages/variable-util-node:
     dependencies:
-      '@avanio/logger-like':
-        specifier: '>= 0.0.1'
-        version: 0.2.12
+      '@luolapeikko/logger-type':
+        specifier: '>= 0.1.0'
+        version: 0.1.0
       '@luolapeikko/result-option':
         specifier: '>= 1.0.0'
         version: 2.2.1
@@ -130,9 +130,9 @@ importers:
 
   packages/variable-util-tachyon:
     dependencies:
-      '@avanio/logger-like':
-        specifier: '>= 0.0.1'
-        version: 0.2.12
+      '@luolapeikko/logger-type':
+        specifier: '>= 0.1.0'
+        version: 0.1.0
       zod:
         specifier: '>= 3.0.0'
         version: 4.3.6
@@ -167,9 +167,6 @@ packages:
 
   '@avanio/logger-like@0.2.12':
     resolution: {integrity: sha512-XoIRKMBtYmva8ElpC5ccr6JkD2WBzVMV4qTcdTFPNkCAf524IET2mcm923PwfoLinDwEuty08sSEtcsoq68+Lw==}
-
-  '@avanio/logger-like@0.2.13':
-    resolution: {integrity: sha512-B4SFzAOFwkLh8OgFJlDmb+/iVOe1L5PVnk9AdBMO0VIXo/lEgcA38MS4bBWm1FCnA9DZcetG9/AufT01QJBcnw==}
 
   '@azure-rest/core-client@2.5.1':
     resolution: {integrity: sha512-EHaOXW0RYDKS5CFffnixdyRPak5ytiCtU7uXDcP/uiY+A6jFRwNGzzJBiznkCzvi5EYpY+YWinieqHb0oY916A==}
@@ -500,6 +497,9 @@ packages:
 
   '@luolapeikko/cache-types@0.0.9':
     resolution: {integrity: sha512-MV6kUFsyd5xiE6Bwjd9GXazo4/kCHcvJoMe7nnLPx9jdjKnDE9dhboMOfFMoZfD5Ea5LO8XNZuNo7XMSoDImPQ==}
+
+  '@luolapeikko/logger-type@0.1.0':
+    resolution: {integrity: sha512-wwdFJGg1sdGTamueJkXjBx2ydEdnp6ec4wj31u6+qtcdAw1PL7d20ZU3KtpqkJ6O75xRvceaVv1sdFC98Hk/2A==}
 
   '@luolapeikko/result-option@2.2.1':
     resolution: {integrity: sha512-0QffjTixx4gH+SXaIu0l3xZwcM8GedNbvtXX8gDpDxQoyH2Do0taXth9PnTiKPO6OL/tl3I/aS1UIn9jIdbtQg==}
@@ -1938,8 +1938,6 @@ snapshots:
 
   '@avanio/logger-like@0.2.12': {}
 
-  '@avanio/logger-like@0.2.13': {}
-
   '@azure-rest/core-client@2.5.1':
     dependencies:
       '@azure/abort-controller': 2.1.2
@@ -2238,6 +2236,8 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.5
 
   '@luolapeikko/cache-types@0.0.9': {}
+
+  '@luolapeikko/logger-type@0.1.0': {}
 
   '@luolapeikko/result-option@2.2.1': {}
 

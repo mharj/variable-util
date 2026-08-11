@@ -1,5 +1,5 @@
-import type {ILoggerLike} from '@avanio/logger-like';
 import {applyStringMap, type IConfigLoaderProps, type LoaderValue, MapConfigLoader, type OverrideKeyMap} from '@avanio/variable-util';
+import type {ILoggerLike} from '@luolapeikko/logger-type';
 import type {IStorageDriver} from 'tachyon-drive';
 import type {TachyonConfigStoreType} from './tachyonConfigSerializer';
 

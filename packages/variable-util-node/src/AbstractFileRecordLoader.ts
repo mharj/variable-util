@@ -1,4 +1,3 @@
-import type {ILoggerLike} from '@avanio/logger-like';
 import {
 	applyStringMap,
 	type IConfigLoaderProps,
@@ -8,6 +7,7 @@ import {
 	type ValidateCallback,
 	VariableError,
 } from '@avanio/variable-util';
+import type {ILoggerLike} from '@luolapeikko/logger-type';
 import {Err, type IResult, Ok} from '@luolapeikko/result-option';
 import {ErrorCore, type Loadable} from '@luolapeikko/ts-common';
 import {type FSWatcher, watch} from 'fs';
