@@ -1,7 +1,8 @@
 import type {ExpireCacheLogMapType} from '@avanio/expire-cache';
-import {type ILoggerLike, LogLevel} from '@avanio/logger-like';
+import {LogLevel} from '@avanio/logger-like';
 import {getConfigVariable, setLogger, UrlParser} from '@avanio/variable-util';
 import type {SecretClient} from '@azure/keyvault-secrets';
+import type {ILoggerLike} from '@luolapeikko/logger-type';
 import * as dotenv from 'dotenv';
 import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 import {AzureSecretsConfigLoader} from '../src';

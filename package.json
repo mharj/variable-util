@@ -19,6 +19,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@avanio/logger-like": "^0.2.13",
     "@biomejs/biome": "2.5.6",
     "@luolapeikko/logger-type": "^0.1.0",
     "@luolapeikko/result-option": "^2.4.0",

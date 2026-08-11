@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@avanio/logger-like':
+        specifier: ^0.2.13
+        version: 0.2.13
       '@biomejs/biome':
         specifier: 2.5.6
         version: 2.5.6
@@ -91,7 +94,7 @@ importers:
     dependencies:
       '@avanio/expire-cache':
         specifier: '>= 0.6.5'
-        version: 0.6.9(@avanio/logger-like@0.2.12)(@luolapeikko/cache-types@0.0.9)
+        version: 0.6.9(@avanio/logger-like@0.2.13)(@luolapeikko/cache-types@0.0.9)
       '@luolapeikko/cache-types':
         specifier: '>= 0.0.8'
         version: 0.0.9
@@ -142,7 +145,7 @@ importers:
         version: link:../variable-util
       tachyon-drive:
         specifier: ^2.0.0
-        version: 2.0.0(@avanio/logger-like@0.2.12)(@luolapeikko/result-option@2.4.0(core-result@0.0.2))(@luolapeikko/ts-common@1.1.6)
+        version: 2.0.0(@avanio/logger-like@0.2.13)(@luolapeikko/result-option@2.4.0(core-result@0.0.2))(@luolapeikko/ts-common@1.1.6)
 
   packages/variable-util-vite:
     dependencies:
@@ -165,8 +168,8 @@ packages:
       '@avanio/logger-like': '>= 0.2.10'
       '@luolapeikko/cache-types': '>= 0.0.8'
 
-  '@avanio/logger-like@0.2.12':
-    resolution: {integrity: sha512-XoIRKMBtYmva8ElpC5ccr6JkD2WBzVMV4qTcdTFPNkCAf524IET2mcm923PwfoLinDwEuty08sSEtcsoq68+Lw==}
+  '@avanio/logger-like@0.2.13':
+    resolution: {integrity: sha512-B4SFzAOFwkLh8OgFJlDmb+/iVOe1L5PVnk9AdBMO0VIXo/lEgcA38MS4bBWm1FCnA9DZcetG9/AufT01QJBcnw==}
 
   '@azure-rest/core-client@2.5.1':
     resolution: {integrity: sha512-EHaOXW0RYDKS5CFffnixdyRPak5ytiCtU7uXDcP/uiY+A6jFRwNGzzJBiznkCzvi5EYpY+YWinieqHb0oY916A==}
@@ -1931,12 +1934,12 @@ packages:
 
 snapshots:
 
-  '@avanio/expire-cache@0.6.9(@avanio/logger-like@0.2.12)(@luolapeikko/cache-types@0.0.9)':
+  '@avanio/expire-cache@0.6.9(@avanio/logger-like@0.2.13)(@luolapeikko/cache-types@0.0.9)':
     dependencies:
-      '@avanio/logger-like': 0.2.12
+      '@avanio/logger-like': 0.2.13
       '@luolapeikko/cache-types': 0.0.9
 
-  '@avanio/logger-like@0.2.12': {}
+  '@avanio/logger-like@0.2.13': {}
 
   '@azure-rest/core-client@2.5.1':
     dependencies:
@@ -3167,9 +3170,9 @@ snapshots:
       '@pkgr/core': 0.2.10
     optional: true
 
-  tachyon-drive@2.0.0(@avanio/logger-like@0.2.12)(@luolapeikko/result-option@2.4.0(core-result@0.0.2))(@luolapeikko/ts-common@1.1.6):
+  tachyon-drive@2.0.0(@avanio/logger-like@0.2.13)(@luolapeikko/result-option@2.4.0(core-result@0.0.2))(@luolapeikko/ts-common@1.1.6):
     dependencies:
-      '@avanio/logger-like': 0.2.12
+      '@avanio/logger-like': 0.2.13
       '@luolapeikko/result-option': 2.4.0(core-result@0.0.2)
       '@luolapeikko/ts-common': 1.1.6
 
