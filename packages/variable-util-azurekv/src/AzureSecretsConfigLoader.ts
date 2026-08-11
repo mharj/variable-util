@@ -70,10 +70,10 @@ export class AzureSecretsConfigLoader<OverrideKeys extends OverrideKeyMap> exten
 		try {
 			const options = await this.getOptions();
 			if (options.cacheLogger) {
-				this.valuePromises.logger.setLogger(options.cacheLogger);
+				this.valuePromises.logger.logger = options.cacheLogger;
 			}
 			if (options.cacheLogMapType) {
-				this.valuePromises.logger.setLogMapping(options.cacheLogMapType);
+				this.valuePromises.logger.logMap = options.cacheLogMapType;
 			}
 			if (options.expireMs !== undefined) {
 				this.valuePromises.setExpireMs(options.expireMs);
