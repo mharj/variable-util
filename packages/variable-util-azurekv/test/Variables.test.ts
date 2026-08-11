@@ -1,5 +1,4 @@
 import type {ExpireCacheLogMapType} from '@avanio/expire-cache';
-import {LogLevel} from '@avanio/logger-like';
 import {getConfigVariable, setLogger, UrlParser} from '@avanio/variable-util';
 import type {SecretClient} from '@azure/keyvault-secrets';
 import type {ILoggerLike} from '@luolapeikko/logger-type';
@@ -23,16 +22,16 @@ const debugLogger = {
 } satisfies ILoggerLike;
 
 const cacheLoggin: ExpireCacheLogMapType = {
-	cleanExpired: LogLevel.Debug,
-	clear: LogLevel.Debug,
-	constructor: LogLevel.Debug,
-	delete: LogLevel.Debug,
-	expires: LogLevel.Debug,
-	get: LogLevel.Debug,
-	has: LogLevel.Debug,
-	onExpire: LogLevel.Debug,
-	set: LogLevel.Debug,
-	size: LogLevel.Debug,
+	cleanExpired: 'debug',
+	clear: 'debug',
+	constructor: 'debug',
+	delete: 'debug',
+	expires: 'debug',
+	get: 'debug',
+	has: 'debug',
+	onExpire: 'debug',
+	set: 'debug',
+	size: 'debug',
 };
 
 setLogger(debugLogger);

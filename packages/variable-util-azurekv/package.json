@@ -1,6 +1,6 @@
 {
   "name": "@avanio/variable-util-azurekv",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "azure key vault variables",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -27,10 +27,10 @@
   "license": "MIT",
   "devDependencies": {
     "@avanio/variable-util": "workspace:*",
-    "@azure/keyvault-secrets": "4.10.0"
+    "@azure/keyvault-secrets": "^4.11.2"
   },
   "peerDependencies": {
-    "@avanio/expire-cache": ">= 0.6.5",
+    "@avanio/expire-cache": ">= 0.7.0",
     "@avanio/variable-util": ">= 1.2.1",
     "@azure/keyvault-secrets": ">= 4.0.0",
     "@luolapeikko/cache-types": ">= 0.0.8",
