@@ -1,6 +1,5 @@
 import {ConfigLoader, type LoaderValue, type OverrideKeyMap, VariableLookupError} from '@avanio/variable-util';
 import type {ILoggerLike} from '@luolapeikko/logger-type';
-import type {Loadable} from '@luolapeikko/ts-common';
 import {existsSync} from 'fs';
 import {readFile} from 'fs/promises';
 import * as path from 'path';
@@ -24,6 +23,8 @@ export interface DockerSecretsConfigLoaderOptions {
 	disabled: boolean;
 }
 
+type Opts = Partial<DockerSecretsConfigLoaderOptions>;
+
 /**
  * Loader for docker secrets, reads secrets from the `/run/secrets` directory.
  * @template OverrideMap Type of the override keys
@@ -44,7 +45,7 @@ export class DockerSecretsConfigLoader<OverrideMap extends OverrideKeyMap = Over
 	};
 
 	public constructor(
-		options: Loadable<Partial<DockerSecretsConfigLoaderOptions>>,
+		options: Opts | Promise<Opts> | (() => Opts | Promise<Opts>),
 		overrideKeys?: Partial<OverrideMap>,
 		loaderType: Lowercase<string> = 'docker-secrets',
 	) {

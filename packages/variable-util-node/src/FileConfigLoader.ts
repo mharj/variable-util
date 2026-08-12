@@ -1,6 +1,7 @@
 import type {OverrideKeyMap} from '@avanio/variable-util';
-import {type Loadable, UndefCore} from '@luolapeikko/ts-common';
 import {AbstractFileRecordLoader, type AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
+
+type Opts = Partial<AbstractFileRecordLoaderOptions<'json'>>;
 
 /**
  * A file-based configuration loader that reads a JSON file.
@@ -23,11 +24,7 @@ export class FileConfigLoader<OverrideMap extends OverrideKeyMap = OverrideKeyMa
 		watch: false,
 	};
 
-	public constructor(
-		options: Loadable<Partial<AbstractFileRecordLoaderOptions<'json'>>>,
-		overrideKeys?: Partial<OverrideMap>,
-		type: Lowercase<string> = 'file',
-	) {
+	public constructor(options: Opts | Promise<Opts> | (() => Opts | Promise<Opts>), overrideKeys?: Partial<OverrideMap>, type: Lowercase<string> = 'file') {
 		super(options, overrideKeys);
 		this.loaderType = type;
 	}
@@ -48,7 +45,7 @@ export class FileConfigLoader<OverrideMap extends OverrideKeyMap = OverrideKeyMa
 	 */
 	private convertObjectToStringRecord(data: object): Record<string, string> {
 		return Object.entries(data).reduce<Record<string, string>>((acc, [key, value]) => {
-			if (UndefCore.isNotNullish(value)) {
+			if (value !== null && value !== undefined) {
 				acc[key] = String(value);
 			}
 			return acc;

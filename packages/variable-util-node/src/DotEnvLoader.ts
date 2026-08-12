@@ -1,8 +1,8 @@
 import type {OverrideKeyMap} from '@avanio/variable-util';
-import type {Loadable} from '@luolapeikko/ts-common';
 import {parse} from 'dotenv';
 import {AbstractFileRecordLoader, type AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
 
+type Opts = Partial<AbstractFileRecordLoaderOptions<'env'>>;
 /**
  * Loader for dotenv files, using the `dotenv` packages parser.
  * @template OverrideMap Type of the override keys
@@ -24,11 +24,7 @@ export class DotEnvLoader<OverrideMap extends OverrideKeyMap = OverrideKeyMap> e
 		watch: false,
 	};
 
-	public constructor(
-		options: Loadable<Partial<AbstractFileRecordLoaderOptions<'env'>>>,
-		overrideKeys?: Partial<OverrideMap>,
-		type: Lowercase<string> = 'dotenv',
-	) {
+	public constructor(options: Opts | Promise<Opts> | (() => Opts | Promise<Opts>), overrideKeys?: Partial<OverrideMap>, type: Lowercase<string> = 'dotenv') {
 		super(options, overrideKeys);
 		this.loaderType = type;
 	}

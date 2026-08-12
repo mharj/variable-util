@@ -9,7 +9,6 @@ import {
 } from '@avanio/variable-util';
 import type {ILoggerLike} from '@luolapeikko/logger-type';
 import {Err, type IResult, Ok} from '@luolapeikko/result-option';
-import {ErrorCore, type Loadable} from '@luolapeikko/ts-common';
 import {type FSWatcher, watch} from 'fs';
 import {readFile} from 'fs/promises';
 
@@ -61,7 +60,10 @@ export abstract class AbstractFileRecordLoader<
 	private watcher: FSWatcher | undefined;
 	private timeout: ReturnType<typeof setTimeout> | undefined;
 
-	public constructor(options: Loadable<Partial<Options>>, overrideKeys?: Partial<OverrideMap>) {
+	public constructor(
+		options: Partial<Options> | Promise<Partial<Options>> | (() => Partial<Options> | Promise<Partial<Options>>),
+		overrideKeys?: Partial<OverrideMap>,
+	) {
 		super(options, overrideKeys);
 		this.handleFileChange = this.handleFileChange.bind(this);
 	}
@@ -94,7 +96,8 @@ export abstract class AbstractFileRecordLoader<
 		try {
 			buffer = await readFile(options.fileName);
 		} catch (cause) {
-			return Err(new VariableError(this.buildErrorStr(ErrorCore.from(cause).message), {cause}));
+			const err = cause instanceof Error ? cause : new Error(`Unknown error reading file ${options.fileName}: ${cause}`);
+			return Err(new VariableError(this.buildErrorStr(err.message), {cause}));
 		}
 		try {
 			let data = await this.handleParse(buffer, options);
@@ -141,8 +144,9 @@ export abstract class AbstractFileRecordLoader<
 		try {
 			options.logger?.debug(this.buildErrorStr(`file ${options.fileName} changed`));
 			await this.reload();
-		} catch (err) {
-			options.logger?.error(this.buildErrorStr(`error reloading file ${options.fileName}: ${ErrorCore.from(err).message}`));
+		} catch (cause) {
+			const err = cause instanceof Error ? cause : new Error(`Unknown error reloading file ${options.fileName}: ${cause}`);
+			options.logger?.error(this.buildErrorStr(err.message), cause);
 		}
 	}
 
