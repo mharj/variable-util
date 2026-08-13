@@ -1,6 +1,6 @@
 {
   "name": "@avanio/variable-util-node",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "nodejs env util",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -30,6 +30,7 @@
   },
   "peerDependencies": {
     "@avanio/variable-util": ">= 1.2.1",
+    "@luolapeikko/core-ts-type": ">= 0.0.7",
     "@luolapeikko/result-option": ">= 1.0.0",
     "@luolapeikko/logger-type": ">= 0.1.0",
     "dotenv": ">= 16.0.0"

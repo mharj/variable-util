@@ -7,6 +7,7 @@ import {
 	type ValidateCallback,
 	VariableError,
 } from '@avanio/variable-util';
+import type {Loadable} from '@luolapeikko/core-ts-type';
 import type {ILoggerLike} from '@luolapeikko/logger-type';
 import {Err, type IResult, Ok} from '@luolapeikko/result-option';
 import {type FSWatcher, watch} from 'fs';
@@ -60,10 +61,7 @@ export abstract class AbstractFileRecordLoader<
 	private watcher: FSWatcher | undefined;
 	private timeout: ReturnType<typeof setTimeout> | undefined;
 
-	public constructor(
-		options: Partial<Options> | Promise<Partial<Options>> | (() => Partial<Options> | Promise<Partial<Options>>),
-		overrideKeys?: Partial<OverrideMap>,
-	) {
+	public constructor(options: Loadable<Partial<Options>>, overrideKeys?: Partial<OverrideMap>) {
 		super(options, overrideKeys);
 		this.handleFileChange = this.handleFileChange.bind(this);
 	}

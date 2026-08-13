@@ -1,7 +1,6 @@
 import type {OverrideKeyMap} from '@avanio/variable-util';
+import type {Loadable} from '@luolapeikko/core-ts-type';
 import {AbstractFileRecordLoader, type AbstractFileRecordLoaderOptions} from './AbstractFileRecordLoader';
-
-type Opts = Partial<AbstractFileRecordLoaderOptions<'json'>>;
 
 /**
  * A file-based configuration loader that reads a JSON file.
@@ -24,7 +23,7 @@ export class FileConfigLoader<OverrideMap extends OverrideKeyMap = OverrideKeyMa
 		watch: false,
 	};
 
-	public constructor(options: Opts | Promise<Opts> | (() => Opts | Promise<Opts>), overrideKeys?: Partial<OverrideMap>, type: Lowercase<string> = 'file') {
+	public constructor(options: Loadable<Partial<AbstractFileRecordLoaderOptions<'json'>>>, overrideKeys?: Partial<OverrideMap>, type: Lowercase<string> = 'file') {
 		super(options, overrideKeys);
 		this.loaderType = type;
 	}

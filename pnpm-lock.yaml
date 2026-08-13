@@ -111,6 +111,9 @@ importers:
 
   packages/variable-util-node:
     dependencies:
+      '@luolapeikko/core-ts-type':
+        specifier: '>= 0.0.7'
+        version: 0.0.7
       '@luolapeikko/logger-type':
         specifier: '>= 0.1.0'
         version: 0.1.0
