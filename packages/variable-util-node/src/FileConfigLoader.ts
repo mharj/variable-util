@@ -23,7 +23,11 @@ export class FileConfigLoader<OverrideMap extends OverrideKeyMap = OverrideKeyMa
 		watch: false,
 	};
 
-	public constructor(options: Loadable<Partial<AbstractFileRecordLoaderOptions<'json'>>>, overrideKeys?: Partial<OverrideMap>, type: Lowercase<string> = 'file') {
+	public constructor(
+		options: Loadable<Partial<AbstractFileRecordLoaderOptions<'json'>>>,
+		overrideKeys?: Partial<OverrideMap>,
+		type: Lowercase<string> = 'file',
+	) {
 		super(options, overrideKeys);
 		this.loaderType = type;
 	}

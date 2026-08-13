@@ -8,9 +8,9 @@
   "scripts": {
     "build": "pnpm -r run build",
     "pretest": "pnpm -r run build",
+    "test": "vitest run --typecheck --coverage --no-file-parallelism",
     "lint": "biome check",
     "lint:fix": "biome check --write",
-    "test": "vitest run --typecheck --coverage --no-file-parallelism",
     "validate": "pnpm -r run validate",
     "docs": "typedoc --options typedoc.json --tsconfig tsconfig.workspace.json"
   },
