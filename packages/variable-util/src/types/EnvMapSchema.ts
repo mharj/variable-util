@@ -1,4 +1,4 @@
-import type {Loadable} from '@luolapeikko/ts-common';
+import type {Loadable} from '@luolapeikko/core-ts-type';
 import type {IConfigParser} from '../interfaces/IConfigParser';
 import type {FormatParameters} from '../lib/formatUtils';
 

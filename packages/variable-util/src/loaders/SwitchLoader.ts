@@ -1,5 +1,5 @@
+import type {Loadable} from '@luolapeikko/core-ts-type';
 import type {ILoggerLike} from '@luolapeikko/logger-type';
-import type {Loadable} from '@luolapeikko/ts-common';
 import {ConfigLoader, type IConfigLoaderProps, type LoaderValue} from './ConfigLoader';
 
 /**

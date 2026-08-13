@@ -1,6 +1,6 @@
+import type {Loadable} from '@luolapeikko/core-ts-type';
 import type {ILoggerLike} from '@luolapeikko/logger-type';
 import {Err, type IErr, type IResult, Ok} from '@luolapeikko/result-option';
-import {type Loadable, LoadableCore} from '@luolapeikko/ts-common';
 import {buildOptions, type ConfigOptions} from './ConfigOptions';
 import {getConfigObject} from './getConfigObject';
 import type {IConfigLoader} from './interfaces';
@@ -87,7 +87,7 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 			throw new VariableLookupError(key, `ConfigMap key ${String(key)} not found in config map`);
 		}
 		const {parser, defaultValue, params, undefinedThrowsError, undefinedErrorMessage} = entry;
-		const loaders = Array.from(await LoadableCore.resolve(this.loaders));
+		const loaders = Array.from(await (typeof this.loaders === 'function' ? this.loaders() : this.loaders));
 		const configObject = (await getConfigObject<Data[Key]>(key, loaders, parser, defaultValue, params, this.options, encodeOptions)) as LoaderTypeValueStrict<
 			Data[Key]
 		>;

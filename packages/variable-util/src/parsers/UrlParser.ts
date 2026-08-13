@@ -1,4 +1,3 @@
-import {ErrorCore} from '@luolapeikko/ts-common';
 import type {IConfigParser, ParserProps} from '../interfaces/IConfigParser';
 
 /**
@@ -32,11 +31,7 @@ export class UrlParser implements IConfigParser<URL, URL> {
 	}
 
 	public parse({value}: ParserProps): URL {
-		try {
-			return new URL(value);
-		} catch (err) {
-			throw ErrorCore.from(err);
-		}
+		return new URL(value);
 	}
 
 	public toString(value: URL): string {

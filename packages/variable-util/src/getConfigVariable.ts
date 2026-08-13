@@ -1,4 +1,4 @@
-import type {Loadable} from '@luolapeikko/ts-common';
+import type {Loadable} from '@luolapeikko/core-ts-type';
 import type {ConfigOptions} from './ConfigOptions';
 import {getConfigObject} from './getConfigObject';
 import type {EncodeOptions, IConfigLoader, IConfigParser} from './interfaces';

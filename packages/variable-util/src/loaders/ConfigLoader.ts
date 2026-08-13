@@ -1,4 +1,4 @@
-import {type Loadable, LoadableCore} from '@luolapeikko/ts-common';
+import type {Loadable} from '@luolapeikko/core-ts-type';
 import {EventEmitter} from 'events';
 import type {IConfigLoader, LoaderValueResult, OverrideKeyMap} from '../interfaces';
 import {handleSeen} from '../lib';
@@ -43,13 +43,13 @@ export abstract class ConfigLoader<Props extends IConfigLoaderProps, OverrideMap
 {
 	public abstract loaderType: Lowercase<string>;
 	protected abstract defaultOptions: Props;
-	protected options: Loadable<Partial<Props>>;
+	protected options: Loadable<Partial<Props>> | Props;
 	protected overrideKeys: Partial<OverrideMap>;
 	protected valueSeen: Map<string, string> = new Map<string, string>();
 
-	public constructor(props: Loadable<Partial<Props>> = {}, overrideKeys: Partial<OverrideMap> = {}) {
+	public constructor(props?: Loadable<Partial<Props>>, overrideKeys: Partial<OverrideMap> = {}) {
 		super();
-		this.options = props;
+		this.options = props ?? ({} as Loadable<Partial<Props>>);
 		this.overrideKeys = overrideKeys;
 	}
 
@@ -67,7 +67,7 @@ export abstract class ConfigLoader<Props extends IConfigLoaderProps, OverrideMap
 
 	public async isLoaderDisabled(): Promise<boolean> {
 		const loadableDisabled = (await this.getOptions()).disabled ?? false;
-		return LoadableCore.resolve(loadableDisabled);
+		return typeof loadableDisabled === 'function' ? loadableDisabled() : loadableDisabled;
 	}
 
 	public setDisabled(disabled: Loadable<boolean>): void {

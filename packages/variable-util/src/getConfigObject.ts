@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/await-thenable */
-import {type Loadable, LoadableCore} from '@luolapeikko/ts-common';
+import type {Loadable} from '@luolapeikko/core-ts-type';
 import {buildOptions, type ConfigOptions} from './ConfigOptions';
 import type {EncodeOptions, IConfigLoader, IConfigParser} from './interfaces';
 import type {FormatParameters} from './lib/formatUtils';
@@ -74,7 +73,7 @@ export async function getConfigObject<Output>(
 	 */
 	if (defaultValueLoadable !== undefined) {
 		try {
-			defaultValue = (await LoadableCore.resolve(defaultValueLoadable)) as Output;
+			defaultValue = await (typeof defaultValueLoadable === 'function' ? defaultValueLoadable() : defaultValueLoadable);
 			type = 'default';
 		} catch (err) {
 			currentOptions.logger?.error(err);

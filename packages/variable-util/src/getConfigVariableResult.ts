@@ -1,5 +1,5 @@
+import type {Loadable} from '@luolapeikko/core-ts-type';
 import {Err, type IResult, Ok} from '@luolapeikko/result-option';
-import type {Loadable} from '@luolapeikko/ts-common';
 import type {ConfigOptions} from './ConfigOptions';
 import {getConfigVariable} from './getConfigVariable';
 import type {IConfigLoader, IConfigParser} from './interfaces';
