@@ -1,6 +1,6 @@
 {
   "name": "@avanio/variable-util",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Utility to get variables from multiple resources",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/mharj/variable-util#readme",
   "peerDependencies": {
-    "@luolapeikko/core-ts-type": ">= 0.0.7",
+    "@luolapeikko/core-ts-type": ">= 0.0.8",
     "@luolapeikko/result-option": ">= 1.0.0",
     "@luolapeikko/logger-type": ">= 0.1.0"
   }

@@ -1,4 +1,4 @@
-import type {ILoggerLike} from '@avanio/logger-like';
+import type {ILoggerLike} from '@luolapeikko/logger-type';
 import * as dotenv from 'dotenv';
 import etag from 'etag';
 import {URL} from 'url';
@@ -105,7 +105,7 @@ let fetchRequestData: Request | undefined;
 let isFetchDisabled = false;
 const fetchLoaderOptions = {
 	cache: reqCacheSetup,
-	disabled: (): boolean => isFetchDisabled,
+	disabled: () => isFetchDisabled,
 	fetchClient: mockFetch,
 	logger: spyLogger,
 	validate: fetchValidate,

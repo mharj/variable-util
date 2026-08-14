@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
     "composite": true,
-    "outDir": "dist",
-    "rootDir": "src"
+    "outDir": "dist"
   },
   "extends": "../../tsconfig.base.json",
-  "include": ["src"],
+  "include": ["src", "test"],
   "references": [{ "path": "../variable-util" }]
 }

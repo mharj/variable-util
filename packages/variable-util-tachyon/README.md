@@ -13,7 +13,7 @@
 To install the necessary dependencies, run:
 
 ```sh
-npm install @avanio/variable-util-tachyon @avanio/variable-util @avanio/logger-like tachyon-drive
+npm install @avanio/variable-util-tachyon @avanio/variable-util @luolapeikko/logger-type tachyon-drive
 ```
 
 ### Example

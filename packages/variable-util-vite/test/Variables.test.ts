@@ -1,5 +1,5 @@
-import type {ILoggerLike} from '@avanio/logger-like';
 import {ConfigMap, clearDefaultValueSeenMap, setLogger, stringParser} from '@avanio/variable-util';
+import type {ILoggerLike} from '@luolapeikko/logger-type';
 import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 import {ViteEnvConfigLoader} from '../src/index.js';
 
@@ -20,7 +20,7 @@ type TestConfig = {
 	_NOT_EXISTS: string | undefined;
 };
 
-export const testConfig = new ConfigMap<TestConfig>(
+export const testConfig: ConfigMap<TestConfig> = new ConfigMap<TestConfig>(
 	{
 		_NOT_EXISTS: {params: {showValue: true}, parser: stringParser()},
 		TEST: {params: {showValue: true}, parser: stringParser()},

@@ -1,3 +1,4 @@
+import type {ILoggerLike} from '@luolapeikko/logger-type';
 import type {IResult} from '@luolapeikko/result-option';
 import * as dotenv from 'dotenv';
 import {URL} from 'url';
@@ -31,7 +32,7 @@ const errorSpy = vi.fn();
 const warnSpy = vi.fn();
 const traceSpy = vi.fn();
 
-export const spyLogger = {
+export const spyLogger: ILoggerLike = {
 	debug: debugSpy,
 	error: errorSpy,
 	info: infoSpy,

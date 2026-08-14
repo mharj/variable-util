@@ -22,7 +22,6 @@
     "@biomejs/biome": "2.5.8",
     "@luolapeikko/logger-type": "^0.1.0",
     "@luolapeikko/result-option": "^2.4.0",
-    "@luolapeikko/ts-common": "^1.1.6",
     "@playwright/test": "^1.62.1",
     "@types/etag": "^1.8.4",
     "@types/node": "^25.9.5",

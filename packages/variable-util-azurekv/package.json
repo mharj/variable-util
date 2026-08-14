@@ -1,6 +1,6 @@
 {
   "name": "@avanio/variable-util-azurekv",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "azure key vault variables",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -34,7 +34,7 @@
     "@avanio/variable-util": ">= 1.2.1",
     "@azure/keyvault-secrets": ">= 4.0.0",
     "@luolapeikko/cache-types": ">= 0.0.8",
-    "@luolapeikko/logger-type": ">= 0.1.0",
-    "@luolapeikko/ts-common": ">= 1.0.0"
+    "@luolapeikko/core-ts-type": ">= 0.0.8",
+    "@luolapeikko/logger-type": ">= 0.1.0"
   }
 }

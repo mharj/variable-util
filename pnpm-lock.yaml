@@ -17,9 +17,6 @@ importers:
       '@luolapeikko/result-option':
         specifier: ^2.4.0
         version: 2.4.0(core-result@0.0.2)
-      '@luolapeikko/ts-common':
-        specifier: ^1.1.6
-        version: 1.1.6
       '@playwright/test':
         specifier: ^1.62.1
         version: 1.62.1
@@ -78,8 +75,8 @@ importers:
   packages/variable-util:
     dependencies:
       '@luolapeikko/core-ts-type':
-        specifier: '>= 0.0.7'
-        version: 0.0.7
+        specifier: '>= 0.0.8'
+        version: 0.0.8
       '@luolapeikko/logger-type':
         specifier: '>= 0.1.0'
         version: 0.1.0
@@ -95,12 +92,12 @@ importers:
       '@luolapeikko/cache-types':
         specifier: '>= 0.0.8'
         version: 0.0.9
+      '@luolapeikko/core-ts-type':
+        specifier: '>= 0.0.8'
+        version: 0.0.8
       '@luolapeikko/logger-type':
         specifier: '>= 0.1.0'
         version: 0.1.0
-      '@luolapeikko/ts-common':
-        specifier: '>= 1.0.0'
-        version: 1.1.4
     devDependencies:
       '@avanio/variable-util':
         specifier: workspace:*
@@ -112,8 +109,8 @@ importers:
   packages/variable-util-node:
     dependencies:
       '@luolapeikko/core-ts-type':
-        specifier: '>= 0.0.7'
-        version: 0.0.7
+        specifier: '>= 0.0.8'
+        version: 0.0.8
       '@luolapeikko/logger-type':
         specifier: '>= 0.1.0'
         version: 0.1.0
@@ -141,8 +138,8 @@ importers:
         specifier: workspace:*
         version: link:../variable-util
       tachyon-drive:
-        specifier: ^2.0.0
-        version: 2.0.0(@avanio/logger-like@0.2.13)(@luolapeikko/result-option@2.4.0(core-result@0.0.2))(@luolapeikko/ts-common@1.1.6)
+        specifier: ^2.1.0
+        version: 2.1.0(@luolapeikko/core-ts-type@0.0.8)(@luolapeikko/key-logger@0.1.0(@luolapeikko/logger-type@0.1.0)(@luolapeikko/loglevel-type@0.1.0))(@luolapeikko/logger-type@0.1.0)(@luolapeikko/result-option@2.4.0(core-result@0.0.2))
 
   packages/variable-util-vite:
     dependencies:
@@ -166,9 +163,6 @@ packages:
       '@luolapeikko/key-logger': '>= 0.1.0'
       '@luolapeikko/logger-type': '>= 0.1.0'
       '@luolapeikko/loglevel-type': '>= 0.1.0'
-
-  '@avanio/logger-like@0.2.13':
-    resolution: {integrity: sha512-B4SFzAOFwkLh8OgFJlDmb+/iVOe1L5PVnk9AdBMO0VIXo/lEgcA38MS4bBWm1FCnA9DZcetG9/AufT01QJBcnw==}
 
   '@azure-rest/core-client@2.5.1':
     resolution: {integrity: sha512-EHaOXW0RYDKS5CFffnixdyRPak5ytiCtU7uXDcP/uiY+A6jFRwNGzzJBiznkCzvi5EYpY+YWinieqHb0oY916A==}
@@ -480,8 +474,8 @@ packages:
   '@luolapeikko/cache-types@0.0.9':
     resolution: {integrity: sha512-MV6kUFsyd5xiE6Bwjd9GXazo4/kCHcvJoMe7nnLPx9jdjKnDE9dhboMOfFMoZfD5Ea5LO8XNZuNo7XMSoDImPQ==}
 
-  '@luolapeikko/core-ts-type@0.0.7':
-    resolution: {integrity: sha512-wLu4FV9+n9yhx0yyzlNB/sAynB+VC1pmwbLvjCuGoNhgnUWbI2lkZdiKV7TisL2oPBZHF9YDPk4vhTQ8sWFybg==}
+  '@luolapeikko/core-ts-type@0.0.8':
+    resolution: {integrity: sha512-90hvq428H+UNKXl97YfPlNq6544aE+G1ImLS69SaMuD1+n4ntWXcsCtbPygWvKTGx1IAMAALvwBPjEc4sCzSyg==}
 
   '@luolapeikko/key-logger@0.1.0':
     resolution: {integrity: sha512-xGULpOsO40CIdzIwWUYJW7yKJNBaez105NPHEfcyUkQJLBfpOFKroWpIsrk+ZIKQR5VVv6DCMaFDDGPkMbfIjQ==}
@@ -502,12 +496,6 @@ packages:
     resolution: {integrity: sha512-Z+Eug2E0aRgYcpkmGpTWQQwbWcRUVubkVQonwOA72+mQY+UBSh4U4OU7/Rt/p/FWwHrFlUPp/hmxMXYVebxd8w==}
     peerDependencies:
       core-result: ^0.0.2
-
-  '@luolapeikko/ts-common@1.1.4':
-    resolution: {integrity: sha512-3qawazIvTudj98kAQP8dYqPhjq1dVY9P0gDKwkU7YQ7ptMRgFdYzaOVjshALoBvPDkjP51WNJyRTv2hXQG6DgA==}
-
-  '@luolapeikko/ts-common@1.1.6':
-    resolution: {integrity: sha512-+l6XcEYv/Ziw4k2uElp1jMwHX6CVmyfrlNGbJtu9bX4CCyNh3fnSgQzxzcAoJ+g/X/ssVOAyGoIjtaVJeYEQ2g==}
 
   '@napi-rs/wasm-runtime@1.2.2':
     resolution: {integrity: sha512-JfB4kuJQjaoHuCTseIINHtHWeJnvgEcxjwA5t/Y00ZgaOO1Crz3fjT/p8kT28zA/Caz7oiUMn3d6H2yOVCVwuw==}
@@ -1615,12 +1603,13 @@ packages:
     resolution: {integrity: sha512-Bh7QjT8/SuKUIfObSXNHNSK6WHo6J1tHCqJsuaFDP7gP0fkzSfTxI8y85JrppZ0h8l0maIgc2tfuZQ6/t3GtnQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
-  tachyon-drive@2.0.0:
-    resolution: {integrity: sha512-lZlYCIdQKzvxe1c2tTjSkMTK7A77BFNkSEenH115KsrsZ5PWj74yIUoijAuJEPCgKwRPdkPm8tnnJCL10bNVHA==}
+  tachyon-drive@2.1.0:
+    resolution: {integrity: sha512-8lai7wkjyPvW7ae36u/APBci+eHMDPnbiU4+6N4FXzzEiKChG2kGHvSuVm86YuFVOR+NiQTZJX2fP7thR9AbPw==}
     peerDependencies:
-      '@avanio/logger-like': '>= 0.2.10'
+      '@luolapeikko/core-ts-type': '>= 0.0.7'
+      '@luolapeikko/key-logger': '>= 0.1.0'
+      '@luolapeikko/logger-type': '>= 0.1.0'
       '@luolapeikko/result-option': '>= 1.0.0'
-      '@luolapeikko/ts-common': '>= 0.1.0'
 
   test-exclude@8.0.0:
     resolution: {integrity: sha512-ZOffsNrXYggvU1mDGHk54I96r26P8SyMjO5slMKSc7+IWmtB/MQKnEC2fP51imB3/pT6YK5cT5E8f+Dd9KdyOQ==}
@@ -1938,8 +1927,6 @@ snapshots:
       '@luolapeikko/logger-type': 0.1.0
       '@luolapeikko/loglevel-type': 0.1.0
 
-  '@avanio/logger-like@0.2.13': {}
-
   '@azure-rest/core-client@2.5.1':
     dependencies:
       '@azure/abort-controller': 2.1.2
@@ -2203,7 +2190,7 @@ snapshots:
 
   '@luolapeikko/cache-types@0.0.9': {}
 
-  '@luolapeikko/core-ts-type@0.0.7': {}
+  '@luolapeikko/core-ts-type@0.0.8': {}
 
   '@luolapeikko/key-logger@0.1.0(@luolapeikko/logger-type@0.1.0)(@luolapeikko/loglevel-type@0.1.0)':
     dependencies:
@@ -2219,10 +2206,6 @@ snapshots:
   '@luolapeikko/result-option@2.4.0(core-result@0.0.2)':
     dependencies:
       core-result: 0.0.2
-
-  '@luolapeikko/ts-common@1.1.4': {}
-
-  '@luolapeikko/ts-common@1.1.6': {}
 
   '@napi-rs/wasm-runtime@1.2.2(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
@@ -3133,11 +3116,12 @@ snapshots:
       '@pkgr/core': 0.2.10
     optional: true
 
-  tachyon-drive@2.0.0(@avanio/logger-like@0.2.13)(@luolapeikko/result-option@2.4.0(core-result@0.0.2))(@luolapeikko/ts-common@1.1.6):
+  tachyon-drive@2.1.0(@luolapeikko/core-ts-type@0.0.8)(@luolapeikko/key-logger@0.1.0(@luolapeikko/logger-type@0.1.0)(@luolapeikko/loglevel-type@0.1.0))(@luolapeikko/logger-type@0.1.0)(@luolapeikko/result-option@2.4.0(core-result@0.0.2)):
     dependencies:
-      '@avanio/logger-like': 0.2.13
+      '@luolapeikko/core-ts-type': 0.0.8
+      '@luolapeikko/key-logger': 0.1.0(@luolapeikko/logger-type@0.1.0)(@luolapeikko/loglevel-type@0.1.0)
+      '@luolapeikko/logger-type': 0.1.0
       '@luolapeikko/result-option': 2.4.0(core-result@0.0.2)
-      '@luolapeikko/ts-common': 1.1.6
 
   test-exclude@8.0.0:
     dependencies:

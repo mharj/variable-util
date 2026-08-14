@@ -5,15 +5,23 @@ import {SemicolonConfigParser} from '../../src/parsers/SemicolonConfigParser';
  * transform string 'true' | 'false' as boolean
  * @since v1.0.0
  */
-export const booleanParamSchema = z.enum(['true', 'false']).transform((value) => value === 'true');
+export const booleanParamSchema: z.ZodType<boolean> = z.enum(['true', 'false']).transform((value) => value === 'true');
 
-export const testObjectFinalSchema = z.object({
+export const testObjectFinalSchema: z.ZodType<{
+	First: boolean;
+	Second: boolean;
+	Third: boolean;
+}> = z.object({
 	First: z.boolean(),
 	Second: z.boolean(),
 	Third: z.boolean(),
 });
 
-const testObjectSchema = z.object({
+const testObjectSchema: z.ZodType<{
+	First: boolean;
+	Second: boolean;
+	Third: boolean;
+}> = z.object({
 	First: booleanParamSchema.optional().default(false),
 	Second: booleanParamSchema.optional().default(false),
 	Third: booleanParamSchema.optional().default(false),
@@ -21,6 +29,10 @@ const testObjectSchema = z.object({
 
 export type TestObjectType = z.infer<typeof testObjectSchema>;
 
-export const testObjectParser = new SemicolonConfigParser({
+export const testObjectParser: SemicolonConfigParser<{
+	First: boolean;
+	Second: boolean;
+	Third: boolean;
+}> = new SemicolonConfigParser({
 	validate: (data) => testObjectSchema.parseAsync(data),
 });

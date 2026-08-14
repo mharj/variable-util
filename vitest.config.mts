@@ -3,7 +3,7 @@ import {defineConfig} from 'vitest/config';
 
 export default defineConfig({
 	optimizeDeps: {
-		include: ['@avanio/logger-like', '@luolapeikko/result-option', '@luolapeikko/ts-common', 'events', 'zod'],
+		include: ['@luolapeikko/logger-type', '@luolapeikko/result-option', '@luolapeikko/core-ts-type', 'events', 'zod'],
 	},
 	plugins: [],
 	resolve: {

@@ -9,8 +9,8 @@
     "@luolapeikko/result-option": {
       "IResult": "https://luolapeikko.github.io/result-option/types/IResult.html"
     },
-    "@luolapeikko/ts-common": {
-      "Loadable": "https://luolapeikko.github.io/ts-common/types/Loadable.html"
+    "@luolapeikko/core-ts-type": {
+      "Loadable": "https://luolapeikko.github.io/core-ts/types/_luolapeikko_core-ts-type.Loadable.html"
     },
     "core-ts-root": {
       "undefined": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined"

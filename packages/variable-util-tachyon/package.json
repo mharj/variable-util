@@ -1,6 +1,6 @@
 {
   "name": "@avanio/variable-util-tachyon",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "tachyon store for variables",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -28,12 +28,12 @@
   "keywords": ["tachyon", "storage", "env", "variable", "util"],
   "devDependencies": {
     "@avanio/variable-util": "workspace:*",
-    "tachyon-drive": "^2.0.0"
+    "tachyon-drive": "^2.1.0"
   },
   "peerDependencies": {
     "@avanio/variable-util": ">= 1.2.1",
     "@luolapeikko/logger-type": ">= 0.1.0",
-    "tachyon-drive": ">= 2.0.0",
+    "tachyon-drive": ">= 2.1.0",
     "zod": ">= 3.0.0"
   }
 }

@@ -24,7 +24,11 @@ export class DotEnvLoader<OverrideMap extends OverrideKeyMap = OverrideKeyMap> e
 		watch: false,
 	};
 
-	public constructor(options: Loadable<AbstractFileRecordLoaderOptions<'env'>>, overrideKeys?: Partial<OverrideMap>, type: Lowercase<string> = 'dotenv') {
+	public constructor(
+		options: Loadable<Partial<AbstractFileRecordLoaderOptions<'env'>>>,
+		overrideKeys?: Partial<OverrideMap>,
+		type: Lowercase<string> = 'dotenv',
+	) {
 		super(options, overrideKeys);
 		this.loaderType = type;
 	}

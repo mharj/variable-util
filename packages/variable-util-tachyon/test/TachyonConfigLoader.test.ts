@@ -1,5 +1,5 @@
-import type {ILoggerLike} from '@avanio/logger-like';
 import {getConfigObjectResult, stringParser} from '@avanio/variable-util';
+import type {ILoggerLike} from '@luolapeikko/logger-type';
 import {type IStorageDriver, MemoryStorageDriver} from 'tachyon-drive';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {

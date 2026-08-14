@@ -1,5 +1,5 @@
-import type {ILoggerLike} from '@avanio/logger-like';
 import {booleanParser, ConfigMap, getConfigVariable, integerParser, setLogger, stringParser, type ValidateCallback} from '@avanio/variable-util';
+import type {ILoggerLike} from '@luolapeikko/logger-type';
 import * as fs from 'fs';
 import * as path from 'path';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
