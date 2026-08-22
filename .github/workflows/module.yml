@@ -21,7 +21,7 @@ jobs:
       - uses: luolapeikko/github-actions/read-package-info@v0
         with:
           working-directory: ${{ inputs.package-path }}
-      - uses: pnpm/action-setup@9b5745cdf0a2e8c2620f0746130f809adb911c19 # v4
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v4
       - uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
