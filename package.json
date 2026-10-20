@@ -14,7 +14,9 @@
     "validate": "pnpm -r run validate",
     "docs": "typedoc --options typedoc.json --tsconfig tsconfig.workspace.json"
   },
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -34,7 +36,7 @@
     "prettier": "^3.9.10",
     "tsdown": "^0.23.1",
     "typedoc": "^0.28.20",
-    "typedoc-plugin-dt-links": "^2.0.76",
+    "typedoc-plugin-dt-links": "^2.0.77",
     "typedoc-plugin-mdn-links": "^5.1.1",
     "typescript": "^6.0.3",
     "vite": "^8.3.4",

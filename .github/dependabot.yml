@@ -3,15 +3,19 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     groups:
-      weekly-batch:
+      actions-batch:
         patterns:
           - "*"
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    groups:
+      devcontainers-batch:
+        patterns:
+          - "*"
   - package-ecosystem: "npm"
     directories:
       - "/"
@@ -21,7 +25,7 @@ updates:
       - "/packages/variable-util-tachyon"
       - "/packages/variable-util-vite"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     groups:
       dev-dependencies:
         dependency-type: "development"
