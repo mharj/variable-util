@@ -34,7 +34,7 @@
     "etag": "^1.8.1",
     "events": "^3.3.0",
     "prettier": "^3.9.10",
-    "tsdown": "^0.23.3",
+    "tsdown": "^0.23.4",
     "typedoc": "^0.28.20",
     "typedoc-plugin-dt-links": "^2.0.78",
     "typedoc-plugin-mdn-links": "^5.1.1",
