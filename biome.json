@@ -11,7 +11,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**/*.ts", "**/*.mts", "**/*.json", "!**/*-lock.json"]
+    "includes": ["**/*.ts", "**/*.mts", "**/*.json", "!**/*-lock.json", "**/package.json"]
   },
   "formatter": {
     "attributePosition": "auto",
