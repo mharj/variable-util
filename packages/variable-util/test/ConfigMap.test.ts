@@ -401,4 +401,10 @@ describe('ConfigMap', () => {
 			expect(readObjectResult.ok()).to.be.eq(undefined);
 		});
 	});
+	describe('has', () => {
+		it('should return true if key exists in schema', function () {
+			expect(config.has('PORT')).to.be.eq(true);
+			expect(config.has('RANDOM_VALUE')).to.be.eq(false);
+		});
+	});
 });

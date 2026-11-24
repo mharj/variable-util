@@ -62,6 +62,15 @@ export class ConfigMap<Data extends Record<string, unknown>> {
 	}
 
 	/**
+	 * Check if the config map has the specified key
+	 * @param key - key to check in the config map
+	 * @returns true if the key exists in the config map, false otherwise
+	 */
+	public has(key: string): key is Extract<keyof Data, string> {
+		return Object.hasOwn(this.schema, key);
+	}
+
+	/**
 	 * Set logger value
 	 * @param {ILoggerLike | undefined} logger - logger like object
 	 */
